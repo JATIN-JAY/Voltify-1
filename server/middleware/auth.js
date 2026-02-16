@@ -26,7 +26,9 @@ export const checkAdmin = async (req, res, next) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    if (!user.isAdmin) {
+    const adminEmail = process.env.ADMIN_EMAIL && process.env.ADMIN_EMAIL.toLowerCase();
+    const isAdminEmail = adminEmail && user.email.toLowerCase() === adminEmail;
+    if (!user.isAdmin && !isAdminEmail) {
       return res.status(403).json({ message: 'Access denied. Admin only.' });
     }
 

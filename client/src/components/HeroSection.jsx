@@ -260,16 +260,16 @@ export default function HeroSection() {
       />
 
       {/* HERO CONTENT */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 py-24 text-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 py-12 sm:py-16 text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, type: "spring", stiffness: 80 }}
         >
-          <h1 className="text-5xl sm:text-7xl font-bold text-gray-900 leading-tight">
-            <div>Premium Mobile Phones</div>
-            <span className="block bg-gradient-to-r from-blue-600 via-cyan-600 to-indigo-600 bg-clip-text text-transparent mt-2">
-              & Accessories
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+            <div>Top-Tier Smartphones</div>
+            <span className="block bg-gradient-to-r from-blue-600 via-cyan-600 to-indigo-600 bg-clip-text text-transparent mt-1">
+              & Essentials
             </span>
           </h1>
         </motion.div>
@@ -278,21 +278,21 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2, type: "spring", stiffness: 80 }}
-          className="mt-6 text-xl text-gray-600 max-w-2xl mx-auto"
+          className="mt-4 text-base sm:text-lg text-gray-600 max-w-2xl mx-auto"
         >
-          Discover cutting-edge smartphones, tablets, earbuds, and premium accessories from top brands.
+          Explore cutting-edge devices and high-quality accessories from trusted global brands.
         </motion.p>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4, type: "spring", stiffness: 80 }}
-          className="mt-10 flex flex-col sm:flex-row justify-center gap-6"
+          className="mt-6 flex flex-col sm:flex-row justify-center gap-4"
         >
           {!user && (
             <Link
               to="/register"
-              className="px-10 py-4 rounded-full text-white font-semibold 
+              className="px-8 py-3 rounded-full text-white font-semibold 
               bg-gradient-to-r from-blue-600 to-cyan-600 
               hover:scale-105 hover:shadow-xl transition-all duration-300"
             >
@@ -302,7 +302,7 @@ export default function HeroSection() {
 
           <Link
             to="/"
-            className="px-10 py-4 rounded-full text-white font-semibold 
+            className="px-8 py-3 rounded-full text-white font-semibold 
             bg-gradient-to-r from-blue-600 to-cyan-600 
             hover:scale-105 hover:shadow-xl transition-all duration-300"
           >
@@ -315,7 +315,7 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6, type: "spring", stiffness: 80 }}
-          className="mt-14 flex justify-center gap-12 text-gray-700"
+          className="mt-8 flex justify-center gap-8 sm:gap-12 text-gray-700"
         >
           <Stat value="5000+" label="Gadgets" />
           <Stat value="4.9★" label="Avg. Rating" />
@@ -325,7 +325,7 @@ export default function HeroSection() {
 
       {/* PRODUCT CAROUSEL */}
       <div 
-        className="relative mt-20"
+        className="relative mt-8 sm:mt-12"
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >

@@ -14,6 +14,9 @@ export default function SearchOverlay({ open, onClose }) {
   const productsCache = useRef(null);
   const debounceRef = useRef(null);
 
+  // Call the search hook
+  useProductSearch(query, open, productsCache, setResults, setLoadingResults);
+
   useEffect(() => {
     if (open) {
       // small delay to trigger fade-in
@@ -140,12 +143,16 @@ export default function SearchOverlay({ open, onClose }) {
 function useProductSearch(query, open, productsCache, setResults, setLoadingResults) {
   useEffect(() => {
     let cancelled = false;
+    
     async function ensureProducts() {
       if (!productsCache.current) {
         try {
+          console.log('Fetching products for search...');
           const res = await api.get('/products');
           productsCache.current = res.data || [];
+          console.log('✓ Products loaded:', productsCache.current.length);
         } catch (err) {
+          console.error('❌ Error fetching products:', err.message);
           productsCache.current = [];
         }
       }
@@ -153,29 +160,47 @@ function useProductSearch(query, open, productsCache, setResults, setLoadingResu
 
     async function doSearch() {
       setLoadingResults(true);
-      await ensureProducts();
-      if (cancelled) return;
-      const q = query.trim().toLowerCase();
-      if (!q) {
+      try {
+        await ensureProducts();
+        
+        if (cancelled) return;
+        
+        const q = query.trim().toLowerCase();
+        if (!q) {
+          setResults([]);
+          setLoadingResults(false);
+          return;
+        }
+        
+        console.log('Searching for:', q);
+        
+        const matches = productsCache.current.filter(p => (
+          (p.name || '').toLowerCase().includes(q) ||
+          (p.brand || '').toLowerCase().includes(q) ||
+          (p.category || '').toLowerCase().includes(q) ||
+          (p.description || '').toLowerCase().includes(q)
+        )).slice(0, 10);
+        
+        console.log('Found matches:', matches.length);
+        setResults(matches);
+      } catch (error) {
+        console.error('Search error:', error);
         setResults([]);
+      } finally {
         setLoadingResults(false);
-        return;
       }
-      const matches = productsCache.current.filter(p => (
-        (p.name || '').toLowerCase().includes(q) ||
-        (p.brand || '').toLowerCase().includes(q) ||
-        (p.category || '').toLowerCase().includes(q) ||
-        (p.description || '').toLowerCase().includes(q)
-      )).slice(0, 10);
-      setResults(matches);
-      setLoadingResults(false);
     }
 
-    // debounce
-    const id = setTimeout(() => {
-      if (open) doSearch();
-    }, 220);
+    // debounce - only search if overlay is open
+    if (open) {
+      const id = setTimeout(() => {
+        doSearch();
+      }, 220);
 
-    return () => { cancelled = true; clearTimeout(id); };
+      return () => { 
+        cancelled = true; 
+        clearTimeout(id); 
+      };
+    }
   }, [query, open, setResults, setLoadingResults]);
 }

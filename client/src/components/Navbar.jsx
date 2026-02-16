@@ -30,13 +30,13 @@ export default function Navbar() {
               shadow-lg group-hover:shadow-2xl group-hover:scale-105 
               transition-all duration-400 backdrop-blur-sm bg-opacity-90
             ">
-              <span className="text-white font-black text-lg tracking-tight drop-shadow-lg">eB</span>
+              <span className="text-white font-black text-lg tracking-tight drop-shadow-lg">⚡</span>
             </div>
             <span className="
               font-extrabold text-xl tracking-tight 
               text-gray-900 group-hover:text-gray-800 transition-colors duration-300
             ">
-              ElectroBazaar
+              Voltify
             </span>
           </Link>
 
@@ -60,7 +60,7 @@ export default function Navbar() {
             {/* top-level My Orders removed - available inside account dropdown */}
 
             {/* Admin Link - Only visible to admins */}
-            {user && (user.isAdmin || user.email === 'admin@phonehub.com') && (
+            {user && (user.isAdmin || user.email === 'admin@voltify.com') && (
               <Link 
                 to="/admin" 
                 className="

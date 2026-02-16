@@ -14,6 +14,8 @@ export default function CartPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [orderSuccess, setOrderSuccess] = useState(false);
+  const [orderId, setOrderId] = useState('');
   const navigate = useNavigate();
 
   const totalPrice = getTotalPrice();
@@ -35,9 +37,9 @@ export default function CartPage() {
 
   const handlePaymentSuccess = async (response) => {
     try {
-      // Clear cart and navigate to success/orders page
-      alert('Payment successful! Order #' + response.order._id);
-      navigate('/');
+      // Show success popup with order ID
+      setOrderId(response.order._id);
+      setOrderSuccess(true);
     } catch (error) {
       setError('Error processing order after payment');
     }
@@ -45,6 +47,12 @@ export default function CartPage() {
 
   const handlePaymentError = (errorMsg) => {
     setError(errorMsg);
+  };
+
+  const handleContinueShopping = () => {
+    setOrderSuccess(false);
+    setOrderId('');
+    navigate('/');
   };
 
   if (cartItems.length === 0) {
@@ -59,6 +67,58 @@ export default function CartPage() {
           <a href="/" className="inline-block px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
             Continue Shopping
           </a>
+        </div>
+      </div>
+    );
+  }
+
+  // Order Success Modal
+  if (orderSuccess) {
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center space-y-6 animate-in fade-in zoom-in duration-300">
+          {/* Success Icon */}
+          <div className="flex justify-center">
+            <div className="relative">
+              <div className="absolute inset-0 bg-emerald-100 rounded-full animate-pulse"></div>
+              <svg className="w-16 h-16 text-emerald-600 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Success Message */}
+          <div className="space-y-2">
+            <h2 className="text-3xl font-bold text-gray-900">Order Placed!</h2>
+            <p className="text-gray-600">Thank you for your purchase. Your order has been confirmed.</p>
+          </div>
+
+          {/* Order ID */}
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+            <p className="text-sm text-gray-600 mb-2">Order ID</p>
+            <p className="text-2xl font-bold text-gray-900 font-mono break-all">{orderId}</p>
+          </div>
+
+          {/* Info Text */}
+          <p className="text-sm text-gray-600">
+            We've sent a confirmation email with your order details. You can track your order status in your profile.
+          </p>
+
+          {/* Action Buttons */}
+          <div className="space-y-3 pt-4">
+            <button
+              onClick={handleContinueShopping}
+              className="w-full px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-200 hover:scale-105"
+            >
+              Continue Shopping
+            </button>
+            <button
+              onClick={() => navigate('/orders')}
+              className="w-full px-6 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-all duration-200"
+            >
+              View My Orders
+            </button>
+          </div>
         </div>
       </div>
     );

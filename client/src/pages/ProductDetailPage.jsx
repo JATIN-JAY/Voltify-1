@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../api';
 import { CartContext } from '../context/CartContext';
+import ProductCard from '../components/ProductGrid';
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -13,9 +14,13 @@ export default function ProductDetailPage() {
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
+  const [suggestedProducts, setSuggestedProducts] = useState([]);
+  const [suggestedLoading, setSuggestedLoading] = useState(true);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     fetchProduct();
+    fetchSuggestedProducts();
   }, [id]);
 
   const fetchProduct = async () => {
@@ -28,6 +33,22 @@ export default function ProductDetailPage() {
       console.error('Error fetching product:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchSuggestedProducts = async () => {
+    try {
+      setSuggestedLoading(true);
+      const response = await api.get('/products');
+      // Filter out current product and get up to 4 random products
+      const filtered = response.data.filter(p => p._id !== id);
+      const suggested = filtered.sort(() => Math.random() - 0.5).slice(0, 4);
+      setSuggestedProducts(suggested);
+    } catch (err) {
+      console.error('Error fetching suggested products:', err);
+      setSuggestedProducts([]);
+    } finally {
+      setSuggestedLoading(false);
     }
   };
 
@@ -83,14 +104,14 @@ export default function ProductDetailPage() {
         </div>
 
         {/* Product Detail */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 mb-16 overflow-hidden">
           {/* Product Image */}
-          <div className="flex items-center justify-start">
-            <div className="relative w-full aspect-square rounded-3xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 shadow-xl">
+          <div className="flex items-start justify-center md:sticky md:top-24 overflow-hidden">
+            <div className="relative w-full max-w-md aspect-square rounded-3xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 shadow-xl">
               <img
                 src={product.image}
                 alt={product.name}
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                className="w-full h-full object-cover hover:brightness-110 transition-all duration-500"
                 onError={(e) => {
                   e.target.src = 'https://via.placeholder.com/600x600?text=Product+Image';
                 }}
@@ -102,7 +123,7 @@ export default function ProductDetailPage() {
           </div>
 
           {/* Product Info */}
-          <div className="flex flex-col justify-center space-y-8">
+          <div className="flex flex-col justify-start space-y-6">
             <div>
               <h1 className="text-4xl font-bold text-gray-900 mb-3">
                 {product.name}
@@ -232,9 +253,21 @@ export default function ProductDetailPage() {
         {/* Related Products Section */}
         <div>
           <h2 className="text-3xl font-bold text-gray-900 mb-8">You Might Also Like</h2>
-          <div className="text-center py-12 bg-gray-50 rounded-2xl">
-            <p className="text-gray-600">More products coming soon...</p>
-          </div>
+          {suggestedLoading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+            </div>
+          ) : suggestedProducts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {suggestedProducts.map((prod, index) => (
+                <ProductCard key={prod._id} product={prod} index={index} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-gray-50 rounded-2xl">
+              <p className="text-gray-600">No other products available.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

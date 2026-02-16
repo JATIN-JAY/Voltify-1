@@ -37,67 +37,91 @@ const RazorpayCheckout = ({ cartItems, totalPrice, shippingInfo, user, onSuccess
 
       const { orderId, keyId } = orderResponse.data;
 
+      if (!orderId || !keyId) {
+        throw new Error('Server did not return order details');
+      }
+
       // Step 2: Load Razorpay script
       const script = document.createElement('script');
       script.src = 'https://checkout.razorpay.com/v1/checkout.js';
       script.async = true;
+      script.onerror = () => {
+        setLoading(false);
+        onError('Failed to load Razorpay. Please check your internet connection.');
+      };
       script.onload = () => {
-        openRazorpayCheckout(orderId, keyId, token);
+        if (window.Razorpay) {
+          openRazorpayCheckout(orderId, keyId, token);
+        } else {
+          setLoading(false);
+          onError('Razorpay script failed to load');
+        }
       };
       document.body.appendChild(script);
     } catch (error) {
       setLoading(false);
-      onError(error.response?.data?.message || 'Failed to create payment order');
+      console.error('Payment error:', error);
+      onError(error.response?.data?.message || error.message || 'Failed to create payment order');
     }
   };
 
   const openRazorpayCheckout = (orderId, keyId, token) => {
-    const options = {
-      key: keyId,
-      // when using an `order_id`, Razorpay uses the order's amount; avoid passing `amount` here
-      currency: 'INR',
-      order_id: orderId,
-      name: 'PhoneHub',
-      description: 'Purchase Electronics',
-      image: 'https://via.placeholder.com/150',
-      prefill: {
-        name: shippingInfo.fullName,
-        email: shippingInfo.email,
-      },
-      handler: async (response) => {
-        // Step 3: Verify payment
-        try {
-          const verifyResponse = await api.post(
-            '/payment/verify-payment',
-            {
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              items: cartItems,
-              amount: totalPrice,
-              shippingInfo,
-            },
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-
-          setLoading(false);
-          onSuccess(verifyResponse.data);
-        } catch (error) {
-          setLoading(false);
-          onError(error.response?.data?.message || 'Payment verification failed');
-        }
-      },
-      modal: {
-        ondismiss: () => {
-          setLoading(false);
+    try {
+      const options = {
+        key: keyId,
+        order_id: orderId,
+        currency: 'INR',
+        name: 'Voltify',
+        description: 'Purchase from Voltify',
+        image: 'https://via.placeholder.com/150x150?text=Voltify',
+        prefill: {
+          name: shippingInfo.fullName || '',
+          email: shippingInfo.email || '',
+          contact: shippingInfo.zipCode || '', // Phone number field
         },
-      },
-    };
+        theme: {
+          color: '#4f46e5', // Indigo color matching your brand
+        },
+        handler: async (response) => {
+          // Step 3: Verify payment
+          try {
+            const verifyResponse = await api.post(
+              '/payment/verify-payment',
+              {
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                items: cartItems,
+                amount: totalPrice,
+                shippingInfo,
+              },
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            );
 
-    const razorpay = new window.Razorpay(options);
-    razorpay.open();
+            setLoading(false);
+            onSuccess(verifyResponse.data);
+          } catch (error) {
+            setLoading(false);
+            console.error('Payment verification error:', error);
+            onError(error.response?.data?.message || 'Payment verification failed');
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setLoading(false);
+          },
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+    } catch (error) {
+      setLoading(false);
+      console.error('Razorpay checkout error:', error);
+      onError('Failed to open payment gateway. Please try again.');
+    }
   };
 
   return (

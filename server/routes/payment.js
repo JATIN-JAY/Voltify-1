@@ -9,28 +9,50 @@ dotenv.config();
 
 const router = express.Router();
 
-// Initialize Razorpay instance
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
+// Initialize Razorpay instance with error checking
+let razorpay;
+
+try {
+  if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+    console.warn('WARNING: Razorpay credentials not found in environment variables!');
+    console.warn('Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in .env file');
+  } else {
+    razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET,
+    });
+    console.log('Razorpay initialized successfully');
+  }
+} catch (error) {
+  console.error('Failed to initialize Razorpay:', error.message);
+}
 
 // Create order for payment
 router.post('/create-order', verifyToken, async (req, res) => {
   try {
+    // Check if Razorpay is initialized
+    if (!razorpay) {
+      console.error('Razorpay not initialized. Check environment variables.');
+      return res.status(500).json({ 
+        message: 'Payment service configuration error. Please check server logs.' 
+      });
+    }
+
     const { amount, items, userEmail, userName, userPhone } = req.body;
 
     // Validate input
     if (!amount || !items || !userEmail) {
-      return res.status(400).json({ message: 'Missing required fields' });
+      return res.status(400).json({ message: 'Missing required fields: amount, items, userEmail' });
     }
 
     // Check maximum allowed amount (useful for test mode limits)
-    const maxAmountPaise = parseInt(process.env.RAZORPAY_MAX_AMOUNT_PAISE || '1000000', 10); // default ₹10,000
+    const maxAmountPaise = parseInt(process.env.RAZORPAY_MAX_AMOUNT_PAISE || '5000000', 10); // default ₹50,000
     const amountPaise = Math.round(Number(amount) * 100);
 
     if (amountPaise > maxAmountPaise) {
-      return res.status(400).json({ message: `Amount exceeds maximum allowed for payments (₹${(maxAmountPaise/100).toLocaleString()}). Try a smaller amount or update RAZORPAY_MAX_AMOUNT_PAISE in server .env for testing.` });
+      return res.status(400).json({ 
+        message: `Amount exceeds maximum allowed for payments (₹${(maxAmountPaise/100).toLocaleString()}). Try a smaller amount or update RAZORPAY_MAX_AMOUNT_PAISE in server .env for testing.` 
+      });
     }
 
     // Create Razorpay order
@@ -45,7 +67,11 @@ router.post('/create-order', verifyToken, async (req, res) => {
       },
     };
 
+    console.log('Creating Razorpay order with options:', { amount: amountPaise, currency: 'INR', userEmail });
+
     const razorpayOrder = await razorpay.orders.create(options);
+
+    console.log('✓ Razorpay order created successfully:', razorpayOrder.id);
 
     res.json({
       orderId: razorpayOrder.id,
@@ -56,8 +82,23 @@ router.post('/create-order', verifyToken, async (req, res) => {
       phone: userPhone,
     });
   } catch (error) {
-    console.error('Error creating Razorpay order:', error);
-    res.status(500).json({ message: 'Failed to create order' });
+    console.error('❌ Error creating Razorpay order:', {
+      message: error.message,
+      code: error.code,
+      statusCode: error.statusCode,
+      description: error.description,
+      fullError: error.toString(),
+    });
+    
+    if (error.description) {
+      return res.status(400).json({ message: `Razorpay Error: ${error.description}` });
+    }
+    
+    if (error.message?.includes('ECONNREFUSED')) {
+      return res.status(500).json({ message: 'Cannot connect to Razorpay. Check internet connection.' });
+    }
+    
+    res.status(500).json({ message: `Failed to create order: ${error.message || 'Unknown error'}` });
   }
 });
 
@@ -66,12 +107,23 @@ router.post('/verify-payment', verifyToken, async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, items, amount, shippingInfo } = req.body;
 
+    // Validate inputs
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return res.status(400).json({ message: 'Missing payment details' });
+    }
+
+    // Check if key is configured
+    if (!process.env.RAZORPAY_KEY_SECRET) {
+      return res.status(500).json({ message: 'Payment service not configured' });
+    }
+
     // Verify signature
     const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET);
     hmac.update(razorpay_order_id + '|' + razorpay_payment_id);
     const generatedSignature = hmac.digest('hex');
 
     if (generatedSignature !== razorpay_signature) {
+      console.error('Signature mismatch:', { generated: generatedSignature, received: razorpay_signature });
       return res.status(400).json({ message: 'Invalid payment signature' });
     }
 
@@ -92,13 +144,15 @@ router.post('/verify-payment', verifyToken, async (req, res) => {
 
     await order.save();
 
+    console.log('Order saved successfully:', order._id);
+
     res.json({
       message: 'Payment verified successfully',
       order,
     });
   } catch (error) {
-    console.error('Error verifying payment:', error);
-    res.status(500).json({ message: 'Failed to verify payment' });
+    console.error('Error verifying payment:', error.message || error);
+    res.status(500).json({ message: 'Failed to verify payment. Check server logs.' });
   }
 });
 

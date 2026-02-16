@@ -11,7 +11,7 @@ async function createAdmin() {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('✓ Connected to MongoDB');
 
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@phonehub.com';
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@voltify.com';
     const adminPassword = 'admin123'; // Change this in production!
 
     console.log(`Checking if admin user exists with email: ${adminEmail}`);
