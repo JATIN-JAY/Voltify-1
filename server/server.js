@@ -12,15 +12,32 @@ dotenv.config();
 
 const app = express();
 
+if (!process.env.MONGODB_URI) {
+  console.error('MONGODB_URI is missing in server/.env');
+  process.exit(1);
+}
+
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // MongoDB Connection
+mongoose.set('bufferCommands', false);
+
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect(process.env.MONGODB_URI, {
+    serverSelectionTimeoutMS: 5000,
+  })
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.log('MongoDB connection error:', err));
+
+mongoose.connection.on('error', (err) => {
+  console.error('MongoDB runtime error:', err.message);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.warn('MongoDB disconnected');
+});
 
 // Routes
 app.use('/api/auth', authRoutes);

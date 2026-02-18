@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import Product from '../models/Product.js';
 import { v2 as cloudinary } from 'cloudinary';
 import { verifyToken, checkAdmin } from '../middleware/auth.js';
@@ -15,8 +16,22 @@ cloudinary.config({
 
 const router = express.Router();
 
+const isDatabaseReady = () => mongoose.connection.readyState === 1;
+
+const ensureDatabaseReady = (res) => {
+  if (mongoose.connection.readyState !== 1) {
+    res.status(503).json({ message: 'Database unavailable. Please try again shortly.' });
+    return false;
+  }
+  return true;
+};
+
 // Get featured products only - MUST be before /:id route
 router.get('/featured/list', async (req, res) => {
+  if (!isDatabaseReady()) {
+    return res.json([]);
+  }
+
   try {
     const products = await Product.find({ featured: true });
     res.json(products);
@@ -27,6 +42,10 @@ router.get('/featured/list', async (req, res) => {
 
 // Get all products
 router.get('/', async (req, res) => {
+  if (!isDatabaseReady()) {
+    return res.json([]);
+  }
+
   try {
     const products = await Product.find();
     res.json(products);
@@ -37,6 +56,8 @@ router.get('/', async (req, res) => {
 
 // Get single product
 router.get('/:id', async (req, res) => {
+  if (!ensureDatabaseReady(res)) return;
+
   try {
     const product = await Product.findById(req.params.id);
     if (!product) {
@@ -50,6 +71,8 @@ router.get('/:id', async (req, res) => {
 
 // Create product (admin only)
 router.post('/', verifyToken, checkAdmin, async (req, res) => {
+  if (!ensureDatabaseReady(res)) return;
+
   try {
     const { name, price, category, brand, description, imageUrl, featured } = req.body;
 
@@ -82,6 +105,8 @@ router.post('/', verifyToken, checkAdmin, async (req, res) => {
 
 // Delete product (admin only)
 router.delete('/:id', verifyToken, checkAdmin, async (req, res) => {
+  if (!ensureDatabaseReady(res)) return;
+
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
     
@@ -97,6 +122,8 @@ router.delete('/:id', verifyToken, checkAdmin, async (req, res) => {
 
 // Update product (admin only)
 router.put('/:id', verifyToken, checkAdmin, async (req, res) => {
+  if (!ensureDatabaseReady(res)) return;
+
   try {
     const { name, price, category, brand, description, imageUrl, featured } = req.body;
 

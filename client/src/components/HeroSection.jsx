@@ -192,6 +192,11 @@ export default function HeroSection() {
     scrollRef.current?.scrollBy({ left: 400, behavior: "smooth" });
   };
 
+  const handleBrowseProducts = () => {
+    const productsSection = document.getElementById('products');
+    productsSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   // Fetch featured products on mount
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
@@ -300,14 +305,15 @@ export default function HeroSection() {
             </Link>
           )}
 
-          <Link
-            to="/"
+          <button
+            type="button"
+            onClick={handleBrowseProducts}
             className="px-8 py-3 rounded-full text-white font-semibold 
             bg-gradient-to-r from-blue-600 to-cyan-600 
             hover:scale-105 hover:shadow-xl transition-all duration-300"
           >
             Browse Products
-          </Link>
+          </button>
         </motion.div>
 
         {/* STATS */}
