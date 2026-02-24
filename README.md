@@ -1,4 +1,4 @@
-# ShopHub - E-Commerce Web Application
+# Voltify - E-Commerce Web Application
 
 A beautiful, beginner-friendly e-commerce web application built with React, Node.js, and MongoDB. The UI is styled to look like the Apple App Store with premium modern design.
 
