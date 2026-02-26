@@ -23,18 +23,12 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="
-              w-9 h-9 bg-gradient-to-br from-blue-500 via-cyan-500 to-indigo-500 
-              rounded-xl flex items-center justify-center 
-              shadow-lg group-hover:shadow-2xl group-hover:scale-105 
-              transition-all duration-400 backdrop-blur-sm bg-opacity-90
-            ">
-              <span className="text-white font-black text-lg tracking-tight drop-shadow-lg">⚡</span>
-            </div>
+          <Link to="/" className="group">
             <span className="
-              font-extrabold text-xl tracking-tight 
-              text-gray-900 group-hover:text-gray-800 transition-colors duration-300
+              text-2xl font-black tracking-tight italic
+              bg-gradient-to-r from-indigo-700 via-violet-600 to-cyan-500
+              bg-clip-text text-transparent
+              transition-all duration-300 group-hover:brightness-110
             ">
               Voltify
             </span>
@@ -60,7 +54,7 @@ export default function Navbar() {
             {/* top-level My Orders removed - available inside account dropdown */}
 
             {/* Admin Link - Only visible to admins */}
-            {user && (user.isAdmin || user.email === 'admin@voltify.com') && (
+            {user?.isAdmin && (
               <Link 
                 to="/admin" 
                 className="

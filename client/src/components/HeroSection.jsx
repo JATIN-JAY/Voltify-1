@@ -1,432 +1,261 @@
 
-
-// import React, { useRef } from 'react';
-// import { Link } from 'react-router-dom';
-// // import { Spotlight } from 'reactbits/animations'
-// export default function HeroSection() {
-//   const scrollRef = useRef(null);
-
-//   const scrollLeft = () => {
-//     if (scrollRef.current) {
-//       scrollRef.current.scrollBy({ left: -400, behavior: 'smooth' });
-//     }
-//   };
-
-//   const scrollRight = () => {
-//     if (scrollRef.current) {
-//       scrollRef.current.scrollBy({ left: 400, behavior: 'smooth' });
-//     }
-//   };
-
-//   const latestProducts = [
-//     {
-//       name: "Pro Laptop",
-//       desc: "Supercharged by next-gen processor.",
-//       price: "From ₹169900.00*",
-//       img: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=1200&q=80",
-//       bgColor: "bg-black",
-//     },
-//     {
-//       name: "Flagship Phone",
-//       desc: "Ultimate camera system. Titanium design.",
-//       price: "From ₹99900.00*",
-//       img: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=1200&q=80",
-//       bgColor: "bg-gradient-to-br from-gray-900 to-black",
-//     },
-//     {
-//       name: "Smart Watch Series",
-//       desc: "The ultimate way to track your health.",
-//       price: "From ₹46900.00*",
-//       img: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=1200&q=80",
-//       bgColor: "bg-black",
-//     },
-//     {
-//       name: "Wireless Earbuds Pro",
-//       desc: "Spatial Audio. Adaptive EQ. Noise cancellation.",
-//       price: "From ₹24900.00*",
-//       img: "https://images.unsplash.com/photo-1609081219090-a6d81d3085bf?auto=format&fit=crop&w=1200&q=80",
-//       bgColor: "bg-gradient-to-br from-orange-900 to-black",
-//     },
-//     {
-//       name: "Gaming Headset",
-//       desc: "Immersive sound. RGB lighting.",
-//       price: "From ₹17900.00*",
-//       img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80",
-//       bgColor: "bg-black",
-//     },
-//   ];
-
-//   return (
-//     <section className="relative bg-white overflow-hidden">
-//       {/* Hero main content (unchanged) */}
-//       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-32 text-center">
-//         <h1 className="text-5xl sm:text-7xl font-bold text-gray-900 leading-tight">
-//           Premium Electronics
-//           <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-//             Made Simple
-//           </span>
-//         </h1>
-
-//         <p className="mt-6 text-xl text-gray-600 max-w-3xl mx-auto">
-//           Discover the latest gadgets handpicked for performance and style.
-//         </p>
-
-//         <div className="mt-10 flex flex-col sm:flex-row justify-center gap-6">
-//           <Link to="/register" className="px-10 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-full hover:shadow-xl hover:scale-105 transition-all duration-300">
-//             Get Started
-//           </Link>
-//           <Link to="/products" className="px-10 py-4 border-2 border-gray-300 text-gray-900 font-semibold rounded-full hover:bg-gray-50 transition-all duration-300">
-//             Browse Products
-//           </Link>
-//         </div>
-
-//         <div className="mt-12 flex justify-center gap-12 text-gray-700">
-//           <div className="text-center">
-//             <div className="text-3xl font-bold">5000+</div>
-//             <p className="text-sm">Gadgets</p>
-//           </div>
-//           <div className="text-center">
-//             <div className="text-3xl font-bold">4.9★</div>
-//             <p className="text-sm">Avg. Rating</p>
-//           </div>
-//           <div className="text-center">
-//             <div className="text-3xl font-bold">24/7</div>
-//             <p className="text-sm">Support</p>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Full-width "The latest" carousel with transparent arrows */}
-//       <div className="mt-16 sm:mt-24 w-full relative">
-//         <div className="text-center mb-8 px-4">
-//           <h2 className="text-4xl sm:text-5xl font-bold text-red-600">
-//             The latest. All-new and loveable.
-//           </h2>
-//         </div>
-
-//         {/* Carousel container */}
-//         <div className="relative">
-//           {/* Left Arrow - transparent, only on desktop */}
-//           <button
-//             onClick={scrollLeft}
-//             className="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 z-20 w-14 h-14 items-center justify-center rounded-full bg-black/30 backdrop-blur-md border border-white/20 text-white hover:bg-black/50 hover:border-white/40 transition-all duration-300 shadow-lg"
-//             aria-label="Scroll left"
-//           >
-//             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-//               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-//             </svg>
-//           </button>
-
-//           {/* Right Arrow - transparent, only on desktop */}
-//           <button
-//             onClick={scrollRight}
-//             className="hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 z-20 w-14 h-14 items-center justify-center rounded-full bg-black/30 backdrop-blur-md border border-white/20 text-white hover:bg-black/50 hover:border-white/40 transition-all duration-300 shadow-lg"
-//             aria-label="Scroll right"
-//           >
-//             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-//               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-//             </svg>
-//           </button>
-
-//           {/* Scrollable area */}
-//           <div 
-//             ref={scrollRef}
-//             className="overflow-x-auto pb-12 scrollbar-hide snap-x snap-mandatory"
-//           >
-//             <div className="flex gap-6 sm:gap-8 px-4 sm:px-8 min-w-max">
-//               {latestProducts.map((product, index) => (
-//                 <div
-//                   key={index}
-//                   className={`group relative w-[85vw] sm:w-[45vw] lg:w-[35vw] xl:w-[30vw] flex-shrink-0 snap-center overflow-hidden rounded-3xl ${product.bgColor} shadow-2xl transition-all duration-500 hover:scale-[1.03] hover:shadow-black/50`}
-//                 >
-//                   <img
-//                     src={product.img}
-//                     alt={product.name}
-//                     className="w-full h-[60vh] sm:h-[70vh] object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-700"
-//                   />
-//                   <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
-//                     <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2">
-//                       {product.name}
-//                     </h3>
-//                     <p className="text-base sm:text-lg text-gray-300 mb-1">
-//                       {product.desc}
-//                     </p>
-//                     <p className="text-lg sm:text-xl font-semibold text-white">
-//                       {product.price}
-//                     </p>
-//                   </div>
-//                 </div>
-//               ))}
-//             </div>
-//           </div>
-//         </div>
-
-//         <div className="text-center mt-6 text-gray-500 text-sm hidden sm:block">
-//           ← Drag or use arrows to explore →
-//         </div>
-//       </div>
-//     </section>
-//   );
-// }
-
-
-import React, { useRef, useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import api from '../api';
 import { motion } from "framer-motion";
 import { CartContext } from "../context/CartContext";
 import { Spotlight } from "../context/Spotlight";
+import api from "../api";
 
 export default function HeroSection() {
-  const scrollRef = useRef(null);
   const { user } = useContext(CartContext);
-  const [isHovering, setIsHovering] = useState(false);
   const [featuredProducts, setFeaturedProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const scrollLeft = () => {
-    scrollRef.current?.scrollBy({ left: -400, behavior: "smooth" });
-  };
-
-  const scrollRight = () => {
-    scrollRef.current?.scrollBy({ left: 400, behavior: "smooth" });
-  };
+  const [loadingFeatured, setLoadingFeatured] = useState(true);
 
   const handleBrowseProducts = () => {
     const productsSection = document.getElementById('products');
     productsSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  // Fetch featured products on mount
+  const fadeUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
       try {
         const response = await api.get('/products/featured/list');
-        const products = response.data.map(product => ({
-          name: product.name,
-          desc: product.description,
-          price: `₹${product.price.toLocaleString('en-IN')}`,
-          img: product.image,
-          bgColor: "bg-black",
-        }));
-        setFeaturedProducts(products);
+        setFeaturedProducts(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
         console.error('Error fetching featured products:', error);
-        // Fallback to empty array if no featured products
         setFeaturedProducts([]);
       } finally {
-        setLoading(false);
+        setLoadingFeatured(false);
       }
     };
 
     fetchFeaturedProducts();
   }, []);
 
-  // Duplicate products for infinite carousel effect
-  const latestProducts = featuredProducts.length > 0 ? [...featuredProducts, ...featuredProducts] : [];
-
-  const handleScroll = () => {
-    if (!scrollRef.current) return;
-    
-    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-    const singleSetWidth = scrollWidth / 2;
-    
-    // If scrolled past halfway, reset to beginning seamlessly
-    if (scrollLeft >= singleSetWidth - 50) {
-      scrollRef.current.scrollLeft = 0;
-    }
-  };
-
-  useEffect(() => {
-    if (isHovering) return;
-    
-    const interval = setInterval(() => {
-      scrollRight();
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, [isHovering]);
-
   return (
-    <section className="relative bg-white overflow-hidden">
-      {/* Spotlight background */}
+    <section className="relative overflow-hidden bg-slate-50/70">
       <Spotlight />
 
-      {/* faded hero background image (stops before the product gallery) */}
       <div
         aria-hidden="true"
-        className="absolute inset-x-0 top-0 -z-10 h-[520px] sm:h-[680px] bg-cover bg-center"
-        style={{
-          backgroundImage: "url('/images/products/image.png')",
-          opacity: 0.18,
-          WebkitMaskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)',
-          maskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)',
-        }}
+        className="absolute inset-x-0 top-0 -z-10 h-[620px] bg-[radial-gradient(circle_at_80%_10%,rgba(59,130,246,0.12),transparent_42%),radial-gradient(circle_at_10%_90%,rgba(14,165,233,0.08),transparent_35%)]"
       />
 
-      {/* HERO CONTENT */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 py-12 sm:py-16 text-center">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 pb-14 pt-10 sm:px-6 sm:pb-16 lg:px-8 lg:pb-20 lg:pt-14">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, type: "spring", stiffness: 80 }}
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.6 }}
+          transition={{ duration: 0.45 }}
+          whileHover={{ y: -1 }}
+          className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-1.5 text-xs font-semibold text-amber-700 shadow-sm"
         >
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-            <div>Top-Tier Smartphones</div>
-            <span className="block bg-gradient-to-r from-blue-600 via-cyan-600 to-indigo-600 bg-clip-text text-transparent mt-1">
-              & Essentials
-            </span>
-          </h1>
+          <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+          Limited Time Sale – Up to 40% OFF
         </motion.div>
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2, type: "spring", stiffness: 80 }}
-          className="mt-4 text-base sm:text-lg text-gray-600 max-w-2xl mx-auto"
-        >
-          Explore cutting-edge devices and high-quality accessories from trusted global brands.
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4, type: "spring", stiffness: 80 }}
-          className="mt-6 flex flex-col sm:flex-row justify-center gap-4"
-        >
-          {!user && (
-            <Link
-              to="/register"
-              className="px-8 py-3 rounded-full text-white font-semibold 
-              bg-gradient-to-r from-blue-600 to-cyan-600 
-              hover:scale-105 hover:shadow-xl transition-all duration-300"
-            >
-              Get Started
-            </Link>
-          )}
-
-          <button
-            type="button"
-            onClick={handleBrowseProducts}
-            className="px-8 py-3 rounded-full text-white font-semibold 
-            bg-gradient-to-r from-blue-600 to-cyan-600 
-            hover:scale-105 hover:shadow-xl transition-all duration-300"
+        <div className="mt-8 grid items-start gap-10 lg:grid-cols-12 lg:gap-12">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.35 }}
+            transition={{ duration: 0.5, delay: 0.05 }}
+            className="lg:col-span-7 lg:pr-8"
           >
-            Browse Products
-          </button>
-        </motion.div>
+            <h1 className="max-w-3xl text-left text-4xl font-black leading-[1.08] tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
+              India’s fastest way to buy premium tech without overpaying.
+            </h1>
 
-        {/* STATS */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6, type: "spring", stiffness: 80 }}
-          className="mt-8 flex justify-center gap-8 sm:gap-12 text-gray-700"
-        >
-          <Stat value="5000+" label="Gadgets" />
-          <Stat value="4.9★" label="Avg. Rating" />
-          <Stat value="24/7" label="Support" />
-        </motion.div>
-      </div>
+            <p className="mt-6 max-w-2xl text-left text-base leading-7 text-slate-600 sm:text-lg">
+              Voltify brings flagship phones, tablets and daily accessories with practical pricing, faster delivery and hassle-free support designed for Indian shoppers.
+            </p>
 
-      {/* PRODUCT CAROUSEL */}
-      <div 
-        className="relative mt-8 sm:mt-12"
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseLeave={() => setIsHovering(false)}
-      >
-        {loading ? (
-          <div className="flex justify-center items-center h-[60vh]">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          </div>
-        ) : latestProducts.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-gray-600 text-lg">No featured products available yet.</p>
-          </div>
-        ) : (
-          <>
-            {/* Arrows */}
-            <Arrow direction="left" onClick={scrollLeft} />
-            <Arrow direction="right" onClick={scrollRight} />
+            <div className="mt-8 flex flex-wrap items-center gap-3.5">
+              <button
+                type="button"
+                onClick={handleBrowseProducts}
+                className="rounded-xl bg-slate-900 px-7 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-slate-800 hover:shadow-lg active:translate-y-0"
+              >
+                Browse Products
+              </button>
 
-            {/* Scroll container */}
-            <div
-              ref={scrollRef}
-              className="overflow-x-auto pb-12 snap-x snap-mandatory scrollbar-hide"
-              onScroll={handleScroll}
-            >
-              <div className="flex gap-8 px-6 min-w-max">
-                {latestProducts.map((p, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.5, delay: (i % 3) * 0.1 }}
-                    viewport={{ once: false, amount: 0.5 }}
-                    className={`group relative w-[85vw] sm:w-[45vw] lg:w-[30vw] 
-                    flex-shrink-0 snap-center overflow-hidden rounded-3xl 
-                    ${p.bgColor} shadow-2xl transition`}
-                  >
-                    <img
-                      src={p.img}
-                      alt={p.name}
-                      className="w-full h-[60vh] object-cover opacity-90 group-hover:opacity-100 transition"
-                      onError={(e) => {
-                        e.target.src = 'https://via.placeholder.com/600x600?text=Product';
-                      }}
-                    />
-
-                    <div className="absolute inset-x-0 bottom-0 p-8 bg-gradient-to-t from-black/90 to-transparent">
-                      <h3 className="text-2xl font-bold text-white">{p.name}</h3>
-                      <p className="text-gray-300">{p.desc}</p>
-                      <p className="text-white font-semibold mt-1">{p.price}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+              {!user && (
+                <Link
+                  to="/register"
+                  className="rounded-xl border border-slate-300 bg-white px-7 py-3 text-sm font-semibold text-slate-700 transition-all duration-300 hover:-translate-y-0.5 hover:bg-slate-100 hover:shadow-sm"
+                >
+                  Create Account
+                </Link>
+              )}
             </div>
 
-            <p className="text-center text-gray-500 text-sm hidden sm:block">
-              ← Drag or use arrows →
-            </p>
-          </>
-        )}
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.5 }}
+              transition={{ duration: 0.45, delay: 0.12 }}
+              className="mt-10 grid max-w-2xl grid-cols-1 gap-3.5 sm:grid-cols-3"
+            >
+              <TrustBadge title="Free Delivery" subtitle="Across major cities" />
+              <TrustBadge title="7-Day Replacement" subtitle="Easy pickup support" />
+              <TrustBadge title="Secure Payment" subtitle="UPI, cards & wallets" />
+            </motion.div>
+          </motion.div>
+
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.55, delay: 0.1 }}
+            className="lg:col-span-5 lg:mt-8"
+          >
+            <FeaturedCarousel products={featuredProducts} loading={loadingFeatured} />
+          </motion.div>
+        </div>
+
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: 0.45, delay: 0.15 }}
+          className="mt-12 border-t border-slate-200 pt-6 lg:ml-6"
+        >
+          <p className="mb-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+            Trusted brands available on Voltify
+          </p>
+          <div className="flex flex-wrap gap-2.5 sm:gap-3.5">
+            {['Apple', 'Samsung', 'OnePlus', 'Xiaomi', 'iQOO', 'Sony'].map((brand) => (
+              <motion.span
+                key={brand}
+                whileHover={{ y: -2 }}
+                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition-colors duration-300 hover:border-slate-300 hover:bg-slate-100"
+              >
+                {brand}
+              </motion.span>
+            ))}
+          </div>
+        </motion.div>
+
       </div>
     </section>
   );
 }
 
-/* ---------- SMALL COMPONENTS ---------- */
-
-function Stat({ value, label }) {
+function TrustBadge({ title, subtitle }) {
   return (
-    <div className="text-center">
-      <div className="text-3xl font-bold">{value}</div>
-      <p className="text-sm">{label}</p>
-    </div>
+    <motion.div
+      whileHover={{ y: -2 }}
+      transition={{ duration: 0.2 }}
+      className="rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition-colors duration-300 hover:border-slate-300 hover:bg-slate-50"
+    >
+      <p className="text-sm font-semibold text-slate-900">{title}</p>
+      <p className="mt-1 text-xs text-slate-500">{subtitle}</p>
+    </motion.div>
   );
 }
 
-function Arrow({ direction, onClick }) {
-  const isLeft = direction === "left";
+function FeaturedCarousel({ products, loading }) {
+  const scrollRef = useRef(null);
+  const [isHovering, setIsHovering] = useState(false);
+
+  const scrollByAmount = (direction) => {
+    const node = scrollRef.current;
+    if (!node) return;
+
+    node.scrollBy({
+      left: direction === 'right' ? 340 : -340,
+      behavior: 'smooth',
+    });
+  };
+
+  useEffect(() => {
+    if (isHovering || !products.length) return;
+
+    const interval = setInterval(() => {
+      const node = scrollRef.current;
+      if (!node) return;
+
+      const maxScrollLeft = node.scrollWidth - node.clientWidth;
+      if (node.scrollLeft >= maxScrollLeft - 8) {
+        node.scrollTo({ left: 0, behavior: 'smooth' });
+        return;
+      }
+
+      node.scrollBy({ left: 320, behavior: 'smooth' });
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [isHovering, products.length]);
+
+  if (loading) {
+    return (
+      <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-3 shadow-lg shadow-slate-200/70">
+        <div className="flex h-[360px] items-center justify-center rounded-2xl bg-slate-100 sm:h-[420px]">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-b-slate-800" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!products.length) {
+    return null;
+  }
 
   return (
-    <button
-      onClick={onClick}
-      className={`hidden sm:flex absolute top-1/2 -translate-y-1/2 z-20 
-      ${isLeft ? "left-4" : "right-4"} 
-      w-14 h-14 items-center justify-center rounded-full 
-      bg-black/30 backdrop-blur-md border border-white/20 text-white 
-      hover:bg-black/50 transition`}
+    <motion.div
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.25 }}
+      className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-3 shadow-lg shadow-slate-200/70"
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
     >
-      <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        {isLeft ? (
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        ) : (
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-        )}
-      </svg>
-    </button>
+      <div className="pointer-events-none absolute inset-x-3 top-3 z-10 flex justify-end">
+        <span className="rounded-full bg-black/50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white backdrop-blur-sm">
+          Featured
+        </span>
+      </div>
+
+      <div
+        ref={scrollRef}
+        className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto rounded-2xl"
+      >
+        {products.map((product) => {
+          const price = Number(product.price || 0);
+          return (
+            <Link
+              key={product._id}
+              to={`/product/${product._id}`}
+              className="group relative block h-[360px] min-w-full snap-start overflow-hidden rounded-2xl sm:h-[420px]"
+            >
+              <img
+                src={product.image}
+                alt={product.name}
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                onError={(e) => {
+                  e.target.src = 'https://via.placeholder.com/640x800?text=Featured+Product';
+                }}
+              />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-4 pt-20">
+                <p className="line-clamp-2 text-sm font-semibold text-white">{product.name}</p>
+                <p className="mt-1 text-sm font-bold text-white">₹{price.toLocaleString('en-IN')}</p>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+
+      <div className="pointer-events-none absolute inset-x-3 bottom-3 z-10 rounded-2xl bg-gradient-to-t from-black/65 via-transparent to-transparent p-4" />
+
+    </motion.div>
   );
 }

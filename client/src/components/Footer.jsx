@@ -21,10 +21,9 @@ export default function Footer() {
         {/* Brand Section */}
         <div className="mb-12 pb-8 border-b border-gray-100">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">E</span>
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900">Voltify</h1>
+            <h1 className="text-3xl font-black tracking-tight italic bg-gradient-to-r from-indigo-700 via-violet-600 to-cyan-500 bg-clip-text text-transparent">
+              Voltify
+            </h1>
           </div>
           <p className="text-gray-600 max-w-sm">
             A modern online destination for premium electronics and smart gadgets focused on quality, 

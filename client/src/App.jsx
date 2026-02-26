@@ -20,8 +20,12 @@ import './index.css';
 function HomePage() {
   return (
     <MainLayout>
-      <HeroSection />
-      <ProductGrid />
+      <div className="relative">
+        <HeroSection />
+        <div className="lg:pr-6">
+          <ProductGrid />
+        </div>
+      </div>
     </MainLayout>
   );
 }

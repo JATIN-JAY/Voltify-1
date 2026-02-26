@@ -17,11 +17,21 @@ export default function ProductDetailPage() {
   const [suggestedProducts, setSuggestedProducts] = useState([]);
   const [suggestedLoading, setSuggestedLoading] = useState(true);
 
+  const cartItem = cartItems.find((item) => item._id === id);
+
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchProduct();
     fetchSuggestedProducts();
   }, [id]);
+
+  useEffect(() => {
+    if (cartItem) {
+      setQuantity(cartItem.quantity);
+    } else {
+      setQuantity(1);
+    }
+  }, [cartItem]);
 
   const fetchProduct = async () => {
     try {
@@ -52,13 +62,35 @@ export default function ProductDetailPage() {
     }
   };
 
-  const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
+  const syncCartWithQuantity = (nextQuantity) => {
+    if (!product) return;
+
+    if (cartItem) {
+      updateQuantity(product._id, nextQuantity);
+      return;
+    }
+
+    for (let i = 0; i < nextQuantity; i++) {
       addToCart(product);
     }
+  };
+
+  const handleIncrementQuantity = () => {
+    const nextQuantity = quantity + 1;
+    setQuantity(nextQuantity);
+    syncCartWithQuantity(nextQuantity);
+  };
+
+  const handleDecrementQuantity = () => {
+    const nextQuantity = Math.max(1, quantity - 1);
+    setQuantity(nextQuantity);
+    syncCartWithQuantity(nextQuantity);
+  };
+
+  const handleAddToCart = () => {
+    syncCartWithQuantity(quantity);
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 2000);
-    setQuantity(1);
   };
 
   const handleBuyNow = () => {
@@ -179,14 +211,14 @@ export default function ProductDetailPage() {
                 <span className="text-gray-700 font-semibold">Quantity:</span>
                 <div className="flex items-center gap-3 bg-gray-100 rounded-full px-4 py-2">
                   <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    onClick={handleDecrementQuantity}
                     className="text-gray-600 hover:text-gray-900 font-bold text-lg"
                   >
                     −
                   </button>
                   <span className="w-8 text-center font-semibold">{quantity}</span>
                   <button
-                    onClick={() => setQuantity(quantity + 1)}
+                    onClick={handleIncrementQuantity}
                     className="text-gray-600 hover:text-gray-900 font-bold text-lg"
                   >
                     +

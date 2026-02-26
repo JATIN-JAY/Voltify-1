@@ -36,67 +36,108 @@ export default function ProductCard({ product, index }) {
     updateQuantity(product._id, existingItem.quantity + 1);
   };
 
+  const sellingPrice = Number(product?.price ?? 0);
+  const originalPrice = Number(product?.originalPrice ?? product?.mrp ?? sellingPrice);
+  const hasDiscount = originalPrice > sellingPrice && sellingPrice > 0;
+  const discountPercent = hasDiscount ? Math.round(((originalPrice - sellingPrice) / originalPrice) * 100) : 0;
+  const ratingValue = Number(product?.rating ?? 0);
+  const reviewCount = Number(product?.reviewCount ?? product?.numReviews ?? 0);
+
+  const renderStars = () => {
+    return Array.from({ length: 5 }, (_, starIndex) => {
+      const active = ratingValue >= starIndex + 1;
+      return (
+        <svg
+          key={`${product._id}-star-${starIndex}`}
+          className={`h-4 w-4 ${active ? 'text-amber-400' : 'text-slate-300'}`}
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.036 3.189a1 1 0 00.95.69h3.352c.969 0 1.371 1.24.588 1.81l-2.712 1.97a1 1 0 00-.364 1.118l1.036 3.19c.3.921-.755 1.688-1.539 1.118l-2.711-1.97a1 1 0 00-1.176 0l-2.711 1.97c-.784.57-1.838-.197-1.539-1.118l1.036-3.19a1 1 0 00-.364-1.118L2.123 8.616c-.783-.57-.38-1.81.588-1.81h3.352a1 1 0 00.95-.69l1.036-3.189z" />
+        </svg>
+      );
+    });
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -6, scale: 1.01 }}
       viewport={{ once: false, amount: 0.3 }}
       transition={{ duration: 0.5, delay: (index % 4) * 0.1 }}
-      className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col h-full"
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:border-slate-300 hover:shadow-xl"
     >
-      {/* Product Image Container - Clickable */}
       <Link to={`/product/${product._id}`} className="relative overflow-hidden aspect-square block">
         <img
           src={product.image}
           alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
+          className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
           onError={(e) => {
             e.target.src = 'https://via.placeholder.com/400x400?text=Product';
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+        {hasDiscount && (
+          <span className="absolute left-3 top-3 rounded-md bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white">
+            {discountPercent}% OFF
+          </span>
+        )}
+        <div className="pointer-events-none absolute inset-x-3 bottom-3 flex translate-y-2 items-center justify-between rounded-lg bg-black/45 px-3 py-2 opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+          <span className="text-xs font-medium text-white/90">View details</span>
+          <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 5l7 7-7 7" />
+          </svg>
+        </div>
       </Link>
 
-      {/* Product Info + Add/Quantity Controls */}
-      <div className="p-5 flex flex-col flex-grow space-y-4">
-        {/* Product Title - Clickable */}
+      <div className="flex flex-grow flex-col space-y-3.5 p-5">
         <Link to={`/product/${product._id}`} className="block">
-          <h3 className="font-bold text-lg text-gray-900 group-hover:text-indigo-600 transition-colors line-clamp-2 hover:underline">
+          <h3 className="line-clamp-2 text-base font-semibold text-slate-900 transition-colors group-hover:text-blue-700">
             {product.name}
           </h3>
         </Link>
 
-        <p className="text-sm text-gray-600 line-clamp-2 flex-grow">
+        <p className="line-clamp-2 flex-grow text-sm text-slate-600">
           {product.description}
         </p>
 
-        <div className="flex justify-between items-center">
-          <span className="text-2xl font-extrabold text-gray-900">
-            ₹{Number(product.price).toLocaleString('en-IN')}
+        <div className="flex items-center gap-1.5 border-b border-slate-100 pb-3">
+          {renderStars()}
+          <span className="text-xs font-medium text-slate-600">
+            {ratingValue > 0 ? ratingValue.toFixed(1) : '0.0'} ({reviewCount})
           </span>
-          <div className="flex items-center gap-1">
-            <svg className="w-5 h-5 text-amber-400 fill-current" viewBox="0 0 20 20">
-              <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-            </svg>
-            <span className="text-sm font-medium text-gray-700">4.8</span>
-          </div>
         </div>
 
-        {/* If item is in cart show quantity controls, otherwise show Add button */}
+        <div className="flex items-end justify-between gap-3">
+          <div className="space-y-0.5">
+            <p className="text-2xl font-extrabold text-slate-900">
+              ₹{sellingPrice.toLocaleString('en-IN')}
+            </p>
+            <p className="text-xs text-slate-500">
+              MRP{' '}
+              <span className="line-through">
+                ₹{originalPrice.toLocaleString('en-IN')}
+              </span>
+            </p>
+          </div>
+          {hasDiscount && <span className="text-xs font-semibold text-emerald-600">Save ₹{(originalPrice - sellingPrice).toLocaleString('en-IN')}</span>}
+        </div>
+
         {existingItem ? (
-          <div className="w-full flex items-center justify-between gap-2 bg-gradient-to-r from-indigo-600 to-violet-600 p-1 rounded-xl shadow-md">
+          <div className="flex w-full items-center justify-between gap-2 rounded-xl bg-slate-900 p-1 shadow-sm">
             <button
               onClick={handleDecrease}
-              className="flex-1 py-2.5 px-4 bg-white/20 hover:bg-white/30 text-white font-bold text-lg rounded-lg transition-all duration-200"
+              className="flex-1 rounded-lg bg-white/15 px-4 py-2.5 text-lg font-bold text-white transition-colors duration-200 hover:bg-white/25"
             >
               −
             </button>
-            <div className="flex-1 py-2.5 px-4 bg-white/20 text-white text-center font-bold text-lg rounded-lg">
+            <div className="flex-1 rounded-lg bg-white/15 px-4 py-2.5 text-center text-lg font-bold text-white">
               {existingItem.quantity}
             </div>
             <button
               onClick={handleIncrease}
-              className="flex-1 py-2.5 px-4 bg-white/20 hover:bg-white/30 text-white font-bold text-lg rounded-lg transition-all duration-200"
+              className="flex-1 rounded-lg bg-white/15 px-4 py-2.5 text-lg font-bold text-white transition-colors duration-200 hover:bg-white/25"
             >
               +
             </button>
@@ -104,10 +145,10 @@ export default function ProductCard({ product, index }) {
         ) : (
           <button
             onClick={handleAddToCart}
-            className={`w-full py-3.5 px-6 rounded-xl font-semibold text-base transition-all duration-300 shadow-md ${
+            className={`w-full rounded-xl px-6 py-3 text-sm font-semibold transition-all duration-300 active:scale-[0.99] ${
               isAdded
-                ? 'bg-emerald-600 text-white shadow-emerald-500/30'
-                : 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:from-indigo-700 hover:to-violet-700 hover:shadow-xl hover:scale-[1.02]'
+                ? 'bg-emerald-600 text-white'
+                : 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md'
             }`}
           >
             {isAdded ? '✓ Added' : 'Add to Cart'}
@@ -157,17 +198,18 @@ export function ProductGrid() {
   }
 
   return (
-    <div id="products" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <div className="mb-12 text-center">
-        <h2 className="text-4xl font-bold text-gray-900 mb-2">Featured Products</h2>
-        <p className="text-gray-600">Curated selection of premium items</p>
+    <section id="products" className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+      <div className="mb-10 text-left lg:ml-5">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Explore catalogue</p>
+        <h2 className="mb-2 text-3xl font-bold text-slate-900 sm:text-4xl">Top Deals For You</h2>
+        <p className="max-w-2xl text-slate-600">Handpicked products with transparent pricing and fast fulfillment</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {products.map((product, index) => (
           <ProductCard key={product._id} product={product} index={index} />
         ))}
       </div>
-    </div>
+    </section>
   );
 }
