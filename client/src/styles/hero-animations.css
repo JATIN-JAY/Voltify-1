@@ -1,0 +1,112 @@
+/* Hero Section Entrance Animations */
+/* All animations use cubic-bezier for premium feel */
+
+/* 1. Label fade in at 0ms */
+.hero-label-fade {
+  animation: labelFadeIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  opacity: 0;
+}
+
+@keyframes labelFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* 2. "Gear up your" slide up and fade at 200ms */
+.hero-headline-slideup {
+  animation: slideUpFadeIn 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s forwards;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+@keyframes slideUpFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 3. Typing effect for "edge." - No animation needed, handled by JS */
+.hero-text-typing {
+  min-height: 1em;
+  display: inline-block;
+}
+
+/* Blinking cursor - thin 2px line */
+.cursor-blink {
+  animation: blink 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background-color: #e8a020;
+  margin-left: 3px;
+  vertical-align: text-bottom;
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+/* 4. Subtitle fade in at 800ms */
+.hero-subtitle-fade {
+  animation: subtitleFadeIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.8s forwards;
+  opacity: 0;
+}
+
+@keyframes subtitleFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* 5. CTA Buttons fade + slide at 1000ms */
+.hero-cta-fade {
+  animation: ctaSlideUpFadeIn 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 1s forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+@keyframes ctaSlideUpFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 6. Featured product card fade from right at 300ms */
+.hero-featured-fade-right {
+  animation: fadeInFromRight 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards;
+  opacity: 0;
+  transform: translateX(40px);
+}
+
+@keyframes fadeInFromRight {
+  0% {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

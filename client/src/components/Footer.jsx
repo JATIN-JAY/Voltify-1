@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
@@ -15,19 +16,20 @@ export default function Footer() {
   };
 
   return (
-    <footer className="mt-24 bg-gradient-to-b from-gray-50 to-white border-t border-gray-100">
+    <footer className="bg-voltify-dark text-voltify-light">
       {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto px-6 py-16">
         {/* Brand Section */}
-        <div className="mb-12 pb-8 border-b border-gray-100">
+        <div className="mb-12 pb-8 border-b border-voltify-border">
           <div className="flex items-center gap-3 mb-4">
-            <h1 className="text-3xl font-black tracking-tight italic bg-gradient-to-r from-indigo-700 via-violet-600 to-cyan-500 bg-clip-text text-transparent">
-              Voltify
-            </h1>
+            <div className="w-10 h-10 bg-voltify-gold rounded-lg flex items-center justify-center">
+              <span className="text-lg font-bold text-voltify-dark">V</span>
+            </div>
+            <h1 className="text-3xl font-display font-bold text-voltify-light">Voltify</h1>
           </div>
-          <p className="text-gray-600 max-w-sm">
-            A modern online destination for premium electronics and smart gadgets focused on quality, 
-            fair pricing, and a smooth shopping experience.
+          <p className="text-voltify-light/50 max-w-sm">
+            Premium tech commerce designed for the refined modern professional. 
+            Skip the overpricing, embrace the elegant.
           </p>
         </div>
 
@@ -35,55 +37,71 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Shop Section */}
           <nav aria-labelledby="shop-heading">
-            <h2 id="shop-heading" className="text-sm font-semibold text-gray-900 mb-6 uppercase tracking-wide">
+            <h2 id="shop-heading" className="text-xs font-display font-bold text-voltify-light mb-6 uppercase tracking-widest">
               Shop
             </h2>
             <ul className="space-y-4 text-sm">
               <li>
                 <Link 
-                  to="/products" 
-                  className="text-gray-600 hover:text-gray-900 transition duration-200"
+                  to="/category/Mobiles" 
+                  className="text-voltify-light/60 hover:text-voltify-gold transition duration-300"
                 >
-                  All Products
+                  Mobiles
                 </Link>
               </li>
               <li>
-                <a 
-                  href="#best-sellers" 
-                  className="text-gray-600 hover:text-gray-900 transition duration-200"
+                <Link 
+                  to="/category/Tablets" 
+                  className="text-voltify-light/60 hover:text-voltify-gold transition duration-300"
                 >
-                  Best Sellers
-                </a>
+                  Tablets
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/category/Audio" 
+                  className="text-voltify-light/60 hover:text-voltify-gold transition duration-300"
+                >
+                  Audio
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/category/Accessories" 
+                  className="text-voltify-light/60 hover:text-voltify-gold transition duration-300"
+                >
+                  Accessories
+                </Link>
               </li>
             </ul>
           </nav>
 
           {/* Company Section */}
           <nav aria-labelledby="company-heading">
-            <h2 id="company-heading" className="text-sm font-semibold text-gray-900 mb-6 uppercase tracking-wide">
+            <h2 id="company-heading" className="text-xs font-display font-bold text-voltify-light mb-6 uppercase tracking-widest">
               Company
             </h2>
             <ul className="space-y-4 text-sm">
               <li>
                 <a 
                   href="#about" 
-                  className="text-gray-600 hover:text-gray-900 transition duration-200"
+                  className="text-voltify-light/60 hover:text-voltify-gold transition duration-300"
                 >
                   About Us
                 </a>
               </li>
               <li>
                 <a 
-                  href="#press" 
-                  className="text-gray-600 hover:text-gray-900 transition duration-200"
+                  href="#blog" 
+                  className="text-voltify-light/60 hover:text-voltify-gold transition duration-300"
                 >
-                  Press
+                  Blog
                 </a>
               </li>
               <li>
                 <a 
                   href="#careers" 
-                  className="text-gray-600 hover:text-gray-900 transition duration-200"
+                  className="text-voltify-light/60 hover:text-voltify-gold transition duration-300"
                 >
                   Careers
                 </a>
@@ -91,7 +109,7 @@ export default function Footer() {
               <li>
                 <a 
                   href="#contact" 
-                  className="text-gray-600 hover:text-gray-900 transition duration-200"
+                  className="text-voltify-light/60 hover:text-voltify-gold transition duration-300"
                 >
                   Contact
                 </a>
@@ -99,16 +117,49 @@ export default function Footer() {
             </ul>
           </nav>
 
+          {/* Seller Section */}
+          <nav aria-labelledby="seller-heading">
+            <h2 id="seller-heading" className="text-xs font-display font-bold text-voltify-light mb-6 uppercase tracking-widest">
+              For Sellers
+            </h2>
+            <ul className="space-y-4 text-sm">
+              <li>
+                <Link 
+                  to="/become-seller" 
+                  className="text-voltify-light/60 hover:text-voltify-gold transition duration-300"
+                >
+                  Become a Seller
+                </Link>
+              </li>
+              <li>
+                <a 
+                  href="#seller-faq" 
+                  className="text-voltify-light/60 hover:text-voltify-gold transition duration-300"
+                >
+                  Seller FAQ
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="#seller-guide" 
+                  className="text-voltify-light/60 hover:text-voltify-gold transition duration-300"
+                >
+                  Seller Guide
+                </a>
+              </li>
+            </ul>
+          </nav>
+
           {/* Legal Section */}
           <nav aria-labelledby="legal-heading">
-            <h2 id="legal-heading" className="text-sm font-semibold text-gray-900 mb-6 uppercase tracking-wide">
+            <h2 id="legal-heading" className="text-xs font-display font-bold text-voltify-light mb-6 uppercase tracking-widest">
               Legal
             </h2>
             <ul className="space-y-4 text-sm">
               <li>
                 <a 
                   href="#terms" 
-                  className="text-gray-600 hover:text-gray-900 transition duration-200"
+                  className="text-voltify-light/60 hover:text-voltify-gold transition duration-300"
                 >
                   Terms & Conditions
                 </a>
@@ -116,17 +167,17 @@ export default function Footer() {
               <li>
                 <a 
                   href="#privacy" 
-                  className="text-gray-600 hover:text-gray-900 transition duration-200"
+                  className="text-voltify-light/60 hover:text-voltify-gold transition duration-300"
                 >
                   Privacy Policy
                 </a>
               </li>
               <li>
                 <a 
-                  href="#sitemap" 
-                  className="text-gray-600 hover:text-gray-900 transition duration-200"
+                  href="#returns" 
+                  className="text-voltify-light/60 hover:text-voltify-gold transition duration-300"
                 >
-                  Sitemap
+                  Returns & Refunds
                 </a>
               </li>
             </ul>
@@ -134,11 +185,11 @@ export default function Footer() {
 
           {/* Newsletter Section */}
           <section aria-labelledby="newsletter-heading">
-            <h2 id="newsletter-heading" className="text-sm font-semibold text-gray-900 mb-6 uppercase tracking-wide">
-              Newsletter
+            <h2 id="newsletter-heading" className="text-xs font-display font-bold text-voltify-light mb-6 uppercase tracking-widest">
+              Stay Updated
             </h2>
-            <p className="text-sm text-gray-600 mb-4">
-              Get updates about exclusive offers and popular tech. <span className="text-xs text-gray-500">No spam — unsubscribe anytime.</span>
+            <p className="text-sm text-voltify-light/60 mb-4">
+              Get exclusive offers and tech insights. <span className="text-xs text-voltify-light/40">No spam—unsubscribe anytime.</span>
             </p>
             <form onSubmit={handleNewsletterSubmit} className="space-y-3">
               <div className="flex gap-2">
@@ -146,69 +197,72 @@ export default function Footer() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your email"
+                  placeholder="your@email.com"
                   aria-label="Email for newsletter subscription"
-                  className="flex-1 px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                  className="input-field flex-1 bg-voltify-dark border-voltify-border placeholder-voltify-light/40 text-voltify-light focus:ring-voltify-gold"
                   required
                 />
-                <button
+                <motion.button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition duration-200"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-4 py-3 bg-voltify-gold text-voltify-dark text-sm font-semibold rounded-xl hover:shadow-lg transition duration-300 whitespace-nowrap"
                   aria-label="Subscribe to newsletter"
                 >
                   Subscribe
-                </button>
+                </motion.button>
               </div>
               {subscribeStatus === 'success' && (
-                <p className="text-xs text-green-600">Thanks for subscribing!</p>
+                <motion.p 
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  className="text-xs text-emerald-400"
+                >
+                  ✓ Thanks for subscribing!
+                </motion.p>
               )}
             </form>
           </section>
         </div>
 
         {/* Contact & Creators Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-12 border-t border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-12 border-t border-voltify-border">
           {/* Contact Details */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wide">Contact</h3>
-            <ul className="space-y-3 text-sm text-gray-600">
+            <h3 className="text-xs font-display font-bold text-voltify-light mb-4 uppercase tracking-widest">Contact</h3>
+            <ul className="space-y-3 text-sm text-voltify-light/60">
               <li>
                 <a 
                   href="mailto:support@voltify.in"
-                  className="hover:text-gray-900 transition duration-200"
+                  className="hover:text-voltify-gold transition duration-300"
                 >
-                  Email: support@voltify.in
+                  📧 support@voltify.in
                 </a>
               </li>
               <li>
                 <a 
                   href="tel:+919889488918"
-                  className="hover:text-gray-900 transition duration-200"
+                  className="hover:text-voltify-gold transition duration-300"
                 >
-                  Phone: +91-9889488918
+                  📱 +91-9889488918
                 </a>
               </li>
-              <li className="text-gray-500">
-                Support Hours: Monday – Saturday, 10:00 AM – 6:00 PM
+              <li className="text-voltify-light/40">
+                Mon – Sat, 10:00 AM – 6:00 PM IST
               </li>
             </ul>
           </div>
 
           {/* Creators Section */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wide">Creators</h3>
-            <ul className="space-y-3 text-sm text-gray-600">
+            <h3 className="text-xs font-display font-bold text-voltify-light mb-4 uppercase tracking-widest">Creator</h3>
+            <ul className="space-y-3 text-sm text-voltify-light/60">
               <li>
-                <strong className="text-gray-900">Jatin Singh</strong>
-                <p className="text-xs text-gray-500">Full-stack development, backend architecture, and deployment</p>
-              </li>
-              <li>
-                <strong className="text-gray-900">Om Gupta</strong>
-                <p className="text-xs text-gray-500">Frontend design, UI/UX, and responsiveness</p>
-              </li>
-              <li>
-                <strong className="text-gray-900">Ankit Kumar</strong>
-                <p className="text-xs text-gray-500">Product management, testing, and content handling</p>
+                <strong className="text-voltify-light">Jatin Singh</strong>
+                <p className="text-xs text-voltify-light/40 mt-1">Backend & Deployment</p>
+                <p className="text-xs text-voltify-light/40 mt-1">Frontend & UI/UX</p>
+                <p className="text-xs text-voltify-light/40 mt-1">Product & Testing</p>
               </li>
             </ul>
           </div>
@@ -216,13 +270,13 @@ export default function Footer() {
       </div>
 
       {/* Copyright Bar */}
-      <div className="border-t border-gray-100 bg-white px-6 py-6">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-500">
-          <p>© {new Date().getFullYear()} Voltify. All rights reserved.</p>
+      <div className="border-t border-voltify-border bg-voltify-dark/80 px-6 py-8">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-voltify-light/50">
+          <p>© {new Date().getFullYear()} Voltify. Crafted with precision.</p>
           <div className="flex items-center gap-6">
-            <a href="#terms" className="hover:text-gray-700 transition duration-200">Terms & Conditions</a>
-            <a href="#privacy" className="hover:text-gray-700 transition duration-200">Privacy Policy</a>
-            <a href="#sitemap" className="hover:text-gray-700 transition duration-200">Sitemap</a>
+            <a href="#terms" className="hover:text-voltify-gold transition duration-300">Terms</a>
+            <a href="#privacy" className="hover:text-voltify-gold transition duration-300">Privacy</a>
+            <a href="#accessibility" className="hover:text-voltify-gold transition duration-300">Accessibility</a>
           </div>
         </div>
       </div>

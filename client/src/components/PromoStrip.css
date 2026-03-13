@@ -1,0 +1,136 @@
+/* Promo Strip Component - Smooth CSS Marquee */
+
+.promo-strip {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 40;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  line-height: 1.4;
+  padding: 0;
+  transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+  opacity: 1;
+  visibility: visible;
+}
+
+.promo-strip.promo-strip--hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+@media (min-width: 768px) {
+  .promo-strip {
+    top: 80px;
+  }
+}
+
+.promo-strip--dark {
+  background-color: #141210;
+  color: #f5f0e8;
+}
+
+.promo-strip--light {
+  background-color: #fafaf8;
+  color: #0f0f1a;
+}
+
+/* Container that holds the scrolling content */
+.promo-strip__container {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+}
+
+/* The scrolling element with duplicated content */
+.promo-strip__scroll {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  gap: 8px;
+  /* Smooth infinite marquee animation */
+  animation: marquee 40s linear infinite;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Individual promo item */
+.promo-strip__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 0 4px;
+}
+
+.promo-strip__item span {
+  display: inline;
+}
+
+/* Separator dots - styled based on variant */
+.promo-strip--dark .promo-strip__separator {
+  color: #e8a020;
+  font-size: 10px;
+  opacity: 0.8;
+}
+
+.promo-strip--light .promo-strip__separator {
+  color: #fbbf24;
+  font-size: 10px;
+  opacity: 0.6;
+}
+
+/* Ensure smooth animation on all browsers */
+@supports (animation-timeline: scroll()) {
+  /* Fallback for browsers that don't support smooth marquee natively */
+}
+
+/* Smooth infinite marquee keyframes */
+@keyframes marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    /* Scroll by exactly 50% (half the width of duplicated content) */
+    transform: translate3d(calc(-50% - 4px), 0, 0);
+  }
+}
+
+/* Pause animation on hover (optional - can be removed) */
+.promo-strip:hover .promo-strip__scroll {
+  animation-play-state: paused;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .promo-strip__container {
+    padding: 10px 20px;
+    min-height: 40px;
+  }
+
+  .promo-strip {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+  }
+}
+
+/* Collapse animation when dismissed */
+.promo-strip.promo-strip--collapsed {
+  height: 0;
+  padding: 0;
+  overflow: hidden;
+}

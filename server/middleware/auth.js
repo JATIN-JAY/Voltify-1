@@ -2,18 +2,37 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
 export const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.split(' ')[1];
 
   if (!token) {
-    return res.status(401).json({ message: 'No token provided' });
+    console.error('❌ No token provided in Authorization header');
+    return res.status(401).json({ message: 'No authentication token provided. Please log in.' });
   }
 
   try {
+    if (!process.env.JWT_SECRET) {
+      console.error('❌ JWT_SECRET not configured in environment variables');
+      return res.status(500).json({ message: 'Server configuration error' });
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.userId = decoded.id;
     next();
   } catch (error) {
-    res.status(401).json({ message: 'Invalid token' });
+    console.error('❌ Token verification failed:', {
+      errorName: error.name,
+      errorMessage: error.message,
+      tokenLength: token.length,
+    });
+
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: 'Your session has expired. Please log in again.' });
+    } else if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({ message: 'Invalid authentication token. Please log in again.' });
+    }
+
+    res.status(401).json({ message: 'Authentication failed. Please log in again.' });
   }
 };
 

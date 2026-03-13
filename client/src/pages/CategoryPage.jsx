@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import api from '../api';
 import { CartContext } from '../context/CartContext';
 
@@ -49,29 +50,29 @@ function ProductCard({ product }) {
 
       <div className="p-5 flex flex-col flex-grow space-y-4">
         <Link to={`/product/${product._id}`} className="block">
-          <h3 className="font-bold text-lg text-gray-900 group-hover:text-indigo-600 transition-colors line-clamp-2 hover:underline">
+          <h3 className="font-bold text-lg text-slate-900 group-hover:text-slate-700 transition-colors line-clamp-2 hover:underline">
             {product.name}
           </h3>
         </Link>
 
-        <p className="text-sm text-gray-600 line-clamp-2 flex-grow">
+        <p className="text-sm text-slate-600 line-clamp-2 flex-grow">
           {product.description}
         </p>
 
         <div className="flex justify-between items-center">
-          <span className="text-2xl font-extrabold text-gray-900">
+          <span className="text-2xl font-extrabold text-slate-900">
             ₹{Number(product.price).toLocaleString('en-IN')}
           </span>
           <div className="flex items-center gap-1">
             <svg className="w-5 h-5 text-amber-400 fill-current" viewBox="0 0 20 20">
               <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
             </svg>
-            <span className="text-sm font-medium text-gray-700">4.8</span>
+            <span className="text-sm font-medium text-slate-700">4.8</span>
           </div>
         </div>
 
         {existingItem ? (
-          <div className="w-full flex items-center justify-between gap-2 bg-gradient-to-r from-indigo-600 to-violet-600 p-1 rounded-xl shadow-md">
+          <div className="w-full flex items-center justify-between gap-2 bg-gradient-to-r from-slate-900 to-slate-800 p-1 rounded-xl shadow-md">
             <button
               onClick={handleDecrease}
               className="flex-1 py-2.5 px-4 bg-white/20 hover:bg-white/30 text-white font-bold text-lg rounded-lg transition-all duration-200"
@@ -94,7 +95,7 @@ function ProductCard({ product }) {
             className={`w-full py-3.5 px-6 rounded-xl font-semibold text-base transition-all duration-300 shadow-md ${
               isAdded
                 ? 'bg-emerald-600 text-white shadow-emerald-500/30'
-                : 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:from-indigo-700 hover:to-violet-700 hover:shadow-xl hover:scale-[1.02]'
+                : 'bg-gradient-to-r from-slate-900 to-slate-800 text-white hover:from-slate-800 hover:to-slate-700 hover:shadow-xl hover:scale-[1.02]'
             }`}
           >
             {isAdded ? '✓ Added' : 'Add to Cart'}
@@ -151,45 +152,62 @@ export default function CategoryPage() {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-20 pt-32">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-900"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white pt-20 pb-12">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 pt-20 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Category Header */}
-        <div className="mb-16 text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">
+        <motion.div 
+          className="mb-16 text-center"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <h1 className="text-5xl font-display font-bold text-slate-900 mb-4">
             {brand ? `${brand} ${categoryTitles[category] || category}` : (categoryTitles[category] || category)}
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-slate-600">
             {brand 
               ? `Browse ${brand}'s premium collection of ${category.toLowerCase()}` 
               : `Browse our premium collection of ${category.toLowerCase()}`}
           </p>
-        </div>
+        </motion.div>
 
         {/* Products Grid */}
         {products.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-lg text-gray-600 mb-6">
+            <p className="text-lg text-slate-600 mb-6">
               No products available in this category yet.
             </p>
             <a
               href="/"
-              className="inline-block px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition"
+              className="inline-block px-8 py-3 btn-primary font-semibold"
             >
               Back to Home
             </a>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {products.map((product) => (
-              <ProductCard key={product._id} product={product} />
+          <motion.div 
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            {products.map((product, idx) => (
+              <motion.div
+                key={product._id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.05 }}
+                viewport={{ once: true }}
+              >
+                <ProductCard product={product} />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
     </div>

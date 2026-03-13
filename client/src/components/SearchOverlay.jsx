@@ -1,8 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, memo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../api';
 
-export default function SearchOverlay({ open, onClose }) {
+/**
+ * SearchOverlay Component - Dark Amber Theme
+ * Premium search experience with live results, trending searches, and quick explore links
+ */
+const SearchOverlay = memo(function SearchOverlay({ open, onClose }) {
   const [visible, setVisible] = useState(false);
   const backdropRef = useRef(null);
   const inputRef = useRef(null);
@@ -12,69 +16,81 @@ export default function SearchOverlay({ open, onClose }) {
   const [results, setResults] = useState([]);
   const [loadingResults, setLoadingResults] = useState(false);
   const productsCache = useRef(null);
-  const debounceRef = useRef(null);
 
   // Call the search hook
   useProductSearch(query, open, productsCache, setResults, setLoadingResults);
 
   useEffect(() => {
     if (open) {
-      // small delay to trigger fade-in
       requestAnimationFrame(() => setVisible(true));
-      // focus input after render
       setTimeout(() => inputRef.current?.focus(), 80);
       document.body.style.overflow = 'hidden';
     } else {
       setVisible(false);
       document.body.style.overflow = '';
     }
-
     return () => { document.body.style.overflow = ''; };
-  }, [open]);
+  }, [open, onClose]);
 
   useEffect(() => {
-    function onKey(e) {
+    const onKey = (e) => {
       if (e.key === 'Escape') onClose();
-    }
+    };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [onClose]);
 
   if (!open) return null;
 
-  const quickLinks = [
+  const exploreLinks = [
     { label: 'Top Deals', to: '/category/Mobiles' },
     { label: 'New Arrivals', to: '/category/Mobiles' },
     { label: 'Best Sellers', to: '/category/Accessories' },
-    { label: 'Offers', to: '/offers' },
-    { label: 'Help Center', to: '/help' },
+    { label: 'Premium Brands', to: '/category/Tablets' },
   ];
+
+  const trendingSearches = [
+    'iPhone 17',
+    'AirPods Pro',
+    'Galaxy S25',
+    'Pixel 9 Pro',
+    'iPad Pro',
+  ];
+
+  const handleTrendingClick = (term) => {
+    setQuery(term);
+    inputRef.current?.focus();
+  };
 
   return (
     <div
       ref={backdropRef}
-      onMouseDown={(e) => { if (e.target === backdropRef.current) onClose(); }}
-      className={`fixed left-0 right-0 top-16 bottom-0 z-50 flex items-start justify-center p-6 sm:p-12 transition-opacity duration-300 ${visible ? 'opacity-100' : 'opacity-0'}`}
+      onClick={(e) => { if (e.target === backdropRef.current) onClose(); }}
+      className={`fixed inset-0 z-50 flex items-start justify-center transition-opacity duration-300 ${visible ? 'opacity-100' : 'opacity-0'}`}
     >
-      {/* backdrop covers area below navbar only */}
-      <div className="absolute inset-0 bg-gray-100/95 backdrop-blur-sm" />
+      {/* Dark semi-transparent backdrop at 70% opacity */}
+      <div className="absolute inset-0 bg-black/70" />
 
-      <button
-        onClick={onClose}
-        aria-label="Close search"
-        className="absolute right-6 top-6 sm:right-12 sm:top-12 z-50 inline-flex items-center justify-center w-10 h-10 rounded-full bg-white shadow text-gray-700 hover:bg-gray-50"
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
+      {/* Centered modal panel - max-width 680px, positioned ~80px from top */}
+      <div className="relative z-50 mt-20 w-full px-4 max-w-[680px]">
+        {/* Modal panel - floating card with dark surface and subtle amber border */}
+        <div className="bg-[#1a1a1a] border border-voltify-gold/30 rounded-2xl p-6 shadow-2xl">
+          {/* Close button - Minimal X, positioned outside panel */}
+          <button
+            onClick={onClose}
+            aria-label="Close search"
+            className="absolute -right-3 -top-3 z-50 p-1.5 bg-[#1a1a1a] border border-voltify-gold/30 rounded-full text-voltify-light/70 hover:text-voltify-gold hover:border-voltify-gold transition-all"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
 
-      <div className="relative z-50 w-full max-w-3xl">
-        <div className="px-4 sm:px-6">
-          <div className="mx-auto w-full">
-            <label className="relative block">
+          <div className="space-y-6">
+            {/* Search Bar */}
+            <label className="relative block group">
               <span className="sr-only">Search</span>
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-voltify-gold/70 group-focus-within:text-voltify-gold transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
                 </svg>
@@ -83,63 +99,101 @@ export default function SearchOverlay({ open, onClose }) {
                 ref={inputRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="w-full rounded-full border border-white/30 bg-white/40 backdrop-blur-md py-4 pl-12 pr-6 text-lg sm:text-xl placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full rounded-xl border-2 border-voltify-border bg-[#1e1e1e] py-4 pl-12 pr-5 text-lg sm:text-xl text-voltify-light placeholder-voltify-light/40 focus:outline-none focus:border-voltify-gold focus:ring-0 transition-colors"
                 placeholder="Search for phones, accessories, brands and more..."
                 aria-label="Search"
               />
             </label>
 
-            {/* Live results */}
-            <div className="mt-4">
-              <div className="bg-white/40 backdrop-blur-sm border border-white/20 rounded-lg shadow-sm">
+            {/* Live Results Section */}
+            {(query.trim() || loadingResults) && (
+              <div className="space-y-3 max-h-96 overflow-y-auto">
                 {loadingResults ? (
-                  <div className="p-6 text-center">Searching...</div>
+                  <div className="py-12 text-center">
+                    <div className="inline-block">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-voltify-gold"></div>
+                    </div>
+                    <p className="text-voltify-light/60 mt-2 text-sm">Searching...</p>
+                  </div>
                 ) : results.length > 0 ? (
-                  <div className="divide-y divide-white/30">
+                  <div className="space-y-2">
                     {results.map((r) => (
                       <button
                         key={r._id}
                         onClick={() => { onClose(); navigate(`/product/${r._id}`); }}
-                        className="w-full text-left px-4 py-3 hover:bg-white/30 flex items-center gap-4"
+                        className="w-full text-left px-4 py-3 hover:bg-voltify-dark/50 flex items-center gap-4 rounded-lg transition-colors group"
                       >
-                        <img src={r.image} alt={r.name} className="w-12 h-12 object-cover rounded" onError={(e)=>{e.target.src='https://via.placeholder.com/80'}} />
-                        <div className="flex-1">
-                          <div className="font-medium text-gray-900">{r.name}</div>
-                          <div className="text-sm text-gray-600">{r.brand || r.category}</div>
+                        <img 
+                          src={r.image} 
+                          alt={r.name} 
+                          className="w-14 h-14 object-cover rounded-lg"
+                          onError={(e)=>{e.target.src='https://via.placeholder.com/80'}} 
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-voltify-light truncate">{r.name}</div>
+                          <div className="text-sm text-voltify-light/60">{r.brand || r.category}</div>
                         </div>
-                        <div className="text-sm font-semibold text-gray-900">₹{r.price?.toLocaleString('en-IN')}</div>
+                        <div className="text-base font-semibold text-voltify-gold whitespace-nowrap">₹{r.price?.toLocaleString('en-IN')}</div>
                       </button>
                     ))}
                   </div>
-                ) : query.trim() !== '' ? (
-                  <div className="p-6 text-center text-gray-600">No results for "{query}"</div>
-                ) : null}
+                ) : (
+                  <div className="py-8 text-center">
+                    <p className="text-voltify-light/60">No results for "{query}"</p>
+                  </div>
+                )}
               </div>
-            </div>
+            )}
 
-            <div className="mt-6 bg-transparent">
-              <h3 className="text-sm font-semibold text-gray-600 mb-3">Quick Links</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {quickLinks.map((q) => (
-                  <Link
-                    key={q.label}
-                    to={q.to}
-                    onClick={onClose}
-                    className="block rounded-lg px-4 py-3 bg-white border border-gray-100 shadow-sm hover:shadow-md text-sm text-gray-700"
-                  >
-                    {q.label}
-                  </Link>
-                ))}
+            {/* Trending Searches & Explore */}
+            {!query && (
+              <div className="space-y-6">
+                {/* Trending Searches */}
+                <div>
+                  <p className="text-xs font-bold text-voltify-gold/70 uppercase tracking-widest mb-3">Trending Now</p>
+                  <div className="flex flex-wrap gap-2">
+                    {trendingSearches.map((term) => (
+                      <button
+                        key={term}
+                        onClick={() => handleTrendingClick(term)}
+                        className="px-3 py-1.5 text-sm text-voltify-gold hover:text-voltify-light transition-colors font-medium"
+                      >
+                        {term}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Explore Section */}
+                <div>
+                  <p className="text-xs font-bold text-voltify-gold/70 uppercase tracking-widest mb-3">Explore</p>
+                  <div className="flex flex-wrap gap-2">
+                    {exploreLinks.map((link) => (
+                      <Link
+                        key={link.label}
+                        to={link.to}
+                        onClick={onClose}
+                        className="px-4 py-2 rounded-full bg-voltify-dark/50 border border-voltify-border text-voltify-light text-sm font-medium hover:border-voltify-gold hover:text-voltify-gold transition-all"
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
-}
+});
 
-// fetch + filter logic
+SearchOverlay.displayName = 'SearchOverlay';
+
+export default SearchOverlay;
+
+// Fetch & filter logic
 function useProductSearch(query, open, productsCache, setResults, setLoadingResults) {
   useEffect(() => {
     let cancelled = false;
@@ -191,7 +245,6 @@ function useProductSearch(query, open, productsCache, setResults, setLoadingResu
       }
     }
 
-    // debounce - only search if overlay is open
     if (open) {
       const id = setTimeout(() => {
         doSearch();

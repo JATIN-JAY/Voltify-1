@@ -153,4 +153,42 @@ router.put('/:id', verifyToken, checkAdmin, async (req, res) => {
   }
 });
 
+// Upload image to Cloudinary (admin only)
+router.post('/upload/image', verifyToken, checkAdmin, async (req, res) => {
+  const multer = (await import('multer')).default;
+  const upload = multer({ storage: multer.memoryStorage() });
+
+  // Handle file upload
+  upload.single('file')(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ message: 'File upload failed' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file provided' });
+    }
+
+    try {
+      // Upload to Cloudinary from buffer
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: 'voltify_products', resource_type: 'auto' },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        stream.end(req.file.buffer);
+      });
+
+      res.json({ 
+        message: 'Image uploaded successfully',
+        imageUrl: result.secure_url 
+      });
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to upload image: ' + error.message });
+    }
+  });
+});
+
 export default router;

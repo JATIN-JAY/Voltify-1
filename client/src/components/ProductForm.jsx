@@ -1,306 +1,161 @@
-import React, { useState, useRef } from 'react';
-import axios from 'axios';
-import api from '../api';
+import React, { useMemo } from 'react';
+import { useProductForm } from '../hooks';
+import { Button, Input, Select, Alert, Card, ImageUpload } from './shared';
+import { BRANDS_BY_CATEGORY } from '../constants/navigation';
 
+/**
+ * ProductForm Component - Refactored with composition patterns
+ * Uses custom hooks and shared components for clean, maintainable code
+ */
 const ProductForm = ({ onProductCreated, categories }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    price: '',
-    category: 'Mobiles',
-    brand: '',
-    description: '',
-    imageUrl: '',
-    featured: false,
-  });
+  const {
+    formData,
+    handleInputChange,
+    handleImageUpload,
+    handleSubmit,
+    loading,
+    uploading,
+    message,
+    imagePreview,
+    uploadError,
+    availableBrands,
+  } = useProductForm(onProductCreated);
 
-  const [imagePreview, setImagePreview] = useState(null);
-  const [uploading, setUploading] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const fileInputRef = useRef(null);
+  // Memoize category options to avoid recreation on every render
+  const categoryOptions = useMemo(
+    () => categories.map((cat) => ({ label: cat, value: cat })),
+    [categories]
+  );
 
-  // Get token from localStorage
-  const token = localStorage.getItem('token');
+  // Memoize brand options to avoid recreation on every render
+  const brandOptions = useMemo(
+    () => availableBrands.map((brand) => ({ label: brand, value: brand })),
+    [availableBrands]
+  );
 
-  // Cloudinary configuration from environment variables
-  const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-  const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
-
-  // Brand options for each category
-  const brandsByCategory = {
-    Mobiles: ['Apple', 'Samsung', 'Google Pixel', 'OnePlus', 'Xiaomi', 'iQOO', 'Motorola'],
-    Tablets: ['Apple', 'Samsung', 'OnePlus', 'Lenovo', 'iPad', 'Huawei'],
-    Audio: ['Apple', 'Samsung', 'Sony', 'JBL', 'Boat', 'Beats', 'Sennheiser'],
-    'Phone Case': ['Spigen', 'OtterBox', 'Anker', 'Belkin', 'Samsung'],
-    Accessories: ['Anker', 'Belkin', 'Samsung', 'Spigen', 'OtterBox'],
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-  };
-
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    setUploading(true);
-    setError('');
-
-    try {
-      // Create FormData for file upload
-      const formDataToSend = new FormData();
-      formDataToSend.append('file', file);
-      formDataToSend.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-
-      // Upload to Cloudinary using unsigned upload
-      const uploadResponse = await axios.post(
-        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
-        formDataToSend,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
-
-      const imageUrl = uploadResponse.data.secure_url;
-      setFormData((prev) => ({
-        ...prev,
-        imageUrl,
-      }));
-      setImagePreview(imageUrl);
-      setSuccess('Image uploaded successfully!');
-      setTimeout(() => setSuccess(''), 3000);
-    } catch (err) {
-      setError('Failed to upload image. Make sure Cloudinary is configured correctly.');
-      console.error(err);
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
-
-    // Validate form
-    if (
-      !formData.name ||
-      !formData.price ||
-      !formData.category ||
-      !formData.brand ||
-      !formData.description ||
-      !formData.imageUrl
-    ) {
-      setError('Please fill in all fields and upload an image');
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const response = await api.post(
-        '/products',
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      setSuccess('Product created successfully!');
-      setFormData({
-        name: '',
-        price: '',
-        category: 'Mobiles',
-        brand: '',
-        description: '',
-        imageUrl: '',
-        featured: false,
-      });
-      setImagePreview(null);
-
-      if (onProductCreated) {
-        onProductCreated(response.data.product);
-      }
-
-      setTimeout(() => setSuccess(''), 3000);
-    } catch (err) {
-      setError(
-        err.response?.data?.message || 'Failed to create product. Please try again.'
-      );
-    } finally {
-      setLoading(false);
-    }
+  const handleCategoryChange = (e) => {
+    handleInputChange(e);
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-8">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Add New Product</h2>
+    <Card className="bg-gradient-to-br from-slate-50 to-slate-100">
+      <Card.Header>
+        <h2 className="text-2xl font-display font-bold text-slate-900">
+          Add New Product
+        </h2>
+      </Card.Header>
 
-      {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded text-red-700">
-          {error}
-        </div>
-      )}
+      <Card.Body className="space-y-6">
+        <Alert
+          type={message.type === 'error' ? 'error' : 'success'}
+          message={message.text}
+        />
 
-      {success && (
-        <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded text-green-700">
-          {success}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Product Name */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Product Name *
-          </label>
-          <input
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Product Name */}
+          <Input
+            label="Product Name"
             type="text"
             name="name"
             value={formData.name}
             onChange={handleInputChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="e.g., iPhone 15 Pro Max"
+            containerClassName="space-y-2"
           />
-        </div>
 
-        {/* Price */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Price (₹) *
-          </label>
-          <input
+          {/* Price */}
+          <Input
+            label="Price (₹)"
             type="number"
             name="price"
             value={formData.price}
             onChange={handleInputChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="e.g., 149999"
             min="0"
             step="0.01"
+            containerClassName="space-y-2"
           />
-        </div>
 
-        {/* Category */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Category *
-          </label>
-          <select
+          {/* Category */}
+          <Select
+            label="Category"
             name="category"
             value={formData.category}
-            onChange={handleInputChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">Select Category</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-        </div>
+            onChange={handleCategoryChange}
+            options={categoryOptions}
+            containerClassName="space-y-2"
+          />
 
-        {/* Brand */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Brand *
-          </label>
-          <select
+          {/* Brand */}
+          <Select
+            label="Brand"
             name="brand"
             value={formData.brand}
             onChange={handleInputChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">Select Brand</option>
-            {brandsByCategory[formData.category]?.map((brand) => (
-              <option key={brand} value={brand}>
-                {brand}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Description */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Description *
-          </label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleInputChange}
-            rows="4"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Enter product description..."
+            options={brandOptions}
+            containerClassName="space-y-2"
           />
-        </div>
 
-        {/* Image Upload */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Product Image *
-          </label>
-          <div className="flex items-center gap-4">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
+          {/* Description */}
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-slate-900">
+              Description
+            </label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              rows="4"
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent placeholder:text-slate-500 transition-all"
+              placeholder="Enter product description..."
             />
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-400"
-            >
-              {uploading ? 'Uploading...' : 'Choose Image'}
-            </button>
-            {imagePreview && (
-              <img
-                src={imagePreview}
-                alt="Preview"
-                className="w-20 h-20 object-cover rounded-lg"
-              />
-            )}
           </div>
-        </div>
 
-        {/* Featured Checkbox */}
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            id="featured"
-            name="featured"
-            checked={formData.featured}
-            onChange={handleInputChange}
-            className="w-4 h-4 cursor-pointer"
-          />
-          <label htmlFor="featured" className="text-sm font-medium text-gray-700 cursor-pointer">
-            Mark as featured product (will appear in hero gallery)
-          </label>
-        </div>
+          {/* Image Upload */}
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-slate-900">
+              Product Image
+            </label>
+            <ImageUpload
+              onUpload={handleImageUpload}
+              preview={imagePreview}
+              uploading={uploading}
+              error={uploadError}
+              label="Choose Image"
+            />
+          </div>
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold rounded-lg hover:shadow-lg disabled:opacity-50 transition-all duration-300"
-        >
-          {loading ? 'Creating Product...' : 'Create Product'}
-        </button>
-      </form>
-    </div>
+          {/* Featured Checkbox */}
+          <div className="flex items-center gap-3 p-3 bg-slate-100 rounded-lg">
+            <input
+              type="checkbox"
+              id="featured"
+              name="featured"
+              checked={formData.featured}
+              onChange={handleInputChange}
+              className="w-5 h-5 cursor-pointer accent-slate-900"
+            />
+            <label
+              htmlFor="featured"
+              className="text-sm font-medium text-slate-900 cursor-pointer"
+            >
+              Mark as featured product (appears in hero section)
+            </label>
+          </div>
+
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            isLoading={loading}
+            disabled={loading || uploading}
+            size="lg"
+            className="w-full"
+          >
+            {loading ? 'Creating Product...' : 'Create Product'}
+          </Button>
+        </form>
+      </Card.Body>
+    </Card>
   );
 };
 

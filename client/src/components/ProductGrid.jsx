@@ -7,10 +7,53 @@ import { motion } from 'framer-motion';
 import { CartContext } from '../context/CartContext';
 
 export default function ProductCard({ product, index }) {
-  const { addToCart, cartItems, updateQuantity, removeFromCart } = useContext(CartContext);
+  const { addToCart, cartItems, updateQuantity, removeFromCart, user } = useContext(CartContext);
   const [isAdded, setIsAdded] = useState(false);
+  const [inWishlist, setInWishlist] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const existingItem = cartItems.find((item) => item._id === product._id);
+
+  // Check if product is in wishlist on mount
+  useEffect(() => {
+    if (user) {
+      checkWishlist();
+    }
+  }, [user, product._id]);
+
+  const checkWishlist = async () => {
+    try {
+      const response = await api.get('/auth/wishlist');
+      const isInWishlist = response.data.wishlist.some((item) => item._id === product._id);
+      setInWishlist(isInWishlist);
+    } catch (error) {
+      console.error('Error checking wishlist:', error);
+    }
+  };
+
+  const handleWishlistToggle = async (e) => {
+    e.preventDefault();
+    if (!user) {
+      alert('Please login to add items to wishlist');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      if (inWishlist) {
+        await api.delete(`/auth/wishlist/${product._id}`);
+        setInWishlist(false);
+      } else {
+        await api.post(`/auth/wishlist/${product._id}`);
+        setInWishlist(true);
+      }
+    } catch (error) {
+      console.error('Error updating wishlist:', error.response?.data || error.message);
+      alert(error.response?.data?.message || 'Failed to update wishlist');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAddToCart = () => {
     addToCart(product);
@@ -36,38 +79,43 @@ export default function ProductCard({ product, index }) {
     updateQuantity(product._id, existingItem.quantity + 1);
   };
 
-  const sellingPrice = Number(product?.price ?? 0);
-  const originalPrice = Number(product?.originalPrice ?? product?.mrp ?? sellingPrice);
+  const sellingPrice = Math.round(Number(product?.price ?? 0));
+  const originalPrice = Math.round(Number(product?.originalPrice ?? product?.mrp ?? sellingPrice));
   const hasDiscount = originalPrice > sellingPrice && sellingPrice > 0;
   const discountPercent = hasDiscount ? Math.round(((originalPrice - sellingPrice) / originalPrice) * 100) : 0;
-  const ratingValue = Number(product?.rating ?? 0);
-  const reviewCount = Number(product?.reviewCount ?? product?.numReviews ?? 0);
 
-  const renderStars = () => {
-    return Array.from({ length: 5 }, (_, starIndex) => {
-      const active = ratingValue >= starIndex + 1;
-      return (
-        <svg
-          key={`${product._id}-star-${starIndex}`}
-          className={`h-4 w-4 ${active ? 'text-amber-400' : 'text-slate-300'}`}
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          aria-hidden="true"
-        >
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.036 3.189a1 1 0 00.95.69h3.352c.969 0 1.371 1.24.588 1.81l-2.712 1.97a1 1 0 00-.364 1.118l1.036 3.19c.3.921-.755 1.688-1.539 1.118l-2.711-1.97a1 1 0 00-1.176 0l-2.711 1.97c-.784.57-1.838-.197-1.539-1.118l1.036-3.19a1 1 0 00-.364-1.118L2.123 8.616c-.783-.57-.38-1.81.588-1.81h3.352a1 1 0 00.95-.69l1.036-3.189z" />
-        </svg>
-      );
-    });
+  // Extract model name and color variant from product name
+  const getModelAndVariant = () => {
+    const name = product.name || '';
+    // Remove brand name and get model (e.g., "Samsung Galaxy A55 5G" → "Galaxy A55 5G")
+    const brands = ['Samsung', 'Apple', 'OnePlus', 'Google', 'Xiaomi', 'Motorola', 'Realme', 'iQOO', 'OPPO', 'Vivo'];
+    let modelName = name;
+    for (const brand of brands) {
+      if (name.startsWith(brand)) {
+        modelName = name.substring(brand.length).trim();
+        break;
+      }
+    }
+    // Extract color if available (usually in parentheses)
+    const colorMatch = name.match(/\((.*?)\)/);
+    const color = colorMatch ? colorMatch[1].split(',')[0].trim() : 'Onyx';
+    return { modelName, color };
   };
+
+  const { modelName, color } = getModelAndVariant();
+  const rating = product.rating || 4.8;
+  const reviewCount = product.reviewCount || 214;
+
+
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -6, scale: 1.01 }}
+      whileHover={{ y: -8 }}
       viewport={{ once: false, amount: 0.3 }}
       transition={{ duration: 0.5, delay: (index % 4) * 0.1 }}
-      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:border-slate-300 hover:shadow-xl"
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-voltify-border bg-voltify-dark/80 shadow-sm transition-all duration-300 hover:shadow-xl hover:border-voltify-gold/60 hover:shadow-voltify-gold/10"
     >
       <Link to={`/product/${product._id}`} className="relative overflow-hidden aspect-square block">
         <img
@@ -83,77 +131,98 @@ export default function ProductCard({ product, index }) {
             {discountPercent}% OFF
           </span>
         )}
-        <div className="pointer-events-none absolute inset-x-3 bottom-3 flex translate-y-2 items-center justify-between rounded-lg bg-black/45 px-3 py-2 opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-          <span className="text-xs font-medium text-white/90">View details</span>
-          <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 5l7 7-7 7" />
+        {/* Wishlist Button - Subtle */}
+        <button
+          onClick={handleWishlistToggle}
+          disabled={loading}
+          className="absolute right-3 top-3 rounded-full p-2 transition-all duration-200 disabled:opacity-50 hover:scale-110"
+          aria-label="Add to wishlist"
+        >
+          <svg
+            className={`h-5 w-5 transition-all duration-200 ${inWishlist ? 'fill-red-500 text-red-500' : 'text-voltify-light/40 hover:text-voltify-light/70'}`}
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+            />
           </svg>
-        </div>
+        </button>
       </Link>
 
-      <div className="flex flex-grow flex-col space-y-3.5 p-5">
+      <div className="flex flex-grow flex-col p-4 space-y-3">
+        {/* Title - Editorial */}
         <Link to={`/product/${product._id}`} className="block">
-          <h3 className="line-clamp-2 text-base font-semibold text-slate-900 transition-colors group-hover:text-blue-700">
-            {product.name}
+          <h3 className="text-sm font-semibold text-voltify-light leading-tight">
+            {modelName}
           </h3>
         </Link>
 
-        <p className="line-clamp-2 flex-grow text-sm text-slate-600">
-          {product.description}
-        </p>
+        {/* Color Variant Tag */}
+        <span className="text-xs text-voltify-light/50 font-medium">
+          {color}
+        </span>
 
-        <div className="flex items-center gap-1.5 border-b border-slate-100 pb-3">
-          {renderStars()}
-          <span className="text-xs font-medium text-slate-600">
-            {ratingValue > 0 ? ratingValue.toFixed(1) : '0.0'} ({reviewCount})
-          </span>
+        {/* Rating Line */}
+        <div className="text-xs text-voltify-light/60">
+          ★ {rating} · {reviewCount.toLocaleString()} reviews
         </div>
 
-        <div className="flex items-end justify-between gap-3">
-          <div className="space-y-0.5">
-            <p className="text-2xl font-extrabold text-slate-900">
-              ₹{sellingPrice.toLocaleString('en-IN')}
+        <div className="flex-grow" />
+
+        {/* Price - Premium */}
+        <div>
+          <p className="text-lg font-bold text-voltify-gold">
+            ₹{sellingPrice.toLocaleString('en-IN')}
+          </p>
+          {hasDiscount && (
+            <p className="text-xs font-medium text-emerald-500 mt-0.5">
+              Save {discountPercent}%
             </p>
-            <p className="text-xs text-slate-500">
-              MRP{' '}
-              <span className="line-through">
-                ₹{originalPrice.toLocaleString('en-IN')}
+          )}
+        </div>
+
+        {/* CTA - Small Icon Button */}
+        <div className="flex items-center justify-between pt-1">
+          <div />
+          {existingItem ? (
+            <div className="flex items-center gap-2 bg-voltify-border/50 rounded-full px-2 py-1">
+              <button
+                onClick={handleDecrease}
+                className="text-voltify-gold hover:text-voltify-gold/70 transition-colors p-1"
+              >
+                −
+              </button>
+              <span className="text-xs font-bold text-voltify-gold w-6 text-center">
+                {existingItem.quantity}
               </span>
-            </p>
-          </div>
-          {hasDiscount && <span className="text-xs font-semibold text-emerald-600">Save ₹{(originalPrice - sellingPrice).toLocaleString('en-IN')}</span>}
-        </div>
-
-        {existingItem ? (
-          <div className="flex w-full items-center justify-between gap-2 rounded-xl bg-slate-900 p-1 shadow-sm">
-            <button
-              onClick={handleDecrease}
-              className="flex-1 rounded-lg bg-white/15 px-4 py-2.5 text-lg font-bold text-white transition-colors duration-200 hover:bg-white/25"
-            >
-              −
-            </button>
-            <div className="flex-1 rounded-lg bg-white/15 px-4 py-2.5 text-center text-lg font-bold text-white">
-              {existingItem.quantity}
+              <button
+                onClick={handleIncrease}
+                className="text-voltify-gold hover:text-voltify-gold/70 transition-colors p-1"
+              >
+                +
+              </button>
             </div>
+          ) : (
             <button
-              onClick={handleIncrease}
-              className="flex-1 rounded-lg bg-white/15 px-4 py-2.5 text-lg font-bold text-white transition-colors duration-200 hover:bg-white/25"
+              onClick={handleAddToCart}
+              className={`rounded-full p-2.5 transition-all duration-300 active:scale-95 ${
+                isAdded
+                  ? 'bg-emerald-600/20 text-emerald-400'
+                  : 'bg-voltify-gold/10 text-voltify-gold hover:bg-voltify-gold/20 border border-voltify-gold/40 hover:border-voltify-gold/60'
+              }`}
+              title="Add to cart"
             >
-              +
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
             </button>
-          </div>
-        ) : (
-          <button
-            onClick={handleAddToCart}
-            className={`w-full rounded-xl px-6 py-3 text-sm font-semibold transition-all duration-300 active:scale-[0.99] ${
-              isAdded
-                ? 'bg-emerald-600 text-white'
-                : 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md'
-            }`}
-          >
-            {isAdded ? '✓ Added' : 'Add to Cart'}
-          </button>
-        )}
+          )}
+        </div>
       </div>
     </motion.div>
   );
@@ -184,7 +253,7 @@ export function ProductGrid() {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-voltify-gold"></div>
       </div>
     );
   }
@@ -192,23 +261,25 @@ export function ProductGrid() {
   if (error || products.length === 0) {
     return (
       <div className="text-center py-20">
-        <p className="text-gray-600">No products available yet.</p>
+        <p className="text-voltify-light/60">No products available yet.</p>
       </div>
     );
   }
 
   return (
-    <section id="products" className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
-      <div className="mb-10 text-left lg:ml-5">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Explore catalogue</p>
-        <h2 className="mb-2 text-3xl font-bold text-slate-900 sm:text-4xl">Top Deals For You</h2>
-        <p className="max-w-2xl text-slate-600">Handpicked products with transparent pricing and fast fulfillment</p>
-      </div>
+    <section id="products" className="bg-voltify-dark px-4 py-14 sm:px-6 sm:py-16 lg:px-0 lg:py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-10 text-left">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-voltify-light/50">Explore catalogue</p>
+          <h2 className="mb-2 text-3xl font-bold text-voltify-light sm:text-4xl">Top Deals For You</h2>
+          <p className="max-w-2xl text-voltify-light/60">Handpicked products with transparent pricing and fast fulfillment</p>
+        </div>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {products.map((product, index) => (
-          <ProductCard key={product._id} product={product} index={index} />
-        ))}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {products.map((product, index) => (
+            <ProductCard key={product._id} product={product} index={index} />
+          ))}
+        </div>
       </div>
     </section>
   );

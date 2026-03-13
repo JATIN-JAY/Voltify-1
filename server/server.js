@@ -4,9 +4,11 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 
 import authRoutes from './routes/auth.js';
+import googleAuthRoutes from './routes/google-auth.js';
 import productRoutes from './routes/products.js';
 import orderRoutes from './routes/orders.js';
 import paymentRoutes from './routes/payment.js';
+import sellerRoutes from './routes/sellers.js';
 
 dotenv.config();
 
@@ -41,9 +43,11 @@ mongoose.connection.on('disconnected', () => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/auth/google', googleAuthRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/sellers', sellerRoutes);
 
 // Basic route
 app.get('/api', (req, res) => {

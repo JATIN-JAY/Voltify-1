@@ -1,88 +1,190 @@
-import React, { useState, useContext } from 'react';
-import { CartContext } from '../context/CartContext';
+import React, { useContext } from 'react';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { ModalContext } from '../context/ModalContext';
+import { useProfile } from '../hooks';
+import { Card, Input, Button, Alert } from '../components/shared';
 
+/**
+ * ProfilePage Component - Refactored with shared UI components
+ * Uses useProfile hook for all form logic and state management
+ */
 export default function ProfilePage() {
-  const { user, loginUser } = useContext(CartContext);
-  const [name, setName] = useState(user?.name || '');
-  const [email] = useState(user?.email || '');
-  const [phone, setPhone] = useState(user?.phone || '');
-  const [saving, setSaving] = useState(false);
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState({ name: user?.name || '', phone: user?.phone || '' });
+  const { openModal } = useContext(ModalContext);
+  const {
+    user,
+    editing,
+    saving,
+    message,
+    draft,
+    handleInputChange,
+    startEditing,
+    cancelEditing,
+    handleSubmit,
+  } = useProfile();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setSaving(true);
-    try {
-      const token = localStorage.getItem('token');
-      const updatedUser = { ...(user || {}), name: draft.name, email, phone: draft.phone };
-      if (token) updatedUser.token = token;
-      loginUser(updatedUser);
-      setName(draft.name);
-      setPhone(draft.phone);
-      setEditing(false);
-      alert('Profile updated');
-    } catch (err) {
-      console.error(err);
-      alert('Failed to update profile');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleCancel = () => {
-    setDraft({ name: user?.name || '', phone: user?.phone || '' });
-    setEditing(false);
-  };
-
-  if (!user) return (
-    <div className="min-h-screen flex items-center justify-center py-24">
-      <div className="max-w-md w-full text-center">
-        <h2 className="text-2xl font-bold mb-2">Please log in</h2>
-        <p className="text-gray-600">You need to be logged in to edit your profile.</p>
-      </div>
-    </div>
-  );
+  // Not logged in view
+  if (!user) {
+    return (
+      <motion.div 
+        className="min-h-screen bg-voltify-dark flex items-center justify-center py-24"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        <motion.div 
+          className="max-w-md w-full text-center"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          <h2 className="text-3xl font-black tracking-tight mb-2 text-voltify-light">Please Log In</h2>
+          <p className="text-voltify-light/60 mb-6">You need to be logged in to edit your profile.</p>
+          <button onClick={() => openModal('login')}>
+            <Button variant="primary" size="lg">
+              Go to Login
+            </Button>
+          </button>
+        </motion.div>
+      </motion.div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-voltify-dark py-12 md:py-24">
       <div className="container mx-auto px-4 max-w-2xl">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">My Profile</h1>
-          {!editing ? (
-            <button onClick={() => { setDraft({ name, phone }); setEditing(true); }} className="px-4 py-2 bg-indigo-600 text-white rounded">Edit Profile</button>
-          ) : (
-            <div className="flex gap-2">
-              <button onClick={handleCancel} className="px-4 py-2 bg-gray-200 rounded">Cancel</button>
-            </div>
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center justify-between mb-8"
+        >
+          <h1 className="text-4xl font-black tracking-tight text-voltify-light">My Profile</h1>
+          {!editing && (
+            <Button
+              onClick={startEditing}
+              variant="primary"
+              size="sm"
+            >
+              Edit Profile
+            </Button>
           )}
-        </div>
+        </motion.div>
 
-        <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow">
-          <label className="block mb-4">
-            <div className="text-sm text-gray-600 mb-1">Name</div>
-            <input value={editing ? draft.name : name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} readOnly={!editing} className={`w-full px-3 py-2 border rounded ${!editing ? 'bg-gray-100' : ''}`} />
-          </label>
+        {/* Alert Messages */}
+        {message.text && (
+          <Alert type={message.type} message={message.text} />
+        )}
 
-          <label className="block mb-4">
-            <div className="text-sm text-gray-600 mb-1">Email (read-only)</div>
-            <input value={email} readOnly className="w-full px-3 py-2 border rounded bg-gray-100" />
-          </label>
+        {/* Profile Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <Card className="bg-[#1f1c19] border border-voltify-border/20 rounded-2xl">
+            <Card.Body className="p-6 md:p-8">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Name Field */}
+                <div>
+                  <Input
+                    label="Full Name"
+                    type="text"
+                    name="name"
+                    value={editing ? draft.name : user.name}
+                    onChange={handleInputChange}
+                    disabled={!editing}
+                    className={editing ? '' : 'bg-voltify-dark/40 cursor-not-allowed text-voltify-light/50'}
+                  />
+                </div>
 
-          <label className="block mb-4">
-            <div className="text-sm text-gray-600 mb-1">Phone</div>
-            <input value={editing ? draft.phone : phone} onChange={(e) => setDraft({ ...draft, phone: e.target.value })} readOnly={!editing} className={`w-full px-3 py-2 border rounded ${!editing ? 'bg-gray-100' : ''}`} />
-          </label>
+                {/* Email Field (Read-only) */}
+                <div>
+                  <Input
+                    label="Email Address"
+                    type="email"
+                    value={user.email}
+                    disabled
+                    className="bg-voltify-dark/40 cursor-not-allowed text-voltify-light/50"
+                  />
+                  <p className="text-xs text-voltify-light/50 mt-2">Email cannot be changed</p>
+                </div>
 
-          <div className="flex justify-end">
-            {editing ? (
-              <button type="submit" disabled={saving} className="px-4 py-2 bg-indigo-600 text-white rounded">
-                {saving ? 'Saving...' : 'Save changes'}
-              </button>
-            ) : null}
-          </div>
-        </form>
+                {/* Phone Field */}
+                <div>
+                  <Input
+                    label="Phone Number"
+                    type="tel"
+                    name="phone"
+                    value={editing ? draft.phone : user.phone}
+                    onChange={handleInputChange}
+                    disabled={!editing}
+                    className={editing ? '' : 'bg-voltify-dark/40 cursor-not-allowed text-voltify-light/50'}
+                    placeholder="+91 XXXXXXXXXX"
+                  />
+                </div>
+
+                {/* Form Actions */}
+                <div className="flex justify-end gap-3 pt-6 border-t border-voltify-border/20">
+                  {editing ? (
+                    <>
+                      <Button
+                        onClick={cancelEditing}
+                        variant="secondary"
+                        size="md"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="submit"
+                        variant="primary"
+                        size="md"
+                        isLoading={saving}
+                      >
+                        {saving ? 'Saving...' : 'Save Changes'}
+                      </Button>
+                    </>
+                  ) : null}
+                </div>
+              </form>
+            </Card.Body>
+          </Card>
+        </motion.div>
+
+        {/* Additional Links */}
+        {!editing && (
+          <motion.div
+            className="mt-8 grid grid-cols-2 gap-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            <Link to="/addresses">
+              <Card className="bg-[#1f1c19] cursor-pointer hover:border-voltify-gold/40 transition-all duration-300 border border-voltify-border/20 rounded-2xl">
+                <Card.Body className="text-center py-8 px-6">
+                  <svg className="w-8 h-8 mx-auto mb-3 text-voltify-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <h3 className="font-semibold text-voltify-light">Addresses</h3>
+                  <p className="text-sm text-voltify-light/60 mt-2">Manage delivery addresses</p>
+                </Card.Body>
+              </Card>
+            </Link>
+
+            <Link to="/orders">
+              <Card className="bg-[#1f1c19] cursor-pointer hover:border-voltify-gold/40 transition-all duration-300 border border-voltify-border/20 rounded-2xl">
+                <Card.Body className="text-center py-8 px-6">
+                  <svg className="w-8 h-8 mx-auto mb-3 text-voltify-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                  </svg>
+                  <h3 className="font-semibold text-voltify-light">Orders</h3>
+                  <p className="text-sm text-voltify-light/60 mt-2">View your order history</p>
+                </Card.Body>
+              </Card>
+            </Link>
+          </motion.div>
+        )}
       </div>
     </div>
   );
-}
+};

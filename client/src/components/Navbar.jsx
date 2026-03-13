@@ -1,356 +1,323 @@
-
-
-
-import React, { useContext, useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import React, { useContext, useState, useRef, useEffect, useCallback } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { CartContext } from '../context/CartContext';
+import { ModalContext } from '../context/ModalContext';
+import { useScrolled } from '../hooks';
+import { NAV_CATEGORIES } from '../constants/navigation';
 import SearchOverlay from './SearchOverlay';
 
-export default function Navbar() {
-  const { user, logoutUser, getTotalItems } = useContext(CartContext);
-  const cartCount = getTotalItems();
-  const [searchOpen, setSearchOpen] = useState(false);
-
+/**
+ * Navigation Menu Item Component
+ * Reusable menu item with dropdown support
+ */
+const NavMenuItem = ({ category, isOpen, onMouseEnter, onMouseLeave }) => {
   return (
-    <>
-    <nav className="
-      fixed top-0 left-0 right-0 z-50
-      bg-white/20 backdrop-blur-2xl backdrop-saturate-150
-      border-b border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.12)]
-      transition-all duration-500
-    ">
-      <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link to="/" className="group">
-            <span className="
-              text-2xl font-black tracking-tight italic
-              bg-gradient-to-r from-indigo-700 via-violet-600 to-cyan-500
-              bg-clip-text text-transparent
-              transition-all duration-300 group-hover:brightness-110
-            ">
-              Voltify
-            </span>
-          </Link>
+    <div className="relative" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+      <button className="text-sm font-normal tracking-[0.02em] text-voltify-light/70 hover:text-voltify-gold transition-colors relative group">
+        {category.name}
+        <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-voltify-gold rounded-full scale-0 group-hover:scale-100 transition-all duration-300"></span>
+      </button>
 
-          {/* Navigation Links */}
-          <div className="hidden md:flex items-center gap-10">
-            <Link 
-              to="/" 
-              className="
-                relative text-gray-900 font-medium text-base tracking-wide 
-                hover:text-indigo-700 transition-colors duration-300 group
-              "
-            >
-              Home
-              <span className="
-                absolute -bottom-1 left-0 h-[2px] w-0 
-                bg-gradient-to-r from-indigo-600 to-purple-600 
-                rounded-full group-hover:w-full transition-all duration-400 ease-out
-              "></span>
-            </Link>
-
-            {/* top-level My Orders removed - available inside account dropdown */}
-
-            {/* Admin Link - Only visible to admins */}
-            {user?.isAdmin && (
-              <Link 
-                to="/admin" 
-                className="
-                  relative px-4 py-2 text-sm font-semibold text-white 
-                  bg-gradient-to-r from-orange-500 to-red-500 
-                  hover:from-orange-600 hover:to-red-600 
-                  rounded-full transition-all duration-300
-                "
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2, delay: 0.05 }}
+            className="absolute top-full left-1/2 -translate-x-1/2 mt-3 bg-voltify-dark/95 rounded-2xl shadow-2xl border border-voltify-border min-w-max py-6 px-2 z-40"
+          >
+            {category.items.map((item) => (
+              <Link
+                key={item.name}
+                to={item.path}
+                className="block px-6 py-2 text-sm font-medium text-voltify-light hover:text-voltify-gold hover:bg-voltify-dark rounded-lg transition-colors whitespace-nowrap"
               >
-                Admin Dashboard
+                {item.name}
               </Link>
-            )}
-
-            {/* Mobiles Category */}
-            <div className="relative group">
-              <button 
-                className="
-                  relative text-gray-900 font-medium text-sm tracking-wide 
-                  hover:text-indigo-700 transition-colors duration-300
-                "
-              >
-                Mobiles
-                <span className="
-                  absolute -bottom-1 left-0 h-[2px] w-full 
-                  bg-gradient-to-r from-indigo-600 to-purple-600 
-                  rounded-full group-hover:w-full group-hover:opacity-100 opacity-0 transition-all duration-400 ease-out
-                "></span>
-              </button>
-              <div className="
-                absolute left-0 mt-2 w-40 bg-white/95 backdrop-blur-xl 
-                rounded-2xl shadow-2xl border border-white/30 
-                opacity-0 invisible group-hover:opacity-100 group-hover:visible 
-                transition-all duration-200 py-3 z-50
-              ">
-                <Link to="/category/Mobiles?brand=Apple" className="block px-5 py-2.5 text-gray-900 hover:text-indigo-700 hover:bg-indigo-50/50 transition-all duration-200 font-medium text-sm">Apple</Link>
-                <Link to="/category/Mobiles?brand=Samsung" className="block px-5 py-2.5 text-gray-900 hover:text-indigo-700 hover:bg-indigo-50/50 transition-all duration-200 font-medium text-sm">Samsung</Link>
-                <Link to="/category/Mobiles?brand=Google Pixel" className="block px-5 py-2.5 text-gray-900 hover:text-indigo-700 hover:bg-indigo-50/50 transition-all duration-200 font-medium text-sm">Google Pixel</Link>
-                <Link to="/category/Mobiles?brand=OnePlus" className="block px-5 py-2.5 text-gray-900 hover:text-indigo-700 hover:bg-indigo-50/50 transition-all duration-200 font-medium text-sm">OnePlus</Link>
-                <Link to="/category/Mobiles?brand=Xiaomi" className="block px-5 py-2.5 text-gray-900 hover:text-indigo-700 hover:bg-indigo-50/50 transition-all duration-200 font-medium text-sm">Xiaomi</Link>
-                <Link to="/category/Mobiles?brand=iQOO" className="block px-5 py-2.5 text-gray-900 hover:text-indigo-700 hover:bg-indigo-50/50 transition-all duration-200 font-medium text-sm">iQOO</Link>
-              </div>
-            </div>
-
-            {/* TV Category */}
-            <div className="relative group">
-              <button 
-                className="
-                  relative text-gray-900 font-medium text-sm tracking-wide 
-                  hover:text-blue-700 transition-colors duration-300
-                "
-              >
-                Tablets
-                <span className="
-                  absolute -bottom-1 left-0 h-[2px] w-full 
-                  bg-gradient-to-r from-blue-600 to-cyan-600 
-                  rounded-full group-hover:w-full group-hover:opacity-100 opacity-0 transition-all duration-400 ease-out
-                "></span>
-              </button>
-              <div className="
-                absolute left-0 mt-2 w-40 bg-white/95 backdrop-blur-xl 
-                rounded-2xl shadow-2xl border border-white/30 
-                opacity-0 invisible group-hover:opacity-100 group-hover:visible 
-                transition-all duration-200 py-3 z-50
-              ">
-                <Link to="/category/Tablets?brand=Apple" className="block px-5 py-2.5 text-gray-900 hover:text-blue-700 hover:bg-blue-50/50 transition-all duration-200 font-medium text-sm">Apple iPad</Link>
-                <Link to="/category/Tablets?brand=Samsung" className="block px-5 py-2.5 text-gray-900 hover:text-blue-700 hover:bg-blue-50/50 transition-all duration-200 font-medium text-sm">Samsung Tab</Link>
-                <Link to="/category/Tablets?brand=OnePlus" className="block px-5 py-2.5 text-gray-900 hover:text-blue-700 hover:bg-blue-50/50 transition-all duration-200 font-medium text-sm">OnePlus Pad</Link>
-                <Link to="/category/Tablets?brand=Lenovo" className="block px-5 py-2.5 text-gray-900 hover:text-blue-700 hover:bg-blue-50/50 transition-all duration-200 font-medium text-sm">Lenovo</Link>
-              </div>
-            </div>
-
-            {/* Audio Category - Earbuds & Headsets */}
-            <div className="relative group">
-              <button 
-                className="
-                  relative text-gray-900 font-medium text-sm tracking-wide 
-                  hover:text-blue-700 transition-colors duration-300
-                "
-              >
-                Audio
-                <span className="
-                  absolute -bottom-1 left-0 h-[2px] w-full 
-                  bg-gradient-to-r from-blue-600 to-cyan-600 
-                  rounded-full group-hover:w-full group-hover:opacity-100 opacity-0 transition-all duration-400 ease-out
-                "></span>
-              </button>
-              <div className="
-                absolute left-0 mt-2 w-40 bg-white/95 backdrop-blur-xl 
-                rounded-2xl shadow-2xl border border-white/30 
-                opacity-0 invisible group-hover:opacity-100 group-hover:visible 
-                transition-all duration-200 py-3 z-50
-              ">
-                <div className="px-5 py-2 text-xs font-semibold text-gray-700 uppercase">Earbuds</div>
-                <Link to="/category/Audio?brand=Apple" className="block px-5 py-2.5 text-gray-900 hover:text-blue-700 hover:bg-blue-50/50 transition-all duration-200 font-medium text-sm">Apple AirPods</Link>
-                <Link to="/category/Audio?brand=Samsung" className="block px-5 py-2.5 text-gray-900 hover:text-blue-700 hover:bg-blue-50/50 transition-all duration-200 font-medium text-sm">Samsung Galaxy</Link>
-                <Link to="/category/Audio?brand=Sony" className="block px-5 py-2.5 text-gray-900 hover:text-blue-700 hover:bg-blue-50/50 transition-all duration-200 font-medium text-sm">Sony WF</Link>
-                <Link to="/category/Audio?brand=Boat" className="block px-5 py-2.5 text-gray-900 hover:text-blue-700 hover:bg-blue-50/50 transition-all duration-200 font-medium text-sm">Boult Audio</Link>
-                <div className="border-t border-gray-200 my-2"></div>
-                <div className="px-5 py-2 text-xs font-semibold text-gray-700 uppercase">Headsets</div>
-                <Link to="/category/Audio?brand=Sony" className="block px-5 py-2.5 text-gray-900 hover:text-blue-700 hover:bg-blue-50/50 transition-all duration-200 font-medium text-sm">Sony</Link>
-                <Link to="/category/Audio?brand=JBL" className="block px-5 py-2.5 text-gray-900 hover:text-blue-700 hover:bg-blue-50/50 transition-all duration-200 font-medium text-sm">JBL</Link>
-                <Link to="/category/Audio?brand=Beats" className="block px-5 py-2.5 text-gray-900 hover:text-blue-700 hover:bg-blue-50/50 transition-all duration-200 font-medium text-sm">Beats</Link>
-                <Link to="/category/Audio?brand=Sennheiser" className="block px-5 py-2.5 text-gray-900 hover:text-blue-700 hover:bg-blue-50/50 transition-all duration-200 font-medium text-sm">Sennheiser</Link>
-              </div>
-            </div>
-
-            {/* Phone Case Category */}
-            <div className="relative group">
-              <button 
-                className="
-                  relative text-gray-900 font-medium text-sm tracking-wide 
-                  hover:text-blue-700 transition-colors duration-300
-                "
-              >
-                Phone Case
-                <span className="
-                  absolute -bottom-1 left-0 h-[2px] w-full 
-                  bg-gradient-to-r from-blue-600 to-cyan-600 
-                  rounded-full group-hover:w-full group-hover:opacity-100 opacity-0 transition-all duration-400 ease-out
-                "></span>
-              </button>
-              <div className="
-                absolute left-0 mt-2 w-40 bg-white/95 backdrop-blur-xl 
-                rounded-2xl shadow-2xl border border-white/30 
-                opacity-0 invisible group-hover:opacity-100 group-hover:visible 
-                transition-all duration-200 py-3 z-50
-              ">
-                <Link to="/category/Phone Case?brand=Spigen" className="block px-5 py-2.5 text-gray-900 hover:text-blue-700 hover:bg-blue-50/50 transition-all duration-200 font-medium text-sm">Protective Cases</Link>
-                <Link to="/category/Phone Case?brand=OtterBox" className="block px-5 py-2.5 text-gray-900 hover:text-blue-700 hover:bg-blue-50/50 transition-all duration-200 font-medium text-sm">Screen Guards</Link>
-              </div>
-            </div>
-
-            {/* Accessories Category */}
-            <div className="relative group">
-              <button 
-                className="
-                  relative text-gray-900 font-medium text-sm tracking-wide 
-                  hover:text-blue-700 transition-colors duration-300
-                "
-              >
-                Accessories
-                <span className="
-                  absolute -bottom-1 left-0 h-[2px] w-full 
-                  bg-gradient-to-r from-blue-600 to-cyan-600 
-                  rounded-full group-hover:w-full group-hover:opacity-100 opacity-0 transition-all duration-400 ease-out
-                "></span>
-              </button>
-              <div className="
-                absolute left-0 mt-2 w-40 bg-white/95 backdrop-blur-xl 
-                rounded-2xl shadow-2xl border border-white/30 
-                opacity-0 invisible group-hover:opacity-100 group-hover:visible 
-                transition-all duration-200 py-3 z-50
-              ">
-                <Link to="/category/Accessories?type=Chargers" className="block px-5 py-2.5 text-gray-900 hover:text-blue-700 hover:bg-blue-50/50 transition-all duration-200 font-medium text-sm">Chargers</Link>
-                <Link to="/category/Accessories?type=Power Banks" className="block px-5 py-2.5 text-gray-900 hover:text-blue-700 hover:bg-blue-50/50 transition-all duration-200 font-medium text-sm">Power Banks</Link>
-                <Link to="/category/Accessories?type=Cables & Adapters" className="block px-5 py-2.5 text-gray-900 hover:text-blue-700 hover:bg-blue-50/50 transition-all duration-200 font-medium text-sm">Cables & Adapters</Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Right side - Auth & Cart */}
-          <div className="flex items-center gap-6">
-            {/* Search button */}
-            <button
-              onClick={() => setSearchOpen(true)}
-              className="p-3 text-gray-800 hover:text-indigo-700 transition-all duration-300 hover:scale-110 active:scale-95"
-              aria-label="Open search"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
-              </svg>
-            </button>
-            <Link 
-              to="/cart" 
-              className="
-                relative p-3 text-gray-800 hover:text-indigo-700 
-                transition-all duration-300 hover:scale-110 active:scale-95
-              "
-              aria-label="View cart"
-            >
-              <svg className="w-7 h-7 stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              {cartCount > 0 && (
-                <span className="
-                  absolute -top-0.5 -right-0.5 bg-gradient-to-br from-red-500 to-rose-600 
-                  text-white text-xs font-bold rounded-full min-w-[20px] h-5 
-                  flex items-center justify-center px-1.5 shadow-md ring-2 ring-white/80
-                ">
-                  {cartCount}
-                </span>
-              )}
-            </Link>
-
-            {user ? (
-              <UserDropdown user={user} logoutUser={logoutUser} />
-            ) : (
-              <div className="flex items-center gap-4">
-                <Link 
-                  to="/login" 
-                  className="
-                    px-5 py-2.5 text-sm font-medium text-gray-800 
-                    hover:text-gray-900 bg-white/40 hover:bg-white/60 
-                    border border-gray-300/50 rounded-full 
-                    transition-all duration-300 hover:shadow-md backdrop-blur-sm
-                  "
-                >
-                  Login
-                </Link>
-                <Link 
-                  to="/register" 
-                  className="
-                    px-6 py-2.5 text-sm font-semibold text-white 
-                    bg-gradient-to-r from-indigo-600 to-purple-600 
-                    hover:from-indigo-700 hover:to-purple-700 
-                    border border-indigo-200/30 rounded-full shadow-xl 
-                    hover:shadow-2xl transition-all duration-300 active:scale-95 backdrop-blur-sm
-                  "
-                >
-                  Sign up
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </nav>
-    {/* Search overlay rendered at top-level of Navbar component */}
-    <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
-    </>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
-}
+};
 
-// UserDropdown subcomponent
-function UserDropdown({ user, logoutUser }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef(null);
+/**
+ * User Navigation Actions
+ * Account, wishlist, orders links with profile dropdown
+ */
+const NavUserActions = ({ user, cartCount, onSearchClick, onLogout, onOpenLogin, onOpenSignup }) => {
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const menuRef = useRef(null);
 
+  // Close menu when clicking outside
   useEffect(() => {
-    function onClick(e) {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
-    }
-    document.addEventListener('mousedown', onClick);
-    return () => document.removeEventListener('mousedown', onClick);
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setShowUserMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="flex items-center gap-4">
       <button
-        onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-3"
-        aria-haspopup="true"
-        aria-expanded={open}
+        onClick={onSearchClick}
+        className="text-voltify-light/70 hover:text-voltify-gold transition-colors"
+        aria-label="Search"
       >
-        <div className="
-          w-9 h-9 bg-gradient-to-br from-blue-500 via-cyan-500 to-indigo-500 
-          rounded-xl flex items-center justify-center 
-          shadow-lg group-hover:shadow-2xl group-hover:scale-105 
-          transition-all duration-400 backdrop-blur-sm bg-opacity-90
-        ">
-          <span className="text-white font-black text-xl tracking-tight drop-shadow-lg">{(user.name || 'U')[0]}</span>
-        </div>
-        <span className="hidden sm:inline text-sm font-semibold text-gray-900 tracking-wide">{user.name}</span>
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
       </button>
 
-      {open && (
-        <div className="absolute right-0 mt-3 w-72 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/30 py-3 z-50">
-          <Link to="/profile" className="block px-5 py-3 hover:bg-gray-50">
-            <div className="font-medium text-gray-800">My Profile</div>
-            <div className="text-xs text-gray-500">Edit your basic details</div>
-          </Link>
-
-          <Link to="/addresses" className="block px-5 py-3 hover:bg-gray-50">
-            <div className="font-medium text-gray-800">My Address</div>
-            <div className="text-xs text-gray-500">Manage and edit your saved addresses</div>
-          </Link>
-
-              <Link to="/orders" className="block px-5 py-3 hover:bg-gray-50">
-                <div className="font-medium text-gray-800">My Orders</div>
-                <div className="text-xs text-gray-500">View, track and manage your orders</div>
-              </Link>
-
-          <Link to="/wishlist" className="block px-5 py-3 hover:bg-gray-50">
-            <div className="font-medium text-gray-800">My Wishlist</div>
-            <div className="text-xs text-gray-500">View and edit your favourite products</div>
-          </Link>
-
-          <div className="mt-2 border-t border-gray-100" />
-          <button
-            onClick={() => { setOpen(false); logoutUser(); }}
-            className="w-full text-left px-5 py-3 text-sm text-red-600 hover:bg-gray-50"
+      {user ? (
+        <div className="relative" ref={menuRef}>
+          <motion.button
+            onClick={() => setShowUserMenu(!showUserMenu)}
+            whileHover={{ scale: 1.1 }}
+            className="w-8 h-8 bg-gradient-to-br from-voltify-gold to-voltify-gold/70 rounded-full flex items-center justify-center text-voltify-dark text-xs font-bold hover:shadow-lg transition-all cursor-pointer"
           >
-            Logout
+            {user.name?.[0]?.toUpperCase() || 'U'}
+          </motion.button>
+
+          <AnimatePresence>
+            {showUserMenu && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="absolute right-0 mt-3 w-56 bg-[#1e1e1e] rounded-3xl shadow-xl border border-voltify-border/40 z-50"
+              >
+                {/* User Info Header */}
+                <div className="px-4 py-4 border-b border-voltify-border/20">
+                  <p className="text-sm font-semibold text-voltify-light">{user.name}</p>
+                  <p className="text-xs text-[#888] mt-1">{user.email}</p>
+                </div>
+
+                {/* Menu Items */}
+                <div className="py-2 px-2">
+                  {/* Profile */}
+                  <Link
+                    to="/profile"
+                    onClick={() => setShowUserMenu(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-voltify-light transition-colors group hover:text-voltify-gold"
+                  >
+                    <svg className="w-5 h-5 text-[#888] group-hover:text-voltify-gold transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                    </svg>
+                    <span>Profile</span>
+                  </Link>
+
+                  {/* Orders */}
+                  <Link
+                    to="/orders"
+                    onClick={() => setShowUserMenu(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-voltify-light transition-colors group hover:text-voltify-gold"
+                  >
+                    <svg className="w-5 h-5 text-[#888] group-hover:text-voltify-gold transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.66V18a2.25 2.25 0 002.25 2.25h10.5m-16.5 0h18.75m-18.75-2.75a.75.75 0 001.5 0m16.5 0a.75.75 0 001.5 0m-18.75-11.881a3 3 0 015.364 0l-30 36m33-12.881h2.25m-1.5-1.5h1.5m2.25 0h1.5" />
+                    </svg>
+                    <span>Orders</span>
+                  </Link>
+
+                  {/* Wishlist */}
+                  <Link
+                    to="/wishlist"
+                    onClick={() => setShowUserMenu(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-voltify-light transition-colors group hover:text-voltify-gold"
+                  >
+                    <svg className="w-5 h-5 text-[#888] group-hover:text-voltify-gold transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-1.085-.45-2.084-1.175-2.792m0 0c-.913-.929-2.205-1.461-3.597-1.461-1.537 0-2.921.604-3.907 1.578M5.175 5.458c-.913.929-1.465 2.144-1.465 3.542 0 1.193.31 2.325.844 3.285m19.5 0A24.01 24.01 0 0012 15m-11.445 0c.844.977 1.845 1.83 2.954 2.504" />
+                    </svg>
+                    <span>Wishlist</span>
+                  </Link>
+
+                  {/* Addresses */}
+                  <Link
+                    to="/addresses"
+                    onClick={() => setShowUserMenu(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-voltify-light transition-colors group hover:text-voltify-gold"
+                  >
+                    <svg className="w-5 h-5 text-[#888] group-hover:text-voltify-gold transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                    </svg>
+                    <span>Addresses</span>
+                  </Link>
+
+                  {/* Admin Panel */}
+                  {user.isAdmin && (
+                    <>
+                      <div className="border-t border-voltify-border/20 my-2"></div>
+                      <Link
+                        to="/admin"
+                        onClick={() => setShowUserMenu(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-voltify-light transition-colors group hover:text-voltify-gold"
+                      >
+                        <svg className="w-5 h-5 text-[#888] group-hover:text-voltify-gold transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.592c.55 0 1.02.398 1.11.94m-9.474 0a.75.75 0 00-.735.735m0 0A.75.75 0 003.75 3h16.5a.75.75 0 010 1.5H3.75A.75.75 0 003 3.75zm0 0A.75.75 0 013.75 3h16.5a.75.75 0 011 .75M9.75 6.75v6.75m0 0v3m0-3h6m-6 3v3m6-3v3m3-6v6m0 0v3m0-3h3m-3 3v3" />
+                        </svg>
+                        <span>Admin Panel</span>
+                      </Link>
+                    </>
+                  )}
+                </div>
+
+                {/* Logout */}
+                <div className="border-t border-voltify-border/20 px-2 py-2">
+                  <button
+                    onClick={() => {
+                      onLogout();
+                      setShowUserMenu(false);
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition-colors group hover:text-red-400"
+                  >
+                    <svg className="w-5 h-5 text-[#888] group-hover:text-red-400 transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0110.5 3h6a2.25 2.25 0 012.25 2.25v13.5A2.25 2.25 0 0116.5 21h-6a2.25 2.25 0 01-2.25-2.25V15m-3 0l3-3m0 0l3 3m-3-3v12" />
+                    </svg>
+                    <span className="text-[#b8636e]">Logout</span>
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onOpenLogin}
+            className="px-4 py-2 text-sm font-bold text-voltify-light hover:text-voltify-gold transition-colors tracking-wide"
+          >
+            Login
+          </button>
+          <button
+            onClick={onOpenSignup}
+            className="px-5 py-2.5 text-sm font-bold text-voltify-dark bg-voltify-gold hover:bg-yellow-500 rounded-lg transition-all duration-300 uppercase tracking-wide"
+          >
+            Sign Up
           </button>
         </div>
       )}
+
+      <Link to="/cart" className="relative">
+        <svg className="w-5 h-5 text-voltify-light/70 hover:text-voltify-gold transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+        </svg>
+        {cartCount > 0 && (
+          <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+            {cartCount}
+          </span>
+        )}
+      </Link>
+
+      <Link to="/become-seller" className="hidden sm:block px-3 py-1.5 text-xs font-bold text-voltify-light border border-voltify-gold/50 rounded-lg hover:bg-voltify-gold/10 transition-all uppercase tracking-wide">
+        Sell
+      </Link>
     </div>
+  );
+};
+
+/**
+ * Navbar Component - Refactored with composition patterns
+ * Separates concerns into smaller, reusable components
+ */
+export default function Navbar() {
+  const { user, logoutUser, getTotalItems } = useContext(CartContext);
+  const { openModal } = useContext(ModalContext);
+  const isScrolled = useScrolled();
+  const cartCount = getTotalItems();
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [activeMenu, setActiveMenu] = useState(null);
+  const location = useLocation();
+  const hoverTimeout = useRef(null);
+
+  // Close menu on navigation
+  useEffect(() => {
+    setActiveMenu(null);
+  }, [location.pathname]);
+
+  // Handle menu hover with delay to prevent flicker
+  const handleMouseEnter = useCallback((menuName) => {
+    if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
+    setActiveMenu(menuName);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    hoverTimeout.current = setTimeout(() => {
+      setActiveMenu(null);
+    }, 150);
+  }, []);
+
+  return (
+    <>
+      <nav
+        className={`fixed top-4 left-4 right-4 rounded-2xl z-50 transition-all duration-500 ${
+          isScrolled
+            ? 'bg-voltify-dark backdrop-blur-xl border border-voltify-border/50 shadow-lg'
+            : 'bg-voltify-dark/95 border border-voltify-border/30'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-12 md:h-14">
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-3 group relative z-50">
+              <div className="relative">
+                <div className="w-10 h-10 bg-voltify-gold rounded-lg flex items-center justify-center text-voltify-dark font-black text-lg group-hover:shadow-[0_0_20px_rgba(232,160,32,0.4)] transition-all duration-500 shadow-lg">
+                  V
+                </div>
+                <span className="absolute inset-0 rounded-lg bg-voltify-gold opacity-0 group-hover:opacity-30 transition-opacity blur-lg"></span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xl font-black tracking-narrow text-voltify-light">Voltify</span>
+                <span className="text-[9px] font-bold tracking-widest text-voltify-gold uppercase -mt-1">Premium Tech</span>
+              </div>
+            </Link>
+
+            {/* Desktop Center Navigation */}
+            <div className="hidden lg:flex items-center justify-center absolute inset-0 pointer-events-none">
+              <div className="flex items-center gap-12 pointer-events-auto">
+                <Link
+                  to="/"
+                  className="text-sm font-normal tracking-[0.02em] text-voltify-light hover:text-voltify-gold transition-colors relative group"
+                >
+                  Home
+                  <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-voltify-gold rounded-full scale-0 group-hover:scale-100 transition-all duration-300"></span>
+                </Link>
+
+                {NAV_CATEGORIES.map((category) => (
+                  <NavMenuItem
+                    key={category.name}
+                    category={category}
+                    isOpen={activeMenu === category.name}
+                    onMouseEnter={() => handleMouseEnter(category.name)}
+                    onMouseLeave={handleMouseLeave}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Right Navigation Actions */}
+            <NavUserActions
+              user={user}
+              cartCount={cartCount}
+              onSearchClick={() => setSearchOpen(true)}
+              onLogout={logoutUser}
+              onOpenLogin={() => openModal('login')}
+              onOpenSignup={() => openModal('signup')}
+            />
+          </div>
+        </div>
+      </nav>
+
+      {/* Search Overlay */}
+      {searchOpen && (
+        <SearchOverlay open={true} onClose={() => setSearchOpen(false)} />
+      )}
+    </>
   );
 }
