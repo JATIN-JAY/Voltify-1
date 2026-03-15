@@ -312,13 +312,17 @@ export default function ProductDetailPage() {
               grid-template-columns: 55% 45%;
               gap: 40px;
               align-items: start;
+              width: 100%;
+              overflow: hidden;
             }
           }
           @media (max-width: 767px) {
             .product-detail-sticky-grid {
               display: grid;
               grid-template-columns: 1fr;
-              gap: 32px;
+              gap: 24px;
+              width: 100%;
+              overflow: hidden;
             }
           }
         `}</style>
@@ -327,7 +331,7 @@ export default function ProductDetailPage() {
         <div className="product-detail-sticky-grid mb-16">
           {/* Product Image Gallery - Sticky Left Column */}
           <motion.div 
-            className="flex flex-col items-start justify-start h-fit gap-3 md:gap-4"
+            className="flex flex-col items-start justify-start h-fit gap-2 md:gap-4 w-full overflow-hidden"
             style={{
               position: 'sticky',
               top: '72px'
@@ -361,18 +365,18 @@ export default function ProductDetailPage() {
                 }}
               />
               {/* Image Counter - Fixed positioning inside container */}
-              <div className="absolute bottom-3 md:bottom-4 right-3 md:right-4 bg-black/60 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs md:text-sm font-semibold pointer-events-none">
+              <div className="absolute bottom-2 md:bottom-4 right-2 md:right-4 bg-black/60 backdrop-blur-sm text-white px-2 md:px-3 py-1 md:py-1.5 rounded-full text-[9px] md:text-sm font-semibold pointer-events-none whitespace-nowrap">
                 {mainImageIndex + 1}/{thumbnailImages.length}
               </div>
             </div>
 
             {/* Thumbnail Images - Gallery below main image */}
-            <div className="flex gap-2 md:gap-3 w-full">
+            <div className="flex gap-1.5 md:gap-3 w-full overflow-x-auto pb-1 -mx-1 px-1">
               {thumbnailImages.map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => setMainImageIndex(idx)}
-                  className={`flex-shrink-0 w-16 md:w-20 h-16 md:h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                  className={`flex-shrink-0 w-13 md:w-20 h-13 md:h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
                     mainImageIndex === idx
                       ? 'border-voltify-gold shadow-lg scale-105'
                       : 'border-voltify-light/20 hover:border-voltify-light/40'
@@ -397,7 +401,7 @@ export default function ProductDetailPage() {
 
           {/* Product Info - Right Column (Natural scroll, no sticky) */}
           <motion.div 
-            className="flex flex-col justify-start space-y-5 md:space-y-6"
+            className="flex flex-col justify-start space-y-3 md:space-y-6 w-full min-w-0"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.15 }}

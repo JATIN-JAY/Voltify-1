@@ -7,3 +7,4 @@ export { useRegister } from './useRegister';
 export { useProfile } from './useProfile';
 export { useOrders } from './useOrders';
 export { useAdminDashboard } from './useAdminDashboard';
+export { useFeedback } from './useFeedback';

@@ -9,6 +9,7 @@ import productRoutes from './routes/products.js';
 import orderRoutes from './routes/orders.js';
 import paymentRoutes from './routes/payment.js';
 import sellerRoutes from './routes/sellers.js';
+import feedbackRoutes from './routes/feedback.js';
 import Product from './models/Product.js';
 
 dotenv.config();
@@ -49,6 +50,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/sellers', sellerRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 // Sitemap XML route - for Google SEO
 app.get('/sitemap.xml', async (req, res) => {

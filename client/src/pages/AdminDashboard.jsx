@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { useAdminDashboard } from '../hooks';
+import { useAdminDashboard, useFeedback } from '../hooks';
 import AdminSidebar from '../components/AdminSidebar';
+import { Star, Trash2, Check } from 'lucide-react';
 
 /**
  * AdminDashboard Component - Redesigned with sidebar navigation
@@ -14,6 +15,10 @@ const AdminDashboard = () => {
     message,
     salesSummary,
   } = useAdminDashboard();
+
+  const { feedbacks, stats: feedbackStats, loading: feedbackLoading, fetchFeedbacks, updateFeedback, deleteFeedback } = useFeedback();
+  const [filterStatus, setFilterStatus] = useState('All');
+  const [sortBy, setSortBy] = useState('newest');
 
   return (
     <div className="min-h-screen bg-[#0f0f0f] flex">
@@ -156,6 +161,153 @@ const AdminDashboard = () => {
                           ))}
                         </tbody>
                       </table>
+                    </div>
+                  </div>
+                </motion.section>
+              )}
+
+              {/* Feedbacks Section */}
+              {!feedbackLoading && (
+                <motion.section
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="mt-12"
+                >
+                  <div className="bg-[#1a1a1a] rounded-xl overflow-hidden border border-[#2a2a2a]">
+                    <div className="p-6 border-b border-[#2a2a2a]">
+                      <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
+                        <h2 className="text-2xl font-black text-white">User Feedbacks</h2>
+                        {feedbackStats && (
+                          <div className="flex items-center gap-4 text-sm">
+                            <div className="text-center">
+                              <p className="text-[#aaaaaa] text-xs uppercase">Total</p>
+                              <p className="text-xl font-bold text-white">{feedbackStats.totalFeedbacks}</p>
+                            </div>
+                            <div className="text-center">
+                              <p className="text-[#aaaaaa] text-xs uppercase">Avg Rating</p>
+                              <p className="text-xl font-bold text-amber-400">{feedbackStats.averageRating} ★</p>
+                            </div>
+                            <div className="text-center">
+                              <p className="text-[#aaaaaa] text-xs uppercase">New</p>
+                              <p className="text-xl font-bold text-voltify-gold">{feedbackStats.unreadCount}</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Filters */}
+                      <div className="flex gap-3 flex-wrap">
+                        <select
+                          value={filterStatus}
+                          onChange={(e) => {
+                            setFilterStatus(e.target.value);
+                            fetchFeedbacks(e.target.value, sortBy);
+                          }}
+                          className="bg-[#0f0f0f] border border-[#2a2a2a] text-white px-4 py-2 rounded-lg text-sm focus:outline-none focus:border-amber-400"
+                        >
+                          <option>All</option>
+                          <option>New</option>
+                          <option>Reviewed</option>
+                          <option>In Progress</option>
+                          <option>Resolved</option>
+                        </select>
+
+                        <select
+                          value={sortBy}
+                          onChange={(e) => {
+                            setSortBy(e.target.value);
+                            fetchFeedbacks(filterStatus, e.target.value);
+                          }}
+                          className="bg-[#0f0f0f] border border-[#2a2a2a] text-white px-4 py-2 rounded-lg text-sm focus:outline-none focus:border-amber-400"
+                        >
+                          <option value="newest">Newest First</option>
+                          <option value="oldest">Oldest First</option>
+                          <option value="rating">Highest Rating</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Feedbacks List */}
+                    <div className="divide-y divide-[#2a2a2a]">
+                      {feedbacks && feedbacks.length > 0 ? (
+                        feedbacks.map((feedback, idx) => (
+                          <motion.div
+                            key={feedback._id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 + idx * 0.05 }}
+                            className="p-6 hover:bg-[#252525] transition"
+                          >
+                            <div className="flex items-start justify-between mb-3">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-2">
+                                  <h3 className="font-bold text-white">{feedback.name}</h3>
+                                  <div className="flex gap-1">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                      <Star
+                                        key={star}
+                                        size={14}
+                                        className={`${
+                                          star <= feedback.rating
+                                            ? 'fill-amber-400 text-amber-400'
+                                            : 'text-[#3a3a3a]'
+                                        }`}
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
+                                <p className="text-[#aaaaaa] text-sm">{feedback.email}</p>
+                                <p className="text-[#888] text-xs mt-1">{feedback.category}</p>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <select
+                                  value={feedback.status}
+                                  onChange={async (e) => {
+                                    await updateFeedback(feedback._id, { status: e.target.value });
+                                  }}
+                                  className="bg-[#0f0f0f] border border-[#2a2a2a] text-white px-3 py-1 rounded text-xs focus:outline-none focus:border-amber-400"
+                                >
+                                  <option>New</option>
+                                  <option>Reviewed</option>
+                                  <option>In Progress</option>
+                                  <option>Resolved</option>
+                                </select>
+                                <button
+                                  onClick={() => deleteFeedback(feedback._id)}
+                                  className="text-[#666] hover:text-red-400 transition-colors"
+                                >
+                                  <Trash2 size={18} />
+                                </button>
+                              </div>
+                            </div>
+
+                            <p className="text-[#cccccc] text-sm mb-3">{feedback.message}</p>
+
+                            {feedback.adminNotes && (
+                              <div className="bg-[#0f0f0f] rounded p-3 mb-3 border-l-2 border-amber-400">
+                                <p className="text-xs font-semibold text-[#888] mb-1">Admin Notes:</p>
+                                <p className="text-sm text-[#aaaaaa]">{feedback.adminNotes}</p>
+                              </div>
+                            )}
+
+                            <div className="flex items-center justify-between text-xs">
+                              <div className="text-[#666]">
+                                {new Date(feedback.createdAt).toLocaleDateString()}
+                              </div>
+                              {feedback.status === 'Resolved' && (
+                                <span className="bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full flex items-center gap-1">
+                                  <Check size={14} /> Resolved
+                                </span>
+                              )}
+                            </div>
+                          </motion.div>
+                        ))
+                      ) : (
+                        <div className="p-8 text-center">
+                          <p className="text-[#666]">No feedbacks yet</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </motion.section>

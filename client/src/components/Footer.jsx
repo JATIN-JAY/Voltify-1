@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { MessageCircle } from 'lucide-react';
+import FeedbackModal from './FeedbackModal';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
   const [subscribeStatus, setSubscribeStatus] = useState('');
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
   const handleNewsletterSubmit = (e) => {
     e.preventDefault();
@@ -280,6 +283,22 @@ export default function Footer() {
           </div>
         </div>
       </div>
+
+      {/* Floating Feedback Button */}
+      <motion.button
+        onClick={() => setIsFeedbackOpen(true)}
+        className="fixed bottom-8 right-8 bg-amber-400 hover:bg-amber-500 text-black rounded-full p-4 shadow-lg z-40 flex items-center gap-2 font-semibold text-sm md:px-6 md:py-3 md:rounded-full"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        aria-label="Send feedback"
+        title="Help us improve - Share your feedback"
+      >
+        <MessageCircle size={20} />
+        <span className="hidden md:inline">Feedback</span>
+      </motion.button>
+
+      {/* Feedback Modal */}
+      <FeedbackModal isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} />
     </footer>
   );
 }
