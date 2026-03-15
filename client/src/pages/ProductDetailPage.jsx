@@ -312,7 +312,7 @@ export default function ProductDetailPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
           {/* Product Image Gallery - Sticky Left Column */}
           <motion.div 
-            className="flex flex-col items-start justify-start sticky top-20 h-fit gap-4"
+            className="flex flex-col items-start justify-start sticky top-[80px] h-fit gap-4"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
@@ -325,11 +325,16 @@ export default function ProductDetailPage() {
                 width={600}
                 height={600}
                 loading="eager"
-                className="w-full h-full object-cover hover:scale-105 transition-all duration-500"
+                className="w-full h-full object-cover transition-opacity duration-300 ease-in-out"
+                style={{ opacity: 1 }}
                 onError={(e) => {
                   e.target.src = 'https://via.placeholder.com/600x600?text=Product+Image';
                 }}
               />
+              {/* Image Counter */}
+              <div className="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1.5 rounded-full text-sm font-semibold">
+                {mainImageIndex + 1}/{thumbnailImages.length}
+              </div>
             </div>
 
             {/* Thumbnail Images */}
@@ -360,12 +365,13 @@ export default function ProductDetailPage() {
             </div>
           </motion.div>
 
-          {/* Product Info */}
+          {/* Product Info - Right Column (Never moves) */}
           <motion.div 
             className="flex flex-col justify-start space-y-6"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.15 }}
+            style={{ position: 'relative', alignSelf: 'start' }}
           >
             <div>
               <p className="text-xs font-semibold text-voltify-light/50 mb-3 uppercase tracking-wider">{product.category}</p>
