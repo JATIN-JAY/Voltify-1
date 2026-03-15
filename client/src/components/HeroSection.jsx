@@ -148,7 +148,7 @@ const HeroSection = memo(function HeroSection() {
 
       <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-6 lg:px-8 pt-0 pb-20 lg:pt-24 lg:pb-24 mt-0">
         
-        <div className="grid items-stretch gap-14 lg:grid-cols-2 lg:gap-24">
+        <div className="grid items-stretch gap-6 lg:grid-cols-2 lg:gap-24">
           
           {/* LEFT COLUMN - Content */}
           <div className="flex flex-col justify-between">
@@ -164,20 +164,20 @@ const HeroSection = memo(function HeroSection() {
 
             {/* Main Headline - Editorial Treatment */}
             <div className="relative mb-8">
-              <h1 className="text-left leading-[0.95] tracking-tighter text-voltify-light font-black">
-                {/* "Gear up your" - Slide up and fade at 200ms */}
-                <span className="block text-5xl sm:text-6xl xl:text-7xl 2xl:text-8xl hero-headline-slideup">
+              <h1 className="text-left leading-[1.1] tracking-tighter text-voltify-light font-black">
+                {/* "Gear up" - Slide up and fade at 200ms */}
+                <span className="block text-4xl sm:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl hero-headline-slideup">
                   Gear up
                 </span>
                 {/* "your" with underline */}
-                <span className="block text-5xl sm:text-6xl xl:text-7xl 2xl:text-8xl hero-headline-slideup">
+                <span className="block text-4xl sm:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl hero-headline-slideup">
                   <span className="relative inline-block">
                     your
-                    <span className="absolute -bottom-2 left-0 right-0 h-2 bg-gradient-to-r from-voltify-gold via-voltify-gold to-transparent opacity-50"></span>
+                    <span className="absolute -bottom-1 left-0 right-0 h-1.5 bg-gradient-to-r from-voltify-gold via-voltify-gold to-transparent opacity-50"></span>
                   </span>
                 </span>
                 {/* "edge." - Type out at 500ms */}
-                <span className="block text-5xl sm:text-6xl xl:text-7xl 2xl:text-8xl -mt-6 relative">
+                <span className="block text-4xl sm:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl relative">
                   <span className="text-voltify-gold hero-text-typing">
                     {typedText}
                     {showCursor && <span className="cursor-blink" />}
@@ -192,14 +192,14 @@ const HeroSection = memo(function HeroSection() {
 
             {/* CTA Buttons - Fade + slide at 1000ms */}
             <div 
-              className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-14 hero-cta-fade"
+              className="flex flex-col items-stretch gap-3 mb-14 hero-cta-fade"
             >
               <button
                 type="button"
                 onClick={handleBrowseProducts}
-                className="group relative w-full sm:w-auto px-6 sm:px-10 py-4 sm:py-5 bg-voltify-gold text-voltify-dark font-black text-sm sm:text-base uppercase tracking-widest rounded-lg transition-all duration-300 hover:shadow-[0_20px_40px_rgba(232,160,32,0.3)] hover:-translate-y-1 active:translate-y-0 touch-target"
+                className="group relative w-full px-6 sm:px-10 py-4 sm:py-5 bg-voltify-gold text-voltify-dark font-black text-sm sm:text-base uppercase tracking-widest rounded-lg transition-all duration-300 hover:shadow-[0_20px_40px_rgba(232,160,32,0.3)] hover:-translate-y-1 active:translate-y-0 touch-target"
               >
-                <span className="flex items-center justify-center sm:justify-start gap-3">
+                <span className="flex items-center justify-center gap-3">
                   Explore Picks
                   <svg className="w-4 sm:w-5 h-4 sm:h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -210,7 +210,7 @@ const HeroSection = memo(function HeroSection() {
               {!user && (
                 <button
                   onClick={() => openModal('signup')}
-                  className="w-full sm:w-auto px-4 sm:px-6 py-3 sm:py-3 border-2 border-voltify-light/30 text-voltify-light font-semibold text-xs uppercase tracking-wide rounded-lg hover:bg-voltify-light/5 transition-colors touch-target">
+                  className="w-full px-4 sm:px-6 py-3 sm:py-4 border-2 border-voltify-light/30 text-voltify-light font-semibold text-xs uppercase tracking-wide rounded-lg hover:bg-voltify-light/5 hover:border-voltify-light/50 transition-all touch-target">
                   Create Account
                 </button>
               )}

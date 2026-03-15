@@ -533,6 +533,9 @@ export default function Navbar() {
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
         user={user}
+        cartCount={cartCount}
+        onSearchClick={() => setSearchOpen(true)}
+        onLogout={logoutUser}
         onOpenLogin={() => openModal('login')}
         onOpenSignup={() => openModal('signup')}
         categories={NAV_CATEGORIES}
