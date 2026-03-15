@@ -167,7 +167,7 @@ const AdminProductsPage = () => {
                               {product.category}
                             </td>
                             <td className="px-6 py-4 font-semibold text-voltify-gold">
-                              ₹{product.price.toLocaleString('en-IN')}
+                              ₹{Math.round(product.price).toLocaleString('en-IN')}
                             </td>
                             <td className="px-6 py-4 text-center">
                               <ToggleSwitch
