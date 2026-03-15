@@ -44,7 +44,6 @@ export default function LoginPage() {
   };
 
   return (
-<<<<<<< HEAD
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50 pt-20 px-4 flex items-center justify-center relative overflow-hidden">
       {/* Decorative gradient blobs */}
       <div className="absolute -top-40 -right-40 w-80 h-80 bg-slate-200/30 rounded-full blur-3xl"></div>
@@ -61,19 +60,6 @@ export default function LoginPage() {
             <div className="space-y-2">
               <h1 className="text-3xl font-black tracking-tight text-slate-900">Welcome Back</h1>
               <p className="text-slate-600">Access your Voltify account</p>
-=======
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 pt-16 px-4 flex items-center justify-center">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-apple-lg p-8 space-y-6">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
-            <p className="text-gray-600">Log in to your Voltify account</p>
-          </div>
-
-          {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-              {error}
->>>>>>> d640514180f76c3456a769d97429584aaf1125bc
             </div>
 
             {message.text && (
