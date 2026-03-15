@@ -95,16 +95,16 @@ export const useAdminDashboard = () => {
     );
 
     try {
-      // Call API with PATCH request
-      await api.patch(
-        `/products/${productId}`,
+      // Call API with PATCH request to /featured endpoint
+      const response = await api.patch(
+        `/products/${productId}/featured`,
         { featured: newFeaturedStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       setMessage({ 
         type: 'success', 
-        text: `Product ${newFeaturedStatus ? 'featured' : 'unfeatured'} successfully` 
+        text: response.data.message || `Product ${newFeaturedStatus ? 'featured' : 'unfeatured'} successfully` 
       });
 
       // Dispatch event to refresh carousel on homepage
@@ -113,12 +113,22 @@ export const useAdminDashboard = () => {
       }));
     } catch (err) {
       console.error('Toggle featured error:', err);
+      
+      // Check if it's a 400 error for limit exceeded
+      if (err.response?.status === 400) {
+        setMessage({ 
+          type: 'warning', 
+          text: err.response?.data?.message || 'Failed to feature product.' 
+        });
+      } else {
+        setMessage({ 
+          type: 'error', 
+          text: 'Failed to update product. Please try again.' 
+        });
+      }
+      
       // Revert on failure
       setProducts(previousProducts);
-      setMessage({ 
-        type: 'error', 
-        text: 'Failed to update product. Please try again.' 
-      });
     }
   }, [products, token]);
 

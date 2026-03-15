@@ -209,6 +209,51 @@ router.patch('/:id', verifyToken, checkAdmin, async (req, res) => {
   }
 });
 
+// Toggle featured status with 5-product limit validation (admin only)
+router.patch('/:id/featured', verifyToken, checkAdmin, async (req, res) => {
+  if (!ensureDatabaseReady(res)) return;
+
+  try {
+    const { featured } = req.body;
+
+    if (featured === undefined) {
+      return res.status(400).json({ message: 'Featured status required' });
+    }
+
+    // If trying to set featured to true, check the 5-product limit
+    if (featured === true) {
+      const currentlyFeaturedCount = await Product.countDocuments({ featured: true });
+      
+      if (currentlyFeaturedCount >= 5) {
+        return res.status(400).json({ 
+          message: 'Maximum 5 featured products allowed. Unfeature another product first.',
+          currentCount: currentlyFeaturedCount,
+          maxAllowed: 5
+        });
+      }
+    }
+
+    // Update only the featured field
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      { featured },
+      { new: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    const normalizedProduct = normalizeProduct(product);
+    res.status(200).json({ 
+      message: `Product ${featured ? 'featured' : 'unfeatured'} successfully`, 
+      product: normalizedProduct
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Upload image to Cloudinary (admin only)
 router.post('/upload/image', verifyToken, checkAdmin, async (req, res) => {
   const multer = (await import('multer')).default;
