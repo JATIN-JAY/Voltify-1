@@ -57,14 +57,52 @@ export const useProductForm = (onProductCreated) => {
   }, [uploadImage]);
 
   const validateForm = useCallback(() => {
-    const required = ['name', 'price', 'category', 'brand', 'description', 'imageUrl'];
-    const missing = required.filter((field) => !formData[field]);
-    
-    if (missing.length > 0) {
-      return 'Please fill in all required fields';
+    // Check if image is still uploading
+    if (uploading) {
+      return 'Please wait for image upload to complete';
     }
+
+    // Individual field validation with trimming
+    const errors = [];
+
+    // Name validation
+    if (!formData.name || !formData.name.trim()) {
+      errors.push('Product name is required');
+    }
+
+    // Price validation - allow 0, must not be empty string
+    if (formData.price === '' || formData.price === null || formData.price === undefined) {
+      errors.push('Price is required');
+    } else if (Number(formData.price) < 0) {
+      errors.push('Price cannot be negative');
+    }
+
+    // Category validation
+    if (!formData.category || !formData.category.trim()) {
+      errors.push('Category is required');
+    }
+
+    // Brand validation
+    if (!formData.brand || !formData.brand.trim()) {
+      errors.push('Brand is required');
+    }
+
+    // Description validation
+    if (!formData.description || !formData.description.trim()) {
+      errors.push('Description is required');
+    }
+
+    // Image validation
+    if (!formData.imageUrl || !formData.imageUrl.trim()) {
+      errors.push('Product image is required');
+    }
+
+    if (errors.length > 0) {
+      return errors.join('. ');
+    }
+
     return null;
-  }, [formData]);
+  }, [formData, uploading]);
 
   const handleSubmit = useCallback(
     async (e) => {
