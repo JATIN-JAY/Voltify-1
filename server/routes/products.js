@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import Product from '../models/Product.js';
 import { v2 as cloudinary } from 'cloudinary';
 import { verifyToken, checkAdmin } from '../middleware/auth.js';
+import { normalizeProducts, normalizeProduct } from '../utils/productDataUtils.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -27,14 +28,34 @@ const ensureDatabaseReady = (res) => {
 };
 
 // Get featured products only - MUST be before /:id route
+// Filters: featured flag + minimum price ₹10,000 + excludes accessories/cases
 router.get('/featured/list', async (req, res) => {
   if (!isDatabaseReady()) {
     return res.json([]);
   }
 
   try {
-    const products = await Product.find({ featured: true });
-    res.json(products);
+    const excludedCategories = [
+      'Accessories',
+      'Cases',
+      'Phone Covers',
+      'Screen Protector',
+      'USB Cable',
+      'Charger',
+      'Cable',
+      'Stand'
+    ];
+
+    const products = await Product.find({
+      featured: true,
+      price: { $gte: 10000 },
+      category: { $nin: excludedCategories }
+    });
+
+    // Normalize product data at the server layer
+    const normalizedProducts = normalizeProducts(products);
+    
+    res.json(normalizedProducts);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -48,7 +69,8 @@ router.get('/', async (req, res) => {
 
   try {
     const products = await Product.find();
-    res.json(products);
+    const normalizedProducts = normalizeProducts(products);
+    res.json(normalizedProducts);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -63,7 +85,8 @@ router.get('/:id', async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
-    res.json(product);
+    const normalizedProduct = normalizeProduct(product);
+    res.json(normalizedProduct);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -94,9 +117,10 @@ router.post('/', verifyToken, checkAdmin, async (req, res) => {
 
     await product.save();
 
+    const normalizedProduct = normalizeProduct(product);
     res.status(201).json({
       message: 'Product created successfully',
-      product,
+      product: normalizedProduct,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -147,7 +171,8 @@ router.put('/:id', verifyToken, checkAdmin, async (req, res) => {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    res.json({ message: 'Product updated successfully', product });
+    const normalizedProduct = normalizeProduct(product);
+    res.json({ message: 'Product updated successfully', product: normalizedProduct });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

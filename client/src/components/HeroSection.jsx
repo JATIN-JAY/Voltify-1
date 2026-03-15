@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { CartContext } from "../context/CartContext";
 import { ModalContext } from "../context/ModalContext";
 import api from "../api";
+import { normalizeProducts } from "../utils/productDataUtils";
 import "../styles/hero-animations.css";
 
 /**
@@ -24,49 +25,74 @@ const HeroSection = memo(function HeroSection() {
     productsSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
 
-  // Typing effect for "edge." text - loops continuously
+  // Typing effect for "edge." text - ensures completion + fallback
   useEffect(() => {
-    const typingStartTime = 500; // Start at 500ms
-    const typeDelay = 150; // Delay between characters in ms
-    const delayBeforeRestart = 2000; // Delay before restarting animation
-    
-    const startTyping = setTimeout(() => {
-      const performTyping = () => {
-        let charIndex = 0;
-        const typingInterval = setInterval(() => {
-          if (charIndex <= edgeText.length) {
-            setTypedText(edgeText.substring(0, charIndex));
-            if (charIndex < edgeText.length) {
-              setShowCursor(true);
-            } else {
-              setShowCursor(false); // Hide cursor after typing completes
-            }
-            charIndex++;
-          } else {
-            clearInterval(typingInterval);
-            // After typing completes, wait before clearing and restarting
-            setTimeout(() => {
-              setTypedText(""); // Clear text
-              setShowCursor(true); // Show cursor again
-              performTyping(); // Restart the typing animation
-            }, delayBeforeRestart);
-          }
-        }, typeDelay);
+    const edgeText = "edge.";
+    let charIndex = 0;
+    let typingInterval = null;
+    let restartTimeout = null;
+    let fallbackTimeout = null;
 
-        return () => clearInterval(typingInterval);
-      };
+    const performTyping = () => {
+      charIndex = 0;
+      
+      typingInterval = setInterval(() => {
+        // Always update typed text progressively
+        setTypedText(edgeText.substring(0, charIndex + 1));
+        setShowCursor(charIndex < edgeText.length);
+        charIndex++;
 
+        // When complete
+        if (charIndex > edgeText.length) {
+          clearInterval(typingInterval);
+          setShowCursor(false);
+          setTypedText(edgeText); // Ensure full text is set
+          
+          // Schedule restart
+          restartTimeout = setTimeout(() => {
+            performTyping();
+          }, 2000);
+        }
+      }, 150);
+    };
+
+    // Start typing after 500ms
+    const initialTimeout = setTimeout(() => {
       performTyping();
-    }, typingStartTime);
+    }, 500);
 
-    return () => clearTimeout(startTyping);
+    // Fallback: Force full text display after 3 seconds if animation hasn't completed
+    fallbackTimeout = setTimeout(() => {
+      setTypedText(edgeText);
+      setShowCursor(false);
+      if (typingInterval) clearInterval(typingInterval);
+      console.warn('Typewriter animation fallback triggered - forced display of full text');
+    }, 3000);
+
+    return () => {
+      clearTimeout(initialTimeout);
+      clearTimeout(fallbackTimeout);
+      clearTimeout(restartTimeout);
+      if (typingInterval) clearInterval(typingInterval);
+    };
   }, []);
 
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
       try {
         const response = await api.get('/products/featured/list');
-        setFeaturedProducts(Array.isArray(response.data) ? response.data : []);
+        const rawProducts = Array.isArray(response.data) ? response.data : [];
+        
+        // Normalize product data (clean names, strip trailing pipes)
+        const normalizedProducts = normalizeProducts(rawProducts);
+        
+        console.log('✓ Loaded featured products:', {
+          count: normalizedProducts.length,
+          prices: normalizedProducts.map(p => p.price),
+          categories: normalizedProducts.map(p => p.category),
+        });
+
+        setFeaturedProducts(normalizedProducts);
       } catch (error) {
         console.error('Error fetching featured products:', error);
         setFeaturedProducts([]);
@@ -215,8 +241,18 @@ function TrustBadge({ icon, title, subtitle }) {
 function FeaturedProductDetails({ products, activeIndex }) {
   if (!products.length) return null;
   
-  const product = products[activeIndex] || products[0];
+  // Ensure activeIndex is valid and synchronized with displayed product
+  const validIndex = Math.min(Math.max(0, activeIndex), products.length - 1);
+  const product = products[validIndex];
   const price = Number(product.price || 0);
+
+  console.log('Product details updated:', {
+    activeIndex,
+    validIndex,
+    productId: product._id,
+    productName: product.name,
+    price,
+  });
 
   return (
     <div className="space-y-4">
@@ -314,8 +350,20 @@ function FeaturedCarousel({ products, loading, onActiveIndexChange, activeIndex 
         ref={scrollRef}
         className="scrollbar-hide flex snap-x snap-mandatory overflow-x-auto h-[240px] sm:h-[280px] items-stretch"
       >
-        {products.map((product) => {
+        {products.map((product, idx) => {
           const price = Number(product.price || 0);
+          const imageUrl = product.image || product.imageUrl || '';
+          
+          // Debug image mapping
+          if (idx === 0) {
+            console.log('Carousel product mapping:', {
+              productId: product._id,
+              productName: product.name,
+              imageUrl: imageUrl,
+              hasImage: !!imageUrl,
+            });
+          }
+
           return (
             <div
               key={product._id}
@@ -324,11 +372,15 @@ function FeaturedCarousel({ products, loading, onActiveIndexChange, activeIndex 
               {/* Clean Product Image Cutout on Dark Background */}
               <div className="h-full w-full flex items-center justify-center bg-gradient-to-b from-voltify-dark/80 to-voltify-dark">
                 <img
-                  src={product.image}
+                  src={imageUrl}
                   alt={product.name}
                   className="h-full w-full object-contain transition-transform duration-700 hover:scale-105"
                   onError={(e) => {
+                    console.warn(`Image failed for product ${product._id}:`, imageUrl);
                     e.target.src = 'https://via.placeholder.com/400x400?text=Product';
+                  }}
+                  onLoad={() => {
+                    if (idx === 0) console.log('✓ First carousel image loaded');
                   }}
                 />
               </div>
