@@ -30,18 +30,46 @@ try {
   console.error('Stack:', error.stack);
 }
 
+// Health check endpoint for payment service
+router.get('/health', (req, res) => {
+  res.json({
+    status: 'Payment service healthy',
+    razorpayInitialized: !!razorpay,
+    razorpayKeyId: process.env.RAZORPAY_KEY_ID ? '✓ Configured' : '✗ Missing',
+    razorpaySecret: process.env.RAZORPAY_KEY_SECRET ? '✓ Configured' : '✗ Missing',
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // Create order for payment
 router.post('/create-order', verifyToken, async (req, res) => {
   try {
+    const { amount, items, userEmail, userName, userPhone } = req.body;
+
+    // Log the request details
+    console.log('📥 Payment request received:', {
+      hasUser: !!verifyToken,
+      amount,
+      userEmail,
+      razorpayInitialized: !!razorpay,
+      env: process.env.NODE_ENV,
+    });
+
     // Check if Razorpay is initialized
     if (!razorpay) {
-      console.error('Razorpay not initialized. Check environment variables.');
+      console.error('❌ Razorpay not initialized');
+      console.error('Razorpay state:', {
+        keyId: process.env.RAZORPAY_KEY_ID ? '✓ Set' : '✗ Missing',
+        keySecret: process.env.RAZORPAY_KEY_SECRET ? '✓ Set' : '✗ Missing',
+      });
       return res.status(500).json({ 
-        message: 'Payment service configuration error. Please check server logs.' 
+        message: 'Payment service not configured. Razorpay initialization failed.',
+        debug: process.env.NODE_ENV === 'development' ? {
+          razorpayKeyId: process.env.RAZORPAY_KEY_ID ? '✓ Set' : '✗ Missing',
+          razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET ? '✓ Set' : '✗ Missing',
+        } : undefined
       });
     }
-
-    const { amount, items, userEmail, userName, userPhone } = req.body;
 
     // Validate input
     if (!amount || !items || !userEmail) {
