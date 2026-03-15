@@ -197,11 +197,11 @@ const HeroSection = memo(function HeroSection() {
               <button
                 type="button"
                 onClick={handleBrowseProducts}
-                className="group relative px-10 py-5 bg-voltify-gold text-voltify-dark font-black text-base uppercase tracking-widest rounded-lg transition-all duration-300 hover:shadow-[0_20px_40px_rgba(232,160,32,0.3)] hover:-translate-y-1 active:translate-y-0"
+                className="group relative w-full sm:w-auto px-6 sm:px-10 py-4 sm:py-5 bg-voltify-gold text-voltify-dark font-black text-sm sm:text-base uppercase tracking-widest rounded-lg transition-all duration-300 hover:shadow-[0_20px_40px_rgba(232,160,32,0.3)] hover:-translate-y-1 active:translate-y-0 touch-target"
               >
-                <span className="flex items-center gap-3">
-                  Explore Curated Picks
-                  <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span className="flex items-center justify-center sm:justify-start gap-3">
+                  Explore Picks
+                  <svg className="w-4 sm:w-5 h-4 sm:h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
                 </span>
@@ -210,7 +210,7 @@ const HeroSection = memo(function HeroSection() {
               {!user && (
                 <button
                   onClick={() => openModal('signup')}
-                  className="px-6 py-3 border-2 border-voltify-light/30 text-voltify-light font-semibold text-xs uppercase tracking-wide rounded-lg hover:bg-voltify-light/5 transition-colors">
+                  className="w-full sm:w-auto px-4 sm:px-6 py-3 sm:py-3 border-2 border-voltify-light/30 text-voltify-light font-semibold text-xs uppercase tracking-wide rounded-lg hover:bg-voltify-light/5 transition-colors touch-target">
                   Create Account
                 </button>
               )}
@@ -218,24 +218,24 @@ const HeroSection = memo(function HeroSection() {
           </div>
 
           {/* RIGHT COLUMN - Featured Product - Fade from right at 300ms */}
-          <div className="relative lg:-mr-8 lg:mt-0 hero-featured-fade-right">
+          <div className="relative mt-8 sm:mt-0 lg:-mr-8 lg:mt-0 hero-featured-fade-right w-full">
             <div className="relative">
-              {/* Clean Product Card Container */}
-              <div className="bg-voltify-dark/80 rounded-xl border border-voltify-border shadow-[0_15px_45px_rgba(0,0,0,0.3)] overflow-hidden">
+              {/* Clean Product Card Container - Mobile Optimized */}
+              <div className="bg-voltify-dark/80 rounded-xl border border-voltify-border shadow-[0_15px_45px_rgba(0,0,0,0.3)] overflow-hidden max-h-96 sm:max-h-none lg:max-h-none">
                 {/* Top Section - Subtle Featured Label */}
-                <div className="px-6 pt-4 pb-3 border-b border-voltify-border">
-                  <span className="inline-block text-[11px] font-bold uppercase tracking-[0.12em] text-voltify-light/50">
+                <div className="px-4 sm:px-6 pt-3 sm:pt-4 pb-2 sm:pb-3 border-b border-voltify-border">
+                  <span className="inline-block text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.12em] text-voltify-light/50">
                     ✓ Flagship Item
                   </span>
                 </div>
 
                 {/* Product Carousel */}
-                <div className="px-6 py-2">
+                <div className="px-3 sm:px-6 py-1 sm:py-2">
                   <FeaturedCarousel products={featuredProducts} loading={loadingFeatured} onActiveIndexChange={setActiveProductIndex} activeIndex={activeProductIndex} />
                 </div>
 
                 {/* Product Details Section */}
-                <div className="px-6 pb-4 border-t border-voltify-border">
+                <div className="px-4 sm:px-6 pb-3 sm:pb-4 border-t border-voltify-border">
                   <FeaturedProductDetails products={featuredProducts} activeIndex={activeProductIndex} />
                 </div>
               </div>

@@ -36,8 +36,8 @@ export default function PromoStrip({ variant = "dark" }) {
       <div className="promo-strip__container">
         <div className="promo-strip__scroll">
           {duplicatedItems.map((item, idx) => (
-            <div key={idx} className="promo-strip__item">
-              <span>{item}</span>
+            <div key={idx} className="promo-strip__item px-2 sm:px-0">
+              <span className="text-xs sm:text-sm">{item}</span>
               {idx < duplicatedItems.length - 1 && (
                 <span className="promo-strip__separator">·</span>
               )}

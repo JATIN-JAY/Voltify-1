@@ -512,7 +512,7 @@ export default function ProductDetailPage() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-voltify-gold"></div>
             </div>
           ) : suggestedProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4">
               {suggestedProducts.map((prod, index) => (
                 <motion.div
                   key={prod._id}

@@ -64,13 +64,13 @@ const NavUserActions = ({ user, cartCount, onSearchClick, onLogout, onOpenLogin,
   }, []);
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-2 sm:gap-4">
       <button
         onClick={onSearchClick}
-        className="text-voltify-light/60 hover:text-voltify-gold transition-colors p-1"
+        className="text-voltify-light/60 hover:text-voltify-gold transition-colors p-2.5 sm:p-2 rounded-lg hover:bg-voltify-light/5 min-h-11 min-w-11 sm:min-h-auto sm:min-w-auto flex items-center justify-center"
         aria-label="Search"
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
       </button>
@@ -80,7 +80,7 @@ const NavUserActions = ({ user, cartCount, onSearchClick, onLogout, onOpenLogin,
           <motion.button
             onClick={() => setShowUserMenu(!showUserMenu)}
             whileHover={{ scale: 1.08 }}
-            className="w-7 h-7 bg-gradient-to-br from-voltify-gold to-voltify-gold/70 rounded-full flex items-center justify-center text-voltify-dark text-xs font-semibold hover:shadow-[0_0_12px_rgba(232,160,32,0.5)] transition-all cursor-pointer"
+            className="w-9 h-9 sm:w-7 sm:h-7 bg-gradient-to-br from-voltify-gold to-voltify-gold/70 rounded-full flex items-center justify-center text-voltify-dark text-xs sm:text-xs font-semibold hover:shadow-[0_0_12px_rgba(232,160,32,0.5)] transition-all cursor-pointer min-h-11 min-w-11 sm:min-h-auto sm:min-w-auto"
           >
             {user.name?.[0]?.toUpperCase() || 'U'}
           </motion.button>
@@ -204,7 +204,7 @@ const NavUserActions = ({ user, cartCount, onSearchClick, onLogout, onOpenLogin,
         </div>
       )}
 
-      <Link to="/cart" className="relative p-1">
+      <Link to="/cart" className="relative p-1 min-h-11 min-w-11 flex items-center justify-center">
         <svg className="w-4 h-4 text-voltify-light/60 hover:text-voltify-gold transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
         </svg>
@@ -215,10 +215,116 @@ const NavUserActions = ({ user, cartCount, onSearchClick, onLogout, onOpenLogin,
         )}
       </Link>
 
-      <Link to="/become-seller" className="hidden sm:block px-3 py-1.5 text-xs font-normal text-voltify-light/70 border border-voltify-gold/30 rounded-lg hover:text-voltify-gold hover:border-voltify-gold/60 transition-all tracking-[0.01em]">
+      <Link to="/become-seller" className="hidden lg:block px-3 py-1.5 text-xs font-normal text-voltify-light/70 border border-voltify-gold/30 rounded-lg hover:text-voltify-gold hover:border-voltify-gold/60 transition-all tracking-[0.01em]">
         Sell
       </Link>
     </div>
+  );
+};
+
+/**
+ * Mobile Navigation Menu - Slide-down drawer for mobile screens
+ */
+const MobileNavMenu = ({ isOpen, onClose, user, onOpenLogin, onOpenSignup, categories }) => {
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-black/50 z-40"
+            style={{ top: '56px' }}
+          />
+          
+          {/* Drawer */}
+          <motion.div
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -20, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed top-14 left-0 right-0 w-full bg-[#1a1a1a] border-b border-voltify-border z-50 shadow-xl"
+          >
+            <div className="px-4 py-4 space-y-3 max-h-[80vh] overflow-y-auto">
+              {/* Close Button */}
+              <div className="flex justify-end mb-2">
+                <button
+                  onClick={onClose}
+                  className="text-voltify-light/60 hover:text-voltify-light transition-colors text-2xl w-8 h-8 flex items-center justify-center"
+                  aria-label="Close menu"
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* Home Link */}
+              <Link
+                to="/"
+                onClick={onClose}
+                className="block px-4 py-3 text-voltify-light hover:text-voltify-gold hover:bg-voltify-dark/50 rounded-lg transition-all font-medium"
+              >
+                Home
+              </Link>
+
+              {/* Category Links */}
+              {categories.map((category) => (
+                <div key={category.name}>
+                  <div className="px-4 py-2 text-xs font-bold uppercase tracking-[0.05em] text-voltify-light/50">
+                    {category.name}
+                  </div>
+                  {category.items.map((item) => (
+                    <Link
+                      key={item.name}
+                      to={item.path}
+                      onClick={onClose}
+                      className="block px-4 py-2.5 ml-2 text-sm text-voltify-light hover:text-voltify-gold hover:bg-voltify-dark/50 rounded-lg transition-all"
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+                </div>
+              ))}
+
+              {/* Sell Button */}
+              <Link
+                to="/become-seller"
+                onClick={onClose}
+                className="block px-4 py-3 mt-4 text-voltify-light border border-voltify-gold/30 rounded-lg hover:text-voltify-gold hover:border-voltify-gold/60 transition-all font-medium text-center text-sm uppercase tracking-wide"
+              >
+                Become a Seller
+              </Link>
+
+              {/* Auth Actions - Mobile Only */}
+              {!user && (
+                <div className="space-y-2 mt-4 border-t border-voltify-border pt-4">
+                  <button
+                    onClick={() => {
+                      onOpenLogin();
+                      onClose();
+                    }}
+                    className="block w-full px-4 py-3 text-center text-sm font-semibold text-voltify-light hover:text-voltify-gold hover:bg-voltify-dark/50 rounded-lg transition-all"
+                  >
+                    Login
+                  </button>
+                  <button
+                    onClick={() => {
+                      onOpenSignup();
+                      onClose();
+                    }}
+                    className="block w-full px-4 py-3 text-center text-sm font-bold text-voltify-dark bg-voltify-gold hover:bg-yellow-500 rounded-lg transition-all uppercase tracking-wide"
+                  >
+                    Sign Up
+                  </button>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 };
 
@@ -233,13 +339,26 @@ export default function Navbar() {
   const cartCount = getTotalItems();
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const hoverTimeout = useRef(null);
 
   // Close menu on navigation
   useEffect(() => {
     setActiveMenu(null);
+    setMobileMenuOpen(false);
   }, [location.pathname]);
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleEscapeKey = (e) => {
+      if (e.key === 'Escape') {
+        setMobileMenuOpen(false);
+      }
+    };
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => document.removeEventListener('keydown', handleEscapeKey);
+  }, []);
 
   // Handle menu hover with delay to prevent flicker
   const handleMouseEnter = useCallback((menuName) => {
@@ -258,8 +377,8 @@ export default function Navbar() {
       <nav
         className="fixed top-0 left-0 right-0 w-full z-50 bg-voltify-dark border-b border-voltify-border/10"
       >
-        <div className="w-full px-6 sm:px-8 lg:px-12">
-          <div className="flex justify-between items-center h-14">
+        <div className="w-full px-4 sm:px-6 lg:px-12">
+          <div className="flex justify-between items-center h-14 gap-4">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2.5 group relative z-50 flex-shrink-0">
               <div className="relative">
@@ -268,13 +387,13 @@ export default function Navbar() {
                 </div>
                 <span className="absolute inset-0 rounded-lg bg-voltify-gold opacity-0 group-hover:opacity-30 transition-opacity blur-lg"></span>
               </div>
-              <div className="flex flex-col">
-                <span className="text-lg font-black tracking-tight text-voltify-light">Voltify</span>
+              <div className="flex flex-col hidden sm:flex">
+                <span className="text-base sm:text-lg font-black tracking-tight text-voltify-light">Voltify</span>
                 <span className="text-[8px] font-normal tracking-[0.05em] text-voltify-gold/80 -mt-0.5">Premium tech</span>
               </div>
             </Link>
 
-            {/* Desktop Center Navigation */}
+            {/* Desktop Center Navigation - Hidden on mobile */}
             <div className="hidden lg:flex items-center justify-center absolute inset-0 pointer-events-none">
               <div className="flex items-center gap-10 pointer-events-auto">
                 <Link
@@ -297,18 +416,49 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* Right Navigation Actions */}
-            <NavUserActions
-              user={user}
-              cartCount={cartCount}
-              onSearchClick={() => setSearchOpen(true)}
-              onLogout={logoutUser}
-              onOpenLogin={() => openModal('login')}
-              onOpenSignup={() => openModal('signup')}
-            />
+            {/* Right Section - Icons and Hamburger */}
+            <div className="flex items-center gap-2 sm:gap-4 ml-auto">
+              {/* Right Navigation Actions */}
+              <NavUserActions
+                user={user}
+                cartCount={cartCount}
+                onSearchClick={() => setSearchOpen(true)}
+                onLogout={logoutUser}
+                onOpenLogin={() => openModal('login')}
+                onOpenSignup={() => openModal('signup')}
+              />
+
+              {/* Hamburger Menu Button - Mobile Only (below lg/1024px) */}
+              <motion.button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="lg:hidden p-2 text-voltify-light/60 hover:text-voltify-gold transition-colors min-h-11 min-w-11 flex items-center justify-center"
+                aria-label="Toggle navigation menu"
+                whileTap={{ scale: 0.95 }}
+              >
+                {mobileMenuOpen ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                )}
+              </motion.button>
+            </div>
           </div>
         </div>
       </nav>
+
+      {/* Mobile Navigation Drawer - Visible only on mobile */}
+      <MobileNavMenu
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        user={user}
+        onOpenLogin={() => openModal('login')}
+        onOpenSignup={() => openModal('signup')}
+        categories={NAV_CATEGORIES}
+      />
 
       {/* Search Overlay */}
       {searchOpen && (

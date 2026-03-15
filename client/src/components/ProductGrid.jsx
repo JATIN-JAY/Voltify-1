@@ -115,13 +115,13 @@ export default function ProductCard({ product, index }) {
       whileHover={{ y: -8 }}
       viewport={{ once: false, amount: 0.3 }}
       transition={{ duration: 0.5, delay: (index % 4) * 0.1 }}
-      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-voltify-border bg-voltify-dark/80 shadow-sm transition-all duration-300 hover:shadow-xl hover:border-voltify-gold/60 hover:shadow-voltify-gold/10"
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-voltify-border bg-voltify-dark/80 shadow-sm transition-all duration-300 hover:shadow-xl hover:border-voltify-gold/60 hover:shadow-voltify-gold/10 w-full"
     >
-      <Link to={`/product/${product._id}`} className="relative overflow-hidden aspect-square block">
+      <Link to={`/product/${product._id}`} className="relative overflow-hidden aspect-square block w-full">
         <img
           src={product.image}
           alt={product.name}
-          className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105 max-w-full"
           onError={(e) => {
             e.target.src = 'https://via.placeholder.com/400x400?text=Product';
           }}
@@ -275,7 +275,7 @@ export function ProductGrid() {
           <p className="max-w-2xl text-voltify-light/60">Handpicked products with transparent pricing and fast fulfillment</p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4">
           {products.map((product, index) => (
             <ProductCard key={product._id} product={product} index={index} />
           ))}
