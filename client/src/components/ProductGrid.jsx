@@ -137,41 +137,41 @@ export default function ProductCard({ product, index }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -4 }}
+      whileHover={{ y: -8 }}
       viewport={{ once: false, amount: 0.3 }}
       transition={{ duration: 0.5, delay: (index % 4) * 0.1 }}
-      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-voltify-light/10 bg-voltify-dark/60 shadow-sm transition-all duration-300 hover:shadow-lg hover:border-voltify-gold/30 w-full"
+      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-voltify-light/10 bg-voltify-dark/80 shadow-sm transition-all duration-300 hover:shadow-2xl hover:border-voltify-gold/40 hover:shadow-voltify-gold/15 hover:bg-voltify-dark/90 w-full"
     >
-      {/* Product Image Container - White/Light Background */}
-      <Link to={productUrl} className="relative overflow-hidden aspect-square block w-full bg-white">
+      {/* Product Image Container */}
+      <Link to={productUrl} className="relative overflow-hidden aspect-square block w-full bg-voltify-dark/50">
         <img
           src={product.image}
           alt={altText}
           width={400}
           height={400}
           loading={shouldLazyLoad ? 'lazy' : 'eager'}
-          className="h-full w-full object-contain transition-transform duration-500 ease-out group-hover:scale-110 max-w-full p-4"
+          className="h-full w-full object-contain transition-transform duration-500 ease-out group-hover:scale-105 max-w-full"
           onError={(e) => {
             e.target.src = 'https://via.placeholder.com/400x400?text=Product';
           }}
         />
         
-        {/* Discount Badge - Top Left */}
+        {/* Discount Badge */}
         {hasDiscount && (
           <div className="absolute left-3 top-3 rounded-lg bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white shadow-lg">
             {discountPercent}% OFF
           </div>
         )}
         
-        {/* Wishlist Button - Top Right */}
+        {/* Wishlist Button */}
         <button
           onClick={handleWishlistToggle}
           disabled={loading}
-          className="absolute right-3 top-3 rounded-full p-2.5 bg-white/90 backdrop-blur-sm transition-all duration-200 disabled:opacity-50 hover:scale-110 shadow-md"
+          className="absolute right-3 top-3 rounded-full p-2.5 bg-voltify-dark/60 backdrop-blur-sm transition-all duration-200 disabled:opacity-50 hover:scale-110 hover:bg-voltify-dark/80"
           aria-label="Add to wishlist"
         >
           <svg
-            className={`h-5 w-5 transition-all duration-200 ${inWishlist ? 'fill-red-500 text-red-500' : 'text-voltify-light/70 hover:text-red-500'}`}
+            className={`h-5 w-5 transition-all duration-200 ${inWishlist ? 'fill-red-500 text-red-500' : 'text-voltify-light/60 hover:text-red-500'}`}
             viewBox="0 0 24 24"
             stroke="currentColor"
             strokeWidth="2"
@@ -185,16 +185,16 @@ export default function ProductCard({ product, index }) {
         </button>
       </Link>
 
-      {/* Card Content - Dark Background */}
-      <div className="flex flex-grow flex-col p-4 sm:p-5 space-y-2 sm:space-y-3">
+      {/* Card Content */}
+      <div className="flex flex-grow flex-col p-4 sm:p-5 space-y-2.5 sm:space-y-3">
         {/* Product Name */}
         <Link to={productUrl} className="block group/title">
-          <h3 className="text-sm sm:text-base font-semibold text-voltify-light leading-snug group-hover/title:text-voltify-gold transition-colors duration-200 line-clamp-2">
+          <h3 className="text-sm sm:text-base font-semibold text-voltify-light leading-snug group-hover/title:text-voltify-gold transition-colors line-clamp-2">
             {modelName}
           </h3>
         </Link>
 
-        {/* Color/Variant - Optional */}
+        {/* Color/Variant */}
         <p className="text-xs text-voltify-light/50 font-medium">
           {color}
         </p>
@@ -202,14 +202,17 @@ export default function ProductCard({ product, index }) {
         {/* Rating */}
         <div className="flex items-center gap-2 text-xs text-voltify-light/60">
           <span>★</span>
-          <span className="font-medium">{rating}</span>
+          <span>{rating}</span>
           <span>·</span>
-          <span>{reviewCount.toLocaleString()} reviews</span>
+          <span>{reviewCount.toLocaleString()}</span>
         </div>
 
-        {/* Price Section */}
-        <div className="py-2">
-          <p className="text-xl sm:text-2xl font-bold text-voltify-gold">
+        {/* Spacer */}
+        <div className="flex-grow" />
+
+        {/* Price */}
+        <div>
+          <p className="text-lg sm:text-xl font-bold text-voltify-gold">
             ₹{sellingPrice.toLocaleString('en-IN')}
           </p>
           {hasDiscount && (
@@ -218,26 +221,25 @@ export default function ProductCard({ product, index }) {
             </p>
           )}
         </div>
+      </div>
 
-        {/* Spacer to push button to bottom */}
-        <div className="flex-grow" />
-
-        {/* Full-Width Add to Cart Button */}
+      {/* Floating Add to Cart Button - Bottom Right */}
+      <div className="absolute bottom-4 right-4 sm:bottom-5 sm:right-5">
         {existingItem ? (
-          <div className="flex items-center justify-center gap-4 bg-voltify-gold rounded-xl py-3 px-4">
+          <div className="flex items-center gap-2 bg-voltify-dark/80 backdrop-blur-sm border border-voltify-gold/40 rounded-full px-3 py-2">
             <button
               onClick={handleDecrease}
-              className="text-voltify-dark hover:opacity-70 transition-opacity font-bold text-lg"
+              className="text-voltify-gold hover:text-voltify-gold/70 transition-colors text-sm font-bold"
               title="Decrease quantity"
             >
               −
             </button>
-            <span className="font-bold text-voltify-dark text-lg w-8 text-center">
+            <span className="text-xs font-bold text-voltify-gold w-5 text-center">
               {existingItem.quantity}
             </span>
             <button
               onClick={handleIncrease}
-              className="text-voltify-dark hover:opacity-70 transition-opacity font-bold text-lg"
+              className="text-voltify-gold hover:text-voltify-gold/70 transition-colors text-sm font-bold"
               title="Increase quantity"
             >
               +
@@ -246,16 +248,25 @@ export default function ProductCard({ product, index }) {
         ) : (
           <motion.button
             onClick={handleAddToCart}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className={`w-full py-3 px-4 rounded-xl font-bold text-base transition-all duration-300 shadow-md ${
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center font-bold transition-all duration-300 shadow-lg ${
               isAdded
                 ? 'bg-emerald-500 text-white'
-                : 'bg-voltify-gold text-voltify-dark hover:bg-yellow-400 hover:shadow-lg'
+                : 'bg-voltify-gold text-voltify-dark hover:shadow-xl hover:bg-yellow-400'
             }`}
             title="Add to cart"
           >
-            {isAdded ? '✓ Added to Cart' : 'Add to Cart'}
+            {isAdded ? (
+              <svg className="h-6 w-6 sm:h-7 sm:w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            ) : (
+              <svg className="h-6 w-6 sm:h-7 sm:w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+            )}
           </motion.button>
         )}
       </div>
