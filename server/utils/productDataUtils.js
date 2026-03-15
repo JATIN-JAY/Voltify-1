@@ -4,13 +4,21 @@
  */
 
 /**
- * Strip trailing pipe characters from product names
- * @param {string} name - Product name potentially with trailing pipes
+ * Strip trailing pipe characters and special characters from product names
+ * Removes: trailing pipes, extra spaces, control characters
+ * @param {string} name - Product name potentially with trailing pipes/special chars
  * @returns {string} Cleaned product name
  */
 export function cleanProductName(name) {
   if (!name || typeof name !== 'string') return '';
-  return name.replace(/\s*\|\s*$/, '').trim();
+  
+  return (
+    name
+      .replace(/\s*\|\s*$/g, '')  // Remove trailing pipe and surrounding spaces
+      .replace(/[\x00-\x1F\x7F]/g, '')  // Remove control characters
+      .replace(/\s+/g, ' ')  // Collapse multiple spaces
+      .trim()
+  );
 }
 
 /**

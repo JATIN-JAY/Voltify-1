@@ -4,6 +4,7 @@ import { CartContext } from "../context/CartContext";
 import { ModalContext } from "../context/ModalContext";
 import api from "../api";
 import { normalizeProducts } from "../utils/productDataUtils";
+import ProductImagePlaceholder from "./ProductImagePlaceholder";
 import "../styles/hero-animations.css";
 
 /**
@@ -83,16 +84,27 @@ const HeroSection = memo(function HeroSection() {
         const response = await api.get('/products/featured/list');
         const rawProducts = Array.isArray(response.data) ? response.data : [];
         
-        // Normalize product data (clean names, strip trailing pipes)
+        // Normalize product data (clean names, strip trailing pipes and special chars)
         const normalizedProducts = normalizeProducts(rawProducts);
         
-        console.log('✓ Loaded featured products:', {
-          count: normalizedProducts.length,
-          prices: normalizedProducts.map(p => p.price),
-          categories: normalizedProducts.map(p => p.category),
+        // Ensure max 3 products
+        const limitedProducts = normalizedProducts.slice(0, 3);
+
+        console.log('✓ Flagship carousel loaded:', {
+          count: limitedProducts.length,
+          maxProducts: 3,
+          products: limitedProducts.map(p => ({
+            id: p._id,
+            name: p.name,
+            price: p.price,
+            hasImage: !!p.image,
+            imageUrl: p.image,
+            featured: p.featured,
+            category: p.category,
+          })),
         });
 
-        setFeaturedProducts(normalizedProducts);
+        setFeaturedProducts(limitedProducts);
       } catch (error) {
         console.error('Error fetching featured products:', error);
         setFeaturedProducts([]);
@@ -353,37 +365,79 @@ function FeaturedCarousel({ products, loading, onActiveIndexChange, activeIndex 
         {products.map((product, idx) => {
           const price = Number(product.price || 0);
           const imageUrl = product.image || product.imageUrl || '';
+          const hasImage = !!imageUrl;
           
-          // Debug image mapping
-          if (idx === 0) {
-            console.log('Carousel product mapping:', {
-              productId: product._id,
-              productName: product.name,
-              imageUrl: imageUrl,
-              hasImage: !!imageUrl,
-            });
+          // Detect image-product mismatch in development
+          if (process.env.NODE_ENV === 'development') {
+            // Extract product ID from image URL for mismatch detection
+            const imageFilename = imageUrl.split('/').pop()?.toLowerCase() || '';
+            const productIdStr = String(product._id).toLowerCase();
+            
+            // Check if image filename contains product-related identifier
+            // Allow common image patterns: product-name, product-id, or generic patterns
+            const isImageMatch = 
+              !imageUrl || // No image is ok (we show placeholder)
+              imageFilename.includes(productIdStr) ||
+              imageFilename.includes(product.name?.toLowerCase().substring(0, 3)) ||
+              imageFilename.includes('product') ||
+              imageUrl.includes('cloudinary') ||
+              imageUrl.includes('placeholder') ||
+              imageUrl.includes('unsplash') ||
+              imageUrl.includes('imgur');
+            
+            if (!isImageMatch && imageUrl) {
+              console.warn(
+                `⚠️ Carousel image-product mismatch detected at index ${idx}:`,
+                {
+                  productId: product._id,
+                  productName: product.name,
+                  imageUrl: imageUrl,
+                  imageFilename: imageFilename,
+                  expectedImagePattern: `*${productIdStr}* or *${product.name?.split(' ')[0].toLowerCase()}*`,
+                }
+              );
+            }
           }
 
           return (
             <div
               key={product._id}
               className="relative w-full flex-none snap-start"
+              data-product-id={product._id}
+              data-image-url={imageUrl}
             >
               {/* Clean Product Image Cutout on Dark Background */}
-              <div className="h-full w-full flex items-center justify-center bg-gradient-to-b from-voltify-dark/80 to-voltify-dark">
-                <img
-                  src={imageUrl}
-                  alt={product.name}
-                  className="h-full w-full object-contain transition-transform duration-700 hover:scale-105"
-                  onError={(e) => {
-                    console.warn(`Image failed for product ${product._id}:`, imageUrl);
-                    e.target.src = 'https://via.placeholder.com/400x400?text=Product';
-                  }}
-                  onLoad={() => {
-                    if (idx === 0) console.log('✓ First carousel image loaded');
-                  }}
-                />
-              </div>
+              {hasImage ? (
+                <div className="h-full w-full flex items-center justify-center bg-gradient-to-b from-voltify-dark/80 to-voltify-dark">
+                  <img
+                    src={imageUrl}
+                    alt={product.name}
+                    className="h-full w-full object-contain transition-transform duration-700 hover:scale-105"
+                    data-product-id={product._id}
+                    onError={(e) => {
+                      console.error(`Image load error for product ${product._id}:`, {
+                        attempts: (e.target.dataset.attempts || 0) + 1,
+                        imageUrl: imageUrl,
+                        fallbackUrl: 'https://via.placeholder.com/400x400?text=No+Image',
+                      });
+                      
+                      // Try placeholder once
+                      if (!e.target.src.includes('placeholder')) {
+                        e.target.src = 'https://via.placeholder.com/400x400?text=No+Image';
+                        e.target.dataset.attempts = (e.target.dataset.attempts || 0) + 1;
+                      }
+                    }}
+                    onLoad={() => {
+                      if (process.env.NODE_ENV === 'development' && idx === 0) {
+                        console.log(`✓ Carousel image loaded for product ${product._id}`);
+                      }
+                    }}
+                  />
+                </div>
+              ) : (
+                // Show placeholder for products with no image
+                <ProductImagePlaceholder />
+              )}
             </div>
           );
         })}

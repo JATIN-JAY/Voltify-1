@@ -29,6 +29,7 @@ const ensureDatabaseReady = (res) => {
 
 // Get featured products only - MUST be before /:id route
 // Filters: featured flag + minimum price ₹10,000 + excludes accessories/cases
+// Limit to 3 products, sorted by most recently added
 router.get('/featured/list', async (req, res) => {
   if (!isDatabaseReady()) {
     return res.json([]);
@@ -50,7 +51,9 @@ router.get('/featured/list', async (req, res) => {
       featured: true,
       price: { $gte: 10000 },
       category: { $nin: excludedCategories }
-    });
+    })
+      .sort({ createdAt: -1 })  // Most recently added first
+      .limit(3);                 // Maximum 3 products for carousel
 
     // Normalize product data at the server layer
     const normalizedProducts = normalizeProducts(products);
