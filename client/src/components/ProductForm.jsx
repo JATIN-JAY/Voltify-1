@@ -6,8 +6,9 @@ import { BRANDS_BY_CATEGORY } from '../constants/navigation';
 /**
  * ProductForm Component - Refactored with composition patterns
  * Uses custom hooks and shared components for clean, maintainable code
+ * Supports both creating new and editing existing products
  */
-const ProductForm = ({ onProductCreated, categories }) => {
+const ProductForm = ({ onProductCreated, categories, productToEdit = null }) => {
   const {
     formData,
     handleInputChange,
@@ -19,7 +20,8 @@ const ProductForm = ({ onProductCreated, categories }) => {
     imagePreview,
     uploadError,
     availableBrands,
-  } = useProductForm(onProductCreated);
+    isEditing,
+  } = useProductForm(onProductCreated, productToEdit);
 
   // Memoize category options to avoid recreation on every render
   const categoryOptions = useMemo(
@@ -41,7 +43,7 @@ const ProductForm = ({ onProductCreated, categories }) => {
     <Card className="bg-gradient-to-br from-slate-50 to-slate-100">
       <Card.Header>
         <h2 className="text-2xl font-display font-bold text-slate-900">
-          Add New Product
+          {isEditing ? 'Edit Product' : 'Add New Product'}
         </h2>
       </Card.Header>
 
@@ -151,7 +153,7 @@ const ProductForm = ({ onProductCreated, categories }) => {
             size="lg"
             className="w-full"
           >
-            {loading ? 'Creating Product...' : 'Create Product'}
+            {loading ? (isEditing ? 'Updating Product...' : 'Creating Product...') : (isEditing ? 'Update Product' : 'Create Product')}
           </Button>
         </form>
       </Card.Body>

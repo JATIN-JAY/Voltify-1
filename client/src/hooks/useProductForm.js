@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import api from '../api';
 import { useImageUpload } from './useImageUpload';
 
@@ -22,15 +22,32 @@ const BRANDS_BY_CATEGORY = {
 
 /**
  * Custom hook for managing product form state and submission
+ * Supports both creating new products and editing existing ones
  * Encapsulates form logic, validation, and API interactions
  */
-export const useProductForm = (onProductCreated) => {
+export const useProductForm = (onProductCreated, productToEdit = null) => {
   const [formData, setFormData] = useState(INITIAL_FORM_STATE);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const { imagePreview, uploading, error: uploadError, uploadImage, clearImage, setError: setUploadError } = useImageUpload();
+  const [isEditing] = useState(!!productToEdit);
 
   const token = localStorage.getItem('token');
+
+  // Initialize form with product data when editing
+  useEffect(() => {
+    if (productToEdit) {
+      setFormData({
+        name: productToEdit.name || '',
+        price: productToEdit.price || '',
+        category: productToEdit.category || 'Mobiles',
+        brand: productToEdit.brand || '',
+        description: productToEdit.description || '',
+        imageUrl: productToEdit.image || '',
+        featured: productToEdit.featured || false,
+      });
+    }
+  }, [productToEdit]);
 
   // Memoized brands for current category
   const availableBrands = useMemo(() => {
@@ -118,13 +135,23 @@ export const useProductForm = (onProductCreated) => {
       setLoading(true);
 
       try {
-        const response = await api.post('/products', formData, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        setMessage({ type: 'success', text: 'Product created successfully!' });
-        setFormData(INITIAL_FORM_STATE);
-        clearImage();
+        let response;
+        
+        if (isEditing && productToEdit) {
+          // Update existing product
+          response = await api.put(`/products/${productToEdit._id}`, formData, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setMessage({ type: 'success', text: 'Product updated successfully!' });
+        } else {
+          // Create new product
+          response = await api.post('/products', formData, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setMessage({ type: 'success', text: 'Product created successfully!' });
+          setFormData(INITIAL_FORM_STATE);
+          clearImage();
+        }
 
         if (onProductCreated) {
           onProductCreated(response.data.product);
@@ -132,13 +159,13 @@ export const useProductForm = (onProductCreated) => {
 
         setTimeout(() => setMessage({ type: '', text: '' }), 3000);
       } catch (err) {
-        const errorMsg = err.response?.data?.message || 'Failed to create product';
+        const errorMsg = err.response?.data?.message || (isEditing ? 'Failed to update product' : 'Failed to create product');
         setMessage({ type: 'error', text: errorMsg });
       } finally {
         setLoading(false);
       }
     },
-    [formData, validateForm, token, onProductCreated, clearImage]
+    [formData, validateForm, token, onProductCreated, clearImage, isEditing, productToEdit]
   );
 
   const resetForm = useCallback(() => {
@@ -160,5 +187,6 @@ export const useProductForm = (onProductCreated) => {
     uploadError,
     setUploadError,
     availableBrands,
+    isEditing,
   };
 };
