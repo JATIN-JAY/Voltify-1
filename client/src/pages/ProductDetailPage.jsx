@@ -305,20 +305,33 @@ export default function ProductDetailPage() {
           />
         )}
 
-        {/* Product Detail */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mb-16">
+        <style>{`
+          @media (min-width: 768px) {
+            .product-detail-sticky-grid {
+              display: grid;
+              grid-template-columns: 55% 45%;
+              gap: 40px;
+              align-items: start;
+            }
+          }
+          @media (max-width: 767px) {
+            .product-detail-sticky-grid {
+              display: grid;
+              grid-template-columns: 1fr;
+              gap: 32px;
+            }
+          }
+        `}</style>
+
+        {/* Product Detail - Grid Layout with Sticky Left Column */}
+        <div className="product-detail-sticky-grid mb-16">
           {/* Product Image Gallery - Sticky Left Column */}
-          {/* 
-            Sticky Layout Implementation:
-            - position: sticky; top: 80px: Sticks to navbar height
-            - h-fit: Only as tall as content, naturally unsticks at section bottom
-            - will-change: transform: GPU optimization for smooth sticky behavior
-            - contain: content: Performance optimization, reduces layout recalculations
-            - max-w-md: Constrains width for consistent display on all screens
-          */}
           <motion.div 
-            className="flex flex-col items-start justify-start sticky top-[80px] h-fit gap-3 md:gap-4 will-change-transform"
-            style={{ contain: 'content' }}
+            className="flex flex-col items-start justify-start h-fit gap-3 md:gap-4"
+            style={{
+              position: 'sticky',
+              top: '72px'
+            }}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
@@ -382,14 +395,7 @@ export default function ProductDetailPage() {
             </div>
           </motion.div>
 
-          {/* Product Info - Right Column (Independent scrolling) */}
-          {/* 
-            Right Column Positioning:
-            - position: relative + alignSelf: start: Maintains independent scroll position
-            - Does NOT move when left column sticky or when user scrolls
-            - Right column scrolls independently with page
-            - No sticky or fixed positioning to ensure natural scroll behavior
-          */}
+          {/* Product Info - Right Column (Natural scroll, no sticky) */}
           <motion.div 
             className="flex flex-col justify-start space-y-5 md:space-y-6"
             initial={{ opacity: 0, x: 20 }}
