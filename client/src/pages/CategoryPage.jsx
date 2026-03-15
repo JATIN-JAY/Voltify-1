@@ -167,7 +167,7 @@ function ProductCard({ product }) {
   const handleAddToCart = () => {
     addToCart(product);
     setIsAdded(true);
-    setTimeout(() => setIsAdded(false), 1000);
+    setTimeout(() => setIsAdded(false), 1500);
   };
 
   const handleDecrease = () => {
@@ -195,20 +195,21 @@ function ProductCard({ product }) {
       whileHover={{ y: -8 }}
       viewport={{ once: false, amount: 0.3 }}
       transition={{ duration: 0.5 }}
+      style={{ boxSizing: 'border-box' }}
       className="group relative bg-[#1e1e1e] rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl hover:border-voltify-gold/40 hover:shadow-voltify-gold/15 transition-all duration-300 flex flex-col h-full border border-voltify-light/10"
     >
       {/* Image Container */}
       <Link to={product.slug && product.category 
         ? `/${product.category.toLowerCase().replace(/\s+/g, '-')}/${product.slug}`
         : `/product/${product._id}`
-      } className="relative overflow-hidden aspect-square block w-full bg-[#1e1e1e] flex-shrink-0">
+      } className="relative overflow-hidden block w-full bg-[#1a1a1a] flex-shrink-0" style={{ height: '180px', maxWidth: '100%', boxSizing: 'border-box' }}>
         <img
           src={product.image}
           alt={`${product.brand || 'Product'} ${product.name} ${product.color || ''} - Buy on Voltify`}
           width={400}
           height={400}
           loading="lazy"
-          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 ease-out mix-blend-mode-screen"
+          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 ease-out"
           onError={(e) => {
             e.target.src = 'https://via.placeholder.com/400x400?text=Product';
           }}
@@ -217,25 +218,25 @@ function ProductCard({ product }) {
       </Link>
 
       {/* Content Section */}
-      <div className="p-4 sm:p-5 flex flex-col flex-grow space-y-2.5">
+      <div className="p-4 sm:p-5 flex flex-col flex-grow space-y-2.5" style={{ paddingBottom: '48px', boxSizing: 'border-box' }}>
         {/* Product Name */}
         <Link to={product.slug && product.category 
           ? `/${product.category.toLowerCase().replace(/\s+/g, '-')}/${product.slug}`
           : `/product/${product._id}`
         } className="block">
-          <h3 className="font-semibold text-sm sm:text-base text-voltify-light group-hover:text-voltify-gold transition-colors line-clamp-2 leading-snug min-h-[2.5rem]">
+          <h3 className="font-semibold text-[13px] text-voltify-light group-hover:text-voltify-gold transition-colors leading-snug" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', maxWidth: '100%' }}>
             {product.name}
           </h3>
         </Link>
 
         {/* Color if available */}
-        <p className="text-xs text-voltify-light/50 font-medium">
+        <p className="text-xs text-voltify-light/50 font-medium" style={{ maxWidth: '100%' }}>
           {product.color || product.category}
         </p>
 
         {/* Rating if available */}
         {product.rating && (
-          <div className="flex items-center gap-2 text-xs text-voltify-light/60">
+          <div className="flex items-center gap-2 text-xs text-voltify-light/60" style={{ maxWidth: '100%' }}>
             <span>★</span>
             <span>{product.rating}</span>
             <span>·</span>
@@ -247,64 +248,78 @@ function ProductCard({ product }) {
         <div className="flex-grow" />
 
         {/* Price */}
-        <div className="min-w-0">
+        <div className="min-w-0" style={{ maxWidth: '100%' }}>
           <span className="text-base sm:text-lg font-bold text-voltify-gold break-words">
             ₹{Number(product.price).toLocaleString('en-IN')}
           </span>
         </div>
-
-        {/* Full-Width Add to Cart Button */}
-        <div className="w-[calc(100%+2rem)] -mx-4 mt-3">
-          {existingItem ? (
-            <motion.div 
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
-              className="flex items-center justify-center gap-2 bg-voltify-gold hover:bg-yellow-500 transition-colors text-voltify-dark font-bold h-9 text-sm rounded-lg mx-3"
-            >
-              <button
-                onClick={handleDecrease}
-                className="w-6 h-6 flex items-center justify-center hover:opacity-70 transition-opacity"
-                title="Decrease quantity"
-              >
-                −
-              </button>
-              <span className="w-6 text-center text-xs font-bold">
-                {existingItem.quantity}
-              </span>
-              <button
-                onClick={handleIncrease}
-                className="w-6 h-6 flex items-center justify-center hover:opacity-70 transition-opacity"
-                title="Increase quantity"
-              >
-                +
-              </button>
-            </motion.div>
-          ) : (
-            <motion.button
-              onClick={handleAddToCart}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className={`w-[calc(100%-1.5rem)] h-9 rounded-lg flex items-center justify-center font-bold text-xs sm:text-sm transition-all duration-300 shadow-md mx-3 ${
-                isAdded
-                  ? 'bg-emerald-500 text-white'
-                  : 'bg-[#f5a623] text-voltify-dark hover:bg-yellow-500 hover:shadow-lg'
-              }`}
-              title="Add to cart"
-            >
-              {isAdded ? (
-                <div className="flex items-center gap-1.5">
-                  <svg className="h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                  <span>Added</span>
-                </div>
-              ) : (
-                'Add to Cart'
-              )}
-            </motion.button>
-          )}
-        </div>
       </div>
+
+      {/* Floating Add to Cart Button (Circle) */}
+      {!existingItem ? (
+        <motion.button
+          onClick={handleAddToCart}
+          whileTap={{ scale: 1.05 }}
+          className="absolute flex items-center justify-center font-bold transition-all duration-300 shadow-lg hover:shadow-xl"
+          style={{
+            position: 'absolute',
+            right: '12px',
+            bottom: '12px',
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
+            backgroundColor: isAdded ? '#d68a0f' : '#f5a623',
+            color: '#1a1a1a',
+            border: 'none',
+            cursor: 'pointer',
+          }}
+          title="Add to cart"
+        >
+          {isAdded ? (
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          ) : (
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          )}
+        </motion.button>
+      ) : (
+        <motion.div 
+          initial={{ scale: 0.95 }}
+          animate={{ scale: 1 }}
+          className="absolute flex items-center justify-center gap-2 text-voltify-dark font-bold text-xs rounded-full"
+          style={{
+            position: 'absolute',
+            right: '12px',
+            bottom: '12px',
+            width: '36px',
+            height: '36px',
+            backgroundColor: '#f5a623',
+            borderRadius: '50%',
+          }}
+        >
+          <button
+            onClick={handleDecrease}
+            className="w-5 h-5 flex items-center justify-center hover:opacity-70 transition-opacity"
+            title="Decrease quantity"
+          >
+            −
+          </button>
+          <span className="w-3 text-center text-xs font-bold">
+            {existingItem.quantity}
+          </span>
+          <button
+            onClick={handleIncrease}
+            className="w-5 h-5 flex items-center justify-center hover:opacity-70 transition-opacity"
+            title="Increase quantity"
+          >
+            +
+          </button>
+        </motion.div>
+      )}
     </motion.div>
   );
 }
@@ -422,8 +437,8 @@ export default function CategoryPage() {
           })}
         </script>
       </Helmet>
-      <div className="min-h-screen bg-[#0f0f0f] pt-20 pb-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-[#0f0f0f] pt-20 pb-12" style={{ overflowX: 'hidden' }}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style={{ overflowX: 'hidden' }}>
         {/* Breadcrumb Navigation */}
         <Breadcrumb 
           items={getCategoryBreadcrumbs(
@@ -491,6 +506,7 @@ export default function CategoryPage() {
         ) : (
           <motion.div 
             className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-4"
+            style={{ padding: '0 16px' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
