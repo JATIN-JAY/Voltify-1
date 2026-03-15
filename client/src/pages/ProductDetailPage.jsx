@@ -189,12 +189,9 @@ export default function ProductDetailPage() {
   };
 
   // Mock thumbnail images (in production, these would come from product data)
-  const thumbnailImages = [
-    product?.image,
-    'https://via.placeholder.com/600x600?text=View+2',
-    'https://via.placeholder.com/600x600?text=View+3',
-    'https://via.placeholder.com/600x600?text=View+4'
-  ];
+  const thumbnailImages = product?.images && product.images.length > 0
+    ? [product?.image, ...product.images]
+    : [product?.image];
 
   // EMI calculation (mock - 12 months at 0% interest)
   const emiAmount = product ? Math.round(Number(product.price) / 12) : 0;
@@ -247,12 +244,9 @@ export default function ProductDetailPage() {
             "@type": "Product",
             "name": product.name,
             "description": product.description || `Premium ${product.category} from ${product.brand}`,
-            "image": [
-              product.image,
-              'https://via.placeholder.com/600x600?text=View+2',
-              'https://via.placeholder.com/600x600?text=View+3',
-              'https://via.placeholder.com/600x600?text=View+4'
-            ],
+            "image": product?.images && product.images.length > 0
+              ? [product.image, ...product.images]
+              : [product.image],
             "brand": {
               "@type": "Brand",
               "name": product.brand || "Voltify"
