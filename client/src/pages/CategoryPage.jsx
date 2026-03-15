@@ -119,11 +119,11 @@ function ProductCard({ product }) {
   };
 
   return (
-    <div className="group bg-[#1e1e1e] rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col h-96 border border-[#2a2a2a]">
+    <div className="group bg-[#1e1e1e] rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col h-80 border border-[#2a2a2a]">
       <Link to={product.slug && product.category 
         ? `/${product.category.toLowerCase().replace(/\s+/g, '-')}/${product.slug}`
         : `/product/${product._id}`
-      } className="relative overflow-hidden h-40 md:h-56 block bg-[#1a1a1a]">
+      } className="relative overflow-hidden h-40 lg:h-52 block bg-[#1a1a1a] flex-shrink-0">
         <img
           src={product.image}
           alt={`${product.brand || 'Product'} ${product.name} ${product.color || ''} - Buy on Voltify`}
@@ -139,22 +139,18 @@ function ProductCard({ product }) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
       </Link>
 
-      <div className="p-3 md:p-4 flex flex-col flex-grow">
+      <div className="p-3 md:p-4 flex flex-col flex-grow gap-2">
         <Link to={product.slug && product.category 
           ? `/${product.category.toLowerCase().replace(/\s+/g, '-')}/${product.slug}`
           : `/product/${product._id}`
-        } className="block mb-1 flex-shrink-0">
+        } className="block flex-shrink-0">
           <h3 className="font-bold text-sm md:text-base text-white group-hover:text-gray-200 transition-colors line-clamp-2 hover:underline">
             {product.name}
           </h3>
         </Link>
 
-        <p className="text-xs md:text-xs text-[#aaaaaa] line-clamp-1 flex-grow mb-2 flex-shrink-0">
-          {product.description}
-        </p>
-
-        <div className="flex items-center mb-3 flex-shrink-0">
-          <span className="text-base md:text-xl font-extrabold text-[#f5a623]">
+        <div className="flex items-center flex-shrink-0">
+          <span className="text-base md:text-lg font-extrabold text-[#f5a623]">
             ₹{Number(product.price).toLocaleString('en-IN')}
           </span>
         </div>
@@ -366,7 +362,7 @@ export default function CategoryPage() {
           </div>
         ) : (
           <motion.div 
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6"
+            className=\"grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-4\"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
