@@ -1,9 +1,11 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { ModalContext } from '../context/ModalContext';
 import { useProfile } from '../hooks';
 import { Card, Input, Button, Alert } from '../components/shared';
+import { getGenericSocialMeta } from '../utils/socialMetaTags';
 
 /**
  * ProfilePage Component - Refactored with shared UI components
@@ -50,7 +52,46 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-voltify-dark py-12 md:py-24">
+    <>
+      <Helmet>
+        <title>My Profile | Voltify</title>
+        <meta name="description" content="Manage your Voltify profile, view your orders and addresses." />
+        
+        {/* Open Graph & Twitter Card Meta Tags */}
+        {getGenericSocialMeta(
+          'My Profile | Voltify',
+          'Manage your Voltify profile, view your orders and addresses.'
+        ).map((meta, idx) => (
+          meta.name ? (
+            <meta key={idx} name={meta.name} content={meta.content} />
+          ) : (
+            <meta key={idx} property={meta.property} content={meta.content} />
+          )
+        ))}
+        
+        {/* JSON-LD BreadcrumbList Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": `${window.location.origin}/`
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Profile",
+                "item": window.location.href
+              }
+            ]
+          })}
+        </script>
+      </Helmet>
+      <div className="min-h-screen bg-voltify-dark py-12 md:py-24">
       <div className="container mx-auto px-4 max-w-2xl">
         {/* Header */}
         <motion.div
@@ -186,5 +227,6 @@ export default function ProfilePage() {
         )}
       </div>
     </div>
+    </>
   );
 };

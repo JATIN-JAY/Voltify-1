@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAdminDashboard } from '../hooks';
+import { getGenericSocialMeta } from '../utils/socialMetaTags';
 import AdminSidebar from '../components/AdminSidebar';
 import ProductForm from '../components/ProductForm';
 
@@ -17,13 +19,28 @@ const AdminProductAddPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] flex">
-      {/* Sidebar */}
-      <AdminSidebar />
+    <>
+      <Helmet>
+        <title>Add New Product | Admin - Voltify</title>
+        <meta name="description" content="Add a new product to your Voltify store catalog." />
+        {getGenericSocialMeta(
+          'Add New Product | Admin - Voltify',
+          'Add a new product to your Voltify store catalog.'
+        ).map((meta, idx) => (
+          meta.name ? (
+            <meta key={idx} name={meta.name} content={meta.content} />
+          ) : (
+            <meta key={idx} property={meta.property} content={meta.content} />
+          )
+        ))}
+      </Helmet>
+      <div className="min-h-screen bg-[#0f0f0f] flex">
+        {/* Sidebar */}
+        <AdminSidebar />
 
-      {/* Main Content */}
-      <main className="flex-1" style={{ marginLeft: '220px' }}>
-        <div className="p-8">
+        {/* Main Content */}
+        <main className="flex-1" style={{ marginLeft: '220px' }}>
+          <div className="p-8">
           {/* Header */}
           <motion.div 
             className="mb-12"
@@ -46,9 +63,10 @@ const AdminProductAddPage = () => {
               categories={categories}
             />
           </motion.div>
-        </div>
-      </main>
-    </div>
+          </div>
+        </main>
+      </div>
+    </>
   );
 };
 

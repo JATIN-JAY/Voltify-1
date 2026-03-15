@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getGenericSocialMeta } from '../utils/socialMetaTags';
 
 export default function WishlistPage() {
   const [items, setItems] = useState([]);
@@ -23,7 +25,46 @@ export default function WishlistPage() {
   };
 
   return (
-    <div className="min-h-screen bg-voltify-dark py-12 md:py-24">
+    <>
+      <Helmet>
+        <title>My Wishlist | Voltify</title>
+        <meta name="description" content="View your Voltify wishlist of favorite products and tech items." />
+        
+        {/* Open Graph & Twitter Card Meta Tags */}
+        {getGenericSocialMeta(
+          'My Wishlist | Voltify',
+          'View your Voltify wishlist of favorite products and tech items.'
+        ).map((meta, idx) => (
+          meta.name ? (
+            <meta key={idx} name={meta.name} content={meta.content} />
+          ) : (
+            <meta key={idx} property={meta.property} content={meta.content} />
+          )
+        ))}
+        
+        {/* JSON-LD BreadcrumbList Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": `${window.location.origin}/`
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Wishlist",
+                "item": window.location.href
+              }
+            ]
+          })}
+        </script>
+      </Helmet>
+      <div className="min-h-screen bg-voltify-dark py-12 md:py-24">
       <div className="container mx-auto px-4 max-w-5xl">
         <motion.h1 
           className="text-4xl font-display font-bold text-voltify-light mb-8"
@@ -60,7 +101,14 @@ export default function WishlistPage() {
                   exit={{ opacity: 0, x: -20 }}
                   className="bg-[#1f1c19] p-6 rounded-2xl border border-voltify-border/20 hover:border-voltify-gold/40 transition duration-300 flex items-center gap-6"
                 >
-                  <img src={p.image || '/images/products/placeholder.png'} alt={p.name} className="w-24 h-24 object-cover rounded-xl shadow-md" />
+                  <img 
+                    src={p.image || '/images/products/placeholder.png'} 
+                    alt={`${p.brand || 'Product'} ${p.name} ${p.color || ''} - Buy on Voltify`}
+                    width={96}
+                    height={96}
+                    loading="lazy"
+                    className="w-24 h-24 object-cover rounded-xl shadow-md" 
+                  />
                   <div className="flex-grow">
                     <Link to={`/product/${p._id}`} className="font-semibold text-voltify-light hover:text-voltify-gold transition text-lg">{p.name}</Link>
                     <div className="text-voltify-light/60 mt-2">₹{p.price?.toLocaleString('en-IN') || '—'}</div>
@@ -80,5 +128,6 @@ export default function WishlistPage() {
         )}
       </div>
     </div>
+    </>
   );
 }

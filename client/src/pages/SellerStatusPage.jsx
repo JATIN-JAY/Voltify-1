@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import api from '../api';
+import { getGenericSocialMeta } from '../utils/socialMetaTags';
 import { Card, Button, Alert } from '../components/shared';
 
 /**
@@ -75,8 +77,23 @@ const SellerStatusPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-voltify-dark pt-24 pb-12 px-4">
-      <div className="max-w-2xl mx-auto">
+    <>
+      <Helmet>
+        <title>Seller Application Status | Voltify</title>
+        <meta name="description" content="Check the status of your Voltify seller application and approval timeline." />
+        {getGenericSocialMeta(
+          'Seller Application Status | Voltify',
+          'Check the status of your seller application.'
+        ).map((meta, idx) => (
+          meta.name ? (
+            <meta key={idx} name={meta.name} content={meta.content} />
+          ) : (
+            <meta key={idx} property={meta.property} content={meta.content} />
+          )
+        ))}
+      </Helmet>
+      <div className="min-h-screen bg-voltify-dark pt-24 pb-12 px-4">
+        <div className="max-w-2xl mx-auto">
         {/* Header */}
         <motion.div className="mb-10 text-center">
           <h1 className="text-4xl font-black text-voltify-light mb-3">Application Status</h1>
@@ -236,8 +253,9 @@ const SellerStatusPage = () => {
             </Card.Body>
           </Card>
         )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

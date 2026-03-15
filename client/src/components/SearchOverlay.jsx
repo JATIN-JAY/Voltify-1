@@ -125,7 +125,10 @@ const SearchOverlay = memo(function SearchOverlay({ open, onClose }) {
                       >
                         <img 
                           src={r.image} 
-                          alt={r.name} 
+                          alt={`${r.brand || 'Product'} ${r.name} ${r.color || ''} - Buy on Voltify`}
+                          width={48}
+                          height={48}
+                          loading="lazy"
                           className="w-12 h-12 object-cover rounded-lg flex-shrink-0"
                           onError={(e)=>{e.target.src='https://via.placeholder.com/60'}} 
                         />

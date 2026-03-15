@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import api from '../api';
+import { getGenericSocialMeta } from '../utils/socialMetaTags';
 import AdminSidebar from '../components/AdminSidebar';
 import { Alert } from '../components/shared';
 
@@ -67,10 +69,25 @@ export default function AdminOrders() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] flex">
-      <AdminSidebar />
-      <main className="flex-1" style={{ marginLeft: '220px' }}>
-        <div className="p-8">
+    <>
+      <Helmet>
+        <title>All Orders | Admin - Voltify</title>
+        <meta name="description" content="View and manage all customer orders in your Voltify admin dashboard." />
+        {getGenericSocialMeta(
+          'All Orders | Admin - Voltify',
+          'View and manage all customer orders.'
+        ).map((meta, idx) => (
+          meta.name ? (
+            <meta key={idx} name={meta.name} content={meta.content} />
+          ) : (
+            <meta key={idx} property={meta.property} content={meta.content} />
+          )
+        ))}
+      </Helmet>
+      <div className="min-h-screen bg-[#0f0f0f] flex">
+        <AdminSidebar />
+        <main className="flex-1" style={{ marginLeft: '220px' }}>
+          <div className="p-8">
           {/* Header */}
           <motion.div 
             className="mb-8"
@@ -217,8 +234,9 @@ export default function AdminOrders() {
               </div>
             </motion.div>
           )}
-        </div>
-      </main>
-    </div>
+          </div>
+        </main>
+      </div>
+    </>
   );
 }

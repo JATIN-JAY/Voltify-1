@@ -71,8 +71,20 @@ function App() {
               <Route path="/become-seller" element={<BecomeSellerPage />} />
               <Route path="/seller/status" element={<SellerStatusPage />} />
 
-              {/* Product routes */}
+              {/* Product routes - SEO-friendly slug-based URLs */}
+              <Route path="/mobiles/:slug" element={<MainLayout><ProductDetailPage /></MainLayout>} />
+              <Route path="/tablets/:slug" element={<MainLayout><ProductDetailPage /></MainLayout>} />
+              <Route path="/audio/:slug" element={<MainLayout><ProductDetailPage /></MainLayout>} />
+              <Route path="/accessories/:slug" element={<MainLayout><ProductDetailPage /></MainLayout>} />
+              
+              {/* Backward compatibility - old ID-based URLs */}
               <Route path="/product/:id" element={<MainLayout><ProductDetailPage /></MainLayout>} />
+              
+              {/* Category routes - both parameter-based and slug-based */}
+              <Route path="/mobiles" element={<MainLayout><CategoryPage /></MainLayout>} />
+              <Route path="/tablets" element={<MainLayout><CategoryPage /></MainLayout>} />
+              <Route path="/audio" element={<MainLayout><CategoryPage /></MainLayout>} />
+              <Route path="/accessories" element={<MainLayout><CategoryPage /></MainLayout>} />
               <Route path="/category/:category" element={<MainLayout><CategoryPage /></MainLayout>} />
 
               {/* User routes */}

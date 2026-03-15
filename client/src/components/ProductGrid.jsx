@@ -6,6 +6,23 @@ import api from '../api';
 import { motion } from 'framer-motion';
 import { CartContext } from '../context/CartContext';
 
+/**
+ * Generate product URL based on category and slug
+ * Falls back to ID-based URL for backward compatibility
+ */
+function getProductUrl(product) {
+  if (!product) return '/';
+  
+  // If product has a slug, use the new category-based slug URL
+  if (product.slug && product.category) {
+    const categorySlug = product.category.toLowerCase().replace(/\s+/g, '-');
+    return `/${categorySlug}/${product.slug}`;
+  }
+  
+  // Fallback to old ID-based URL for backward compatibility
+  return `/product/${product._id}`;
+}
+
 export default function ProductCard({ product, index }) {
   const { addToCart, cartItems, updateQuantity, removeFromCart, user } = useContext(CartContext);
   const [isAdded, setIsAdded] = useState(false);
@@ -105,6 +122,14 @@ export default function ProductCard({ product, index }) {
   const { modelName, color } = getModelAndVariant();
   const rating = product.rating || 4.8;
   const reviewCount = product.reviewCount || 214;
+  const productUrl = getProductUrl(product);
+  
+  // Generate SEO-optimized alt text: "{brand} {productName} {color} - Buy on Voltify"
+  const altText = `${product.brand} ${product.name} ${product.color || color} - Buy on Voltify`;
+  
+  // Determine if image should be lazy loaded
+  // Only the first 8 products (initial viewport) should NOT be lazy loaded
+  const shouldLazyLoad = index >= 8;
 
 
 
@@ -117,10 +142,13 @@ export default function ProductCard({ product, index }) {
       transition={{ duration: 0.5, delay: (index % 4) * 0.1 }}
       className="group flex h-full flex-col overflow-hidden rounded-2xl border border-voltify-border bg-voltify-dark/80 shadow-sm transition-all duration-300 hover:shadow-xl hover:border-voltify-gold/60 hover:shadow-voltify-gold/10 w-full"
     >
-      <Link to={`/product/${product._id}`} className="relative overflow-hidden aspect-square block w-full">
+      <Link to={productUrl} className="relative overflow-hidden aspect-square block w-full">
         <img
           src={product.image}
-          alt={product.name}
+          alt={altText}
+          width={400}
+          height={400}
+          loading={shouldLazyLoad ? 'lazy' : 'eager'}
           className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105 max-w-full"
           onError={(e) => {
             e.target.src = 'https://via.placeholder.com/400x400?text=Product';

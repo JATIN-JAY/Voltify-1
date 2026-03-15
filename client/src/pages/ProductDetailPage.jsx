@@ -1,23 +1,35 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import api from '../api';
 import { CartContext } from '../context/CartContext';
 import ProductCard from '../components/ProductGrid';
+import { getProductSocialMeta } from '../utils/socialMetaTags';
+import { Breadcrumb } from '../components/Breadcrumb';
+import { getProductBreadcrumbs, generateBreadcrumbSchema } from '../utils/breadcrumbUtils';
+
+/**
+ * Check if a string is a MongoDB ObjectId
+ */
+function isMongoId(str) {
+  return /^[0-9a-fA-F]{24}$/.test(str);
+}
 
 /**
  * Custom hook for fetching product data in parallel
  * Implements async-parallel pattern: independent operations run concurrently
- * Reduces total load time by running product fetch and suggested products fetch in parallel
+ * Supports both slug-based and ID-based URLs for backward compatibility
  */
-function useProductData(id) {
+function useProductData(identifier, category) {
   const [product, setProduct] = useState(null);
   const [suggestedProducts, setSuggestedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!id) return;
+    if (!identifier) return;
 
     /**
      * Parallel data fetching pattern (CRITICAL optimization)
@@ -29,8 +41,19 @@ function useProductData(id) {
         setLoading(true);
         setError(null);
 
-        // Start both requests immediately (no await yet)
-        const productPromise = api.get(`/products/${id}`);
+        let productPromise;
+        let productId = identifier;
+
+        // Determine if identifier is a slug or ID
+        if (isMongoId(identifier)) {
+          // Old ID-based URL - fetch by ID and redirect if slug exists
+          productPromise = api.get(`/products/${identifier}`);
+        } else {
+          // New slug-based URL - fetch by slug
+          productPromise = api.get(`/products/slug/${identifier}`);
+        }
+
+        // Get suggested products
         const suggestedPromise = api.get('/products');
 
         // Use Promise.all to wait for both in parallel (2× faster than sequential)
@@ -39,10 +62,18 @@ function useProductData(id) {
           suggestedPromise
         ]);
 
-        setProduct(productRes.data);
+        const loadedProduct = productRes.data;
+        setProduct(loadedProduct);
+        productId = loadedProduct._id;
+
+        // If old ID URL was used and product has a slug, redirect to new URL
+        if (isMongoId(identifier) && loadedProduct.slug && category) {
+          const categorySlug = category.toLowerCase().replace(/\s+/g, '-');
+          navigate(`/${categorySlug}/${loadedProduct.slug}`, { replace: true });
+        }
 
         // Filter out current product and get up to 4 random products
-        const filtered = suggestedRes.data.filter(p => p._id !== id);
+        const filtered = suggestedRes.data.filter(p => p._id !== productId);
         const suggested = filtered.sort(() => Math.random() - 0.5).slice(0, 4);
         setSuggestedProducts(suggested);
       } catch (err) {
@@ -56,18 +87,23 @@ function useProductData(id) {
     };
 
     loadProductData();
-  }, [id]);
+  }, [identifier, category, navigate]);
 
   return { product, suggestedProducts, loading, error };
 }
 
 export default function ProductDetailPage() {
-  const { id } = useParams();
+  // Handle both new slug-based URLs and old ID-based URLs
+  const params = useParams();
   const navigate = useNavigate();
   const { addToCart, cartItems, updateQuantity } = useContext(CartContext);
 
+  // Determine identifier (slug or id) and category from URL
+  const identifier = params.slug || params.id;
+  const category = params.category; // Only set for new slug-based URLs
+
   // Use custom hook for optimized data fetching
-  const { product, suggestedProducts, loading, error } = useProductData(id);
+  const { product, suggestedProducts, loading, error } = useProductData(identifier, category);
 
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
@@ -77,7 +113,7 @@ export default function ProductDetailPage() {
   const [pincode, setPincode] = useState('');
   const [pincodeValid, setPincodeValid] = useState(null);
 
-  const cartItem = cartItems.find((item) => item._id === id);
+  const cartItem = cartItems.find((item) => item._id === product?._id);
 
   // Sync quantity with cart item
   useEffect(() => {
@@ -87,7 +123,7 @@ export default function ProductDetailPage() {
     } else {
       setQuantity(1);
     }
-  }, [cartItem, id]);
+  }, [cartItem, product?._id]);
 
   /**
    * Memoized callback to prevent re-renders in child components
@@ -186,20 +222,91 @@ export default function ProductDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-voltify-dark pt-20 pb-12">
+    <>
+      <Helmet>
+        <title>{product.name} - Buy at ₹{Number(product.price).toLocaleString('en-IN')} | Voltify</title>
+        <meta name="description" content={`Buy ${product.name} at ₹${Number(product.price).toLocaleString('en-IN')} on Voltify. Premium quality ${product.category} with fast delivery. Free shipping across India.`} />
+        <meta name="keywords" content={`${product.name}, ${product.category}, buy online, price, India`} />
+        
+        {/* Open Graph & Twitter Card Meta Tags for Product Sharing */}
+        {getProductSocialMeta(product).map((meta, idx) => (
+          meta.name ? (
+            <meta key={idx} name={meta.name} content={meta.content} />
+          ) : (
+            <meta key={idx} property={meta.property} content={meta.content} />
+          )
+        ))}
+        
+        {/* JSON-LD Product Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org/",
+            "@type": "Product",
+            "name": product.name,
+            "description": product.description || `Premium ${product.category} from ${product.brand}`,
+            "image": [
+              product.image,
+              'https://via.placeholder.com/600x600?text=View+2',
+              'https://via.placeholder.com/600x600?text=View+3',
+              'https://via.placeholder.com/600x600?text=View+4'
+            ],
+            "brand": {
+              "@type": "Brand",
+              "name": product.brand || "Voltify"
+            },
+            "offers": {
+              "@type": "Offer",
+              "url": window.location.href,
+              "priceCurrency": "INR",
+              "price": String(product.price),
+              "availability": "https://schema.org/InStock"
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.8",
+              "ratingCount": "124"
+            }
+          })}
+        </script>
+
+        {/* JSON-LD BreadcrumbList Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": `${window.location.origin}/`
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": product.category,
+                "item": `${window.location.origin}/${product.category.toLowerCase().replace(/\s+/g, '-')}`
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": product.name,
+                "item": window.location.href
+              }
+            ]
+          })}
+        </script>
+      </Helmet>
+      <div className="min-h-screen bg-voltify-dark pt-20 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumb */}
-        <motion.div 
-          className="mb-8 flex items-center gap-2 text-xs text-voltify-light/50"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-        >
-          <Link to="/" className="hover:text-voltify-gold transition font-semibold">Home</Link>
-          <span>/</span>
-          <Link to={`/category/${product.category}`} className="hover:text-voltify-gold transition font-semibold">{product.category}</Link>
-          <span>/</span>
-          <span className="text-voltify-light font-medium">{product.name}</span>
-        </motion.div>
+        {/* Breadcrumb Navigation */}
+        {product && (
+          <Breadcrumb 
+            items={getProductBreadcrumbs(product)}
+            showMobileAbbreviated={true}
+            className="mb-8 bg-voltify-dark/50 rounded-lg -mx-4 px-4"
+          />
+        )}
 
         {/* Product Detail */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
@@ -214,7 +321,10 @@ export default function ProductDetailPage() {
             <div className="relative w-full max-w-md aspect-square rounded-2xl overflow-hidden shadow-2xl bg-voltify-dark/50">
               <img
                 src={thumbnailImages[mainImageIndex] || product?.image}
-                alt={product?.name}
+                alt={`${product.brand} ${product.name} ${product.color || selectedColor} - Buy on Voltify`}
+                width={600}
+                height={600}
+                loading="eager"
                 className="w-full h-full object-cover hover:scale-105 transition-all duration-500"
                 onError={(e) => {
                   e.target.src = 'https://via.placeholder.com/600x600?text=Product+Image';
@@ -236,7 +346,10 @@ export default function ProductDetailPage() {
                 >
                   <img
                     src={img || 'https://via.placeholder.com/100x100'}
-                    alt={`View ${idx + 1}`}
+                    alt={`${product.brand} ${product.name} view ${idx + 1} - Buy on Voltify`}
+                    width={100}
+                    height={100}
+                    loading="eager"
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       e.target.src = 'https://via.placeholder.com/100x100';
@@ -533,5 +646,6 @@ export default function ProductDetailPage() {
         </motion.div>
       </div>
     </div>
+    </>
   );
 }

@@ -1,7 +1,9 @@
 import React, { useState, useContext } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { CartContext } from '../context/CartContext';
 import { ModalContext } from '../context/ModalContext';
+import { getGenericSocialMeta } from '../utils/socialMetaTags';
 
 export default function AddressesPage() {
   const { user, loginUser } = useContext(CartContext);
@@ -31,7 +33,24 @@ export default function AddressesPage() {
   };
 
   if (!user) return (
-    <motion.div 
+    <>
+      <Helmet>
+        <title>My Addresses | Voltify</title>
+        <meta name="description" content="Manage your Voltify delivery addresses. Add, edit, or remove addresses for faster checkout." />
+        
+        {/* Open Graph & Twitter Card Meta Tags */}
+        {getGenericSocialMeta(
+          'My Addresses | Voltify',
+          'Manage your Voltify delivery addresses for faster checkout.'
+        ).map((meta, idx) => (
+          meta.name ? (
+            <meta key={idx} name={meta.name} content={meta.content} />
+          ) : (
+            <meta key={idx} property={meta.property} content={meta.content} />
+          )
+        ))}
+      </Helmet>
+      <motion.div 
       className="min-h-screen bg-voltify-dark flex items-center justify-center py-24"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -54,6 +73,7 @@ export default function AddressesPage() {
         </motion.button>
       </motion.div>
     </motion.div>
+    </>
   );
 
   return (

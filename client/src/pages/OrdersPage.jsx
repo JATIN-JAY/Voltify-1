@@ -1,9 +1,11 @@
 import React, { useContext, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { ModalContext } from '../context/ModalContext';
 import { useOrders } from '../hooks';
 import { Card, Alert, Button } from '../components/shared';
+import { getGenericSocialMeta } from '../utils/socialMetaTags';
 
 /**
  * OrdersPage Component - Refactored with shared UI components
@@ -54,7 +56,46 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-voltify-dark py-12 md:py-24 orders-page orders-container">
+    <>
+      <Helmet>
+        <title>My Orders | Voltify</title>
+        <meta name="description" content="View your Voltify order history with tracking information and details." />
+        
+        {/* Open Graph & Twitter Card Meta Tags */}
+        {getGenericSocialMeta(
+          'My Orders | Voltify',
+          'View your Voltify order history with tracking information and details.'
+        ).map((meta, idx) => (
+          meta.name ? (
+            <meta key={idx} name={meta.name} content={meta.content} />
+          ) : (
+            <meta key={idx} property={meta.property} content={meta.content} />
+          )
+        ))}
+        
+        {/* JSON-LD BreadcrumbList Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": `${window.location.origin}/`
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Orders",
+                "item": window.location.href
+              }
+            ]
+          })}
+        </script>
+      </Helmet>
+      <div className="min-h-screen bg-voltify-dark py-12 md:py-24 orders-page orders-container">
       <div className="container mx-auto px-4">
         {/* Header */}
         <motion.div 
@@ -191,7 +232,10 @@ export default function OrdersPage() {
                                 >
                                   <img
                                     src={productImage || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="rgba(232,160,32,0.4)" stroke-width="1.5"%3E%3Cpath stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-4.22 4.125-9.25 4.125S2 8.653 2 6.375m18.25 0c0-2.278-4.22-4.125-9.25-4.125S2 4.097 2 6.375m18.25 0v11.25c0 2.278-4.22 4.125-9.25 4.125s-9.25-1.847-9.25-4.125V6.375M4.5 12.75h15"/%3E%3C/svg%3E'}
-                                    alt={productName}
+                                    alt={`${productName} order item - Buy on Voltify`}
+                                    width={64}
+                                    height={64}
+                                    loading="lazy"
                                     title={`Image: ${productImage ? 'Loading...' : 'No image available'}`}
                                     style={{
                                       width: '100%',
@@ -291,5 +335,6 @@ export default function OrdersPage() {
         )}
       </div>
     </div>
+    </>
   );
 }

@@ -1,10 +1,12 @@
 import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 import { GoogleLogin } from '@react-oauth/google';
 import { GoogleAuthContext } from '../context/GoogleAuthContext';
 import { useRegister } from '../hooks';
 import { Card, Input, Button, Alert } from '../components/shared';
+import { getGenericSocialMeta } from '../utils/socialMetaTags';
 
 /**
  * RegisterPage Component - Refactored with shared UI components
@@ -46,7 +48,24 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50 pt-20 px-4 flex items-center justify-center relative overflow-hidden">
+    <>
+      <Helmet>
+        <title>Register | Voltify - Create your Account</title>
+        <meta name="description" content="Create a free Voltify account. Sign up to shop premium tech products, track orders, and enjoy exclusive benefits." />
+        
+        {/* Open Graph & Twitter Card Meta Tags */}
+        {getGenericSocialMeta(
+          'Register | Voltify',
+          'Create your Voltify account to shop premium tech products.'
+        ).map((meta, idx) => (
+          meta.name ? (
+            <meta key={idx} name={meta.name} content={meta.content} />
+          ) : (
+            <meta key={idx} property={meta.property} content={meta.content} />
+          )
+        ))}
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50 pt-20 px-4 flex items-center justify-center relative overflow-hidden">
       {/* Decorative gradient blobs */}
       <div className="absolute -top-40 -right-40 w-80 h-80 bg-slate-200/30 rounded-full blur-3xl"></div>
       <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-slate-200/30 rounded-full blur-3xl"></div>
@@ -210,6 +229,7 @@ export default function RegisterPage() {
           </Card.Body>
         </Card>
       </motion.div>
-    </div>
+      </div>
+    </>
   );
 }

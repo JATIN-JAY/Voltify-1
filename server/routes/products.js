@@ -64,6 +64,75 @@ router.get('/featured/list', async (req, res) => {
   }
 });
 
+// Get products by category - MUST be before /:slug route
+router.get('/category/:category', async (req, res) => {
+  if (!isDatabaseReady()) {
+    return res.json([]);
+  }
+
+  try {
+    const { category } = req.params;
+    
+    // Normalize category name (handle both variations)
+    const categoryMap = {
+      'mobiles': 'Mobiles',
+      'tablets': 'Tablets',
+      'audio': 'Audio',
+      'accessories': 'Accessories',
+      'phone-case': 'Phone Case',
+      'phone-cases': 'Phone Case'
+    };
+    
+    const normalizedCategory = categoryMap[category.toLowerCase()] || category;
+
+    const products = await Product.find({ category: normalizedCategory });
+    const normalizedProducts = normalizeProducts(products);
+    
+    res.json(normalizedProducts);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get product by slug (SEO-friendly) - MUST be before /:id route
+router.get('/slug/:slug', async (req, res) => {
+  if (!ensureDatabaseReady(res)) return;
+
+  try {
+    const product = await Product.findOne({ slug: req.params.slug.toLowerCase() });
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    const normalizedProduct = normalizeProduct(product);
+    res.json(normalizedProduct);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Redirect from old ID-based URL to new slug-based URL
+// Frontend can call this to get the redirect location
+router.get('/redirect/:id', async (req, res) => {
+  if (!ensureDatabaseReady(res)) return;
+
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product || !product.slug) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    // Return the new slug and category for client-side redirect
+    const categorySlug = product.category.toLowerCase().replace(/\s+/g, '-');
+    res.json({
+      slug: product.slug,
+      category: categorySlug,
+      newUrl: `/${categorySlug}/${product.slug}`
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Get all products
 router.get('/', async (req, res) => {
   if (!isDatabaseReady()) {
@@ -79,7 +148,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get single product
+// Get single product by ID (backward compatibility)
 router.get('/:id', async (req, res) => {
   if (!ensureDatabaseReady(res)) return;
 
@@ -100,7 +169,7 @@ router.post('/', verifyToken, checkAdmin, async (req, res) => {
   if (!ensureDatabaseReady(res)) return;
 
   try {
-    const { name, price, category, brand, description, imageUrl, featured } = req.body;
+    const { name, price, category, brand, color, description, imageUrl, featured } = req.body;
 
     // Validate required fields
     if (!name || !price || !category || !brand || !description || !imageUrl) {
@@ -113,6 +182,7 @@ router.post('/', verifyToken, checkAdmin, async (req, res) => {
       price: parseFloat(price),
       category,
       brand,
+      color: color || '',
       description,
       image: imageUrl,
       featured: featured ?? false,
@@ -152,7 +222,7 @@ router.put('/:id', verifyToken, checkAdmin, async (req, res) => {
   if (!ensureDatabaseReady(res)) return;
 
   try {
-    const { name, price, category, brand, description, imageUrl, featured } = req.body;
+    const { name, price, category, brand, color, description, imageUrl, featured } = req.body;
 
     // Build update object dynamically with provided fields
     const updateData = {};
@@ -160,6 +230,7 @@ router.put('/:id', verifyToken, checkAdmin, async (req, res) => {
     if (price !== undefined) updateData.price = parseFloat(price);
     if (category !== undefined) updateData.category = category;
     if (brand !== undefined) updateData.brand = brand;
+    if (color !== undefined) updateData.color = color;
     if (description !== undefined) updateData.description = description;
     if (imageUrl !== undefined) updateData.image = imageUrl;
     if (featured !== undefined) updateData.featured = featured;
@@ -257,6 +328,8 @@ router.patch('/:id/featured', verifyToken, checkAdmin, async (req, res) => {
 // Upload image to Cloudinary (admin only)
 router.post('/upload/image', verifyToken, checkAdmin, async (req, res) => {
   const multer = (await import('multer')).default;
+  const { optimizeImage } = await import('../utils/imageOptimization.js');
+  
   const upload = multer({ storage: multer.memoryStorage() });
 
   // Handle file upload
@@ -270,16 +343,26 @@ router.post('/upload/image', verifyToken, checkAdmin, async (req, res) => {
     }
 
     try {
-      // Upload to Cloudinary from buffer
+      // Optimize image with Sharp
+      // - Resize to max 800px width
+      // - Convert to WebP format
+      // - Quality: 80 for good balance
+      const optimizedBuffer = await optimizeImage(req.file.buffer);
+
+      // Upload optimized image to Cloudinary
       const result = await new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
-          { folder: 'voltify_products', resource_type: 'auto' },
+          { 
+            folder: 'voltify_products',
+            resource_type: 'auto',
+            format: 'webp', // Ensure WebP format in Cloudinary
+          },
           (error, result) => {
             if (error) reject(error);
             else resolve(result);
           }
         );
-        stream.end(req.file.buffer);
+        stream.end(optimizedBuffer);
       });
 
       res.json({ 
@@ -287,6 +370,7 @@ router.post('/upload/image', verifyToken, checkAdmin, async (req, res) => {
         imageUrl: result.secure_url 
       });
     } catch (error) {
+      console.error('Image upload error:', error);
       res.status(500).json({ message: 'Failed to upload image: ' + error.message });
     }
   });

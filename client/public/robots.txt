@@ -1,0 +1,54 @@
+# Voltify Robots.txt - SEO Configuration
+# Allows search engine crawlers to index the site efficiently
+
+# Allow all crawlers by default
+User-agent: *
+Allow: /
+
+# Disallow admin paths (protected routes)
+Disallow: /admin/
+Disallow: /admin
+
+# Disallow checkout and cart paths (user-specific pages)
+Disallow: /cart
+Disallow: /checkout
+
+# Disallow authentication pages (to prevent indexing user flows)
+Disallow: /login
+Disallow: /register
+
+# Disallow address and profile pages (user-specific data)
+Disallow: /addresses
+Disallow: /profile
+
+# Disallow order pages (user-specific data)
+Disallow: /orders
+
+# Disallow wishlist pages (user-specific data)
+Disallow: /wishlist
+
+# Point to sitemap for better indexing
+Sitemap: https://voltify.in/sitemap.xml
+
+# Crawl delay (optional - be respectful to server)
+# Crawl-delay: 1
+
+# Specific rules for Google
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+# Specific rules for Bing
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Bad bots to block
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /

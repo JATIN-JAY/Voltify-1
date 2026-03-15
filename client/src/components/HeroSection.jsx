@@ -292,7 +292,10 @@ function FeaturedProductDetails({ products, activeIndex }) {
       <div className="flex items-end gap-3 justify-between">
         <p className="text-2xl font-black text-voltify-gold">₹{Math.round(price).toLocaleString('en-IN')}</p>
         <Link
-          to={`/product/${product._id}`}
+          to={product.slug && product.category 
+            ? `/${product.category.toLowerCase().replace(/\s+/g, '-')}/${product.slug}`
+            : `/product/${product._id}`
+          }
           className="group inline-flex items-center justify-center w-9 h-9 rounded-full bg-voltify-gold text-voltify-dark hover:bg-voltify-gold/90 transition-colors flex-shrink-0 mb-1"
           aria-label="View product"
         >
@@ -428,7 +431,11 @@ function FeaturedCarousel({ products, loading, onActiveIndexChange, activeIndex 
                 <div className="h-full w-full flex items-center justify-center bg-gradient-to-b from-voltify-dark/80 to-voltify-dark">
                   <img
                     src={imageUrl}
-                    alt={product.name}
+                    alt={`${product.brand} ${product.name} ${product.color || ''} - Buy on Voltify`}
+                    width={400}
+                    height={280}
+                    loading="eager"
+                    fetchpriority={idx === 0 ? 'high' : 'auto'}
                     className="h-full w-full object-contain transition-transform duration-700 hover:scale-105"
                     data-product-id={product._id}
                     onError={(e) => {

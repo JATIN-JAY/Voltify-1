@@ -1,9 +1,13 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CartContext } from '../context/CartContext';
 import { Button, Alert, Card } from '../components/shared';
 import RazorpayCheckout from '../components/RazorpayCheckout';
+import { getGenericSocialMeta } from '../utils/socialMetaTags';
+import { Breadcrumb } from '../components/Breadcrumb';
+import { getCartBreadcrumbs, generateBreadcrumbSchema } from '../utils/breadcrumbUtils';
 
 /**
  * CartPage Component - Refactored with shared UI components
@@ -175,8 +179,53 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-voltify-dark pt-20 pb-12 overflow-x-hidden">
+    <>
+      <Helmet>
+        <title>Shopping Cart | Voltify - Checkout Your Items</title>
+        <meta name="description" content="Review your shopping cart at Voltify. Proceed to checkout with secure payment options. Free shipping on orders over ₹500." />
+        
+        {/* Open Graph & Twitter Card Meta Tags */}
+        {getGenericSocialMeta(
+          'Shopping Cart | Voltify',
+          'Review your shopping cart at Voltify. Proceed to checkout with secure payment options. Free shipping on orders over ₹500.'
+        ).map((meta, idx) => (
+          meta.name ? (
+            <meta key={idx} name={meta.name} content={meta.content} />
+          ) : (
+            <meta key={idx} property={meta.property} content={meta.content} />
+          )
+        ))}
+        
+        {/* JSON-LD BreadcrumbList Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": `${window.location.origin}/`
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Cart",
+                "item": window.location.href
+              }
+            ]
+          })}
+        </script>
+      </Helmet>
+      <div className="min-h-screen bg-voltify-dark pt-20 pb-12 overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Breadcrumb Navigation */}
+        <Breadcrumb 
+          items={getCartBreadcrumbs()}
+          showMobileAbbreviated={false}
+          className="mb-8 bg-voltify-dark/50 rounded-lg -mx-4 px-4"
+        />
         <h1 className="text-4xl font-bold tracking-tight text-voltify-light mb-6">Shopping Cart</h1>
 
         {error && (
@@ -198,7 +247,9 @@ export default function CartPage() {
                       <div className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 rounded-lg overflow-hidden bg-voltify-dark flex items-center justify-center border border-voltify-border/20 cart-item">
                         <img
                           src={imageUrl}
-                          alt={item.name}
+                          alt={`${item.brand || 'Product'} ${item.name} ${item.color || ''} - Buy on Voltify`}
+                          width={120}
+                          height={120}
                           className="w-full h-full object-contain p-1"
                           style={{ maxWidth: '100%', maxHeight: '100%' }}
                           loading="lazy"
@@ -394,5 +445,6 @@ export default function CartPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

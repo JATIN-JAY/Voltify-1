@@ -429,7 +429,7 @@ export default function Navbar() {
                 </div>
                 <span className="absolute inset-0 rounded-lg bg-voltify-gold opacity-0 group-hover:opacity-30 transition-opacity blur-lg"></span>
               </div>
-              <div className="flex flex-col hidden sm:flex">
+              <div className="hidden sm:flex flex-col">
                 <span className="text-base sm:text-lg font-black tracking-tight text-voltify-light">Voltify</span>
                 <span className="text-[8px] font-normal tracking-[0.05em] text-voltify-gold/80 -mt-0.5">Premium tech</span>
               </div>

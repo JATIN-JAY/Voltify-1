@@ -28,7 +28,13 @@ const ImageUpload = memo(({
     <div className="space-y-3">
       {preview && (
         <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-slate-100">
-          <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+          <img 
+            src={preview} 
+            alt="Image preview for upload" 
+            width={400}
+            height={400}
+            className="w-full h-full object-cover" 
+          />
           <div className="absolute inset-0 bg-black/10" />
         </div>
       )}

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useAdminDashboard } from '../hooks';
+import { getGenericSocialMeta } from '../utils/socialMetaTags';
 import AdminSidebar from '../components/AdminSidebar';
 import ConfirmationModal from '../components/ConfirmationModal';
 import ToggleSwitch from '../components/ToggleSwitch';
@@ -15,6 +17,9 @@ const AdminProductsPage = () => {
     toggleFeatured,
     deleteProduct,
   } = useAdminDashboard();
+
+  const pageTitle = 'Manage Products | Admin - Voltify';
+  const pageDescription = 'Manage Voltify products - edit, delete, and toggle featured status';
 
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [deleteMessage, setDeleteMessage] = useState('');
@@ -51,7 +56,20 @@ const AdminProductsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] flex">
+    <>
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        {/* Open Graph & Twitter Card Meta Tags */}
+        {getGenericSocialMeta(pageTitle, pageDescription).map((meta, idx) => (
+          meta.name ? (
+            <meta key={idx} name={meta.name} content={meta.content} />
+          ) : (
+            <meta key={idx} property={meta.property} content={meta.content} />
+          )
+        ))}
+      </Helmet>
+      <div className="min-h-screen bg-[#0f0f0f] flex">
       {/* Sidebar */}
       <AdminSidebar />
 
@@ -150,7 +168,10 @@ const AdminProductsPage = () => {
                             <td className="px-6 py-4">
                               <img
                                 src={product.image}
-                                alt={product.name}
+                                alt={`${product.brand || 'Product'} ${product.name} - Admin`}
+                                width={64}
+                                height={64}
+                                loading="lazy"
                                 className="w-16 h-16 object-cover rounded-lg bg-[#0f0f0f]"
                                 onError={(e) => {
                                   e.target.src = 'https://via.placeholder.com/64';
@@ -216,7 +237,8 @@ const AdminProductsPage = () => {
         isLoading={deleteLoading === confirmDelete}
         isDangerous={true}
       />
-    </div>
+      </div>
+    </>
   );
 };
 
