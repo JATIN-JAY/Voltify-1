@@ -75,7 +75,7 @@ export default function CartPage() {
   // Empty Cart View
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 pt-24 pb-12">
+      <div className="min-h-screen bg-voltify-dark pt-20 pb-12">
         <motion.div 
           className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
           initial={{ opacity: 0, y: 20 }}
@@ -83,7 +83,7 @@ export default function CartPage() {
           transition={{ duration: 0.5 }}
         >
           <motion.svg 
-            className="w-24 h-24 mx-auto text-slate-300 mb-6"
+            className="w-24 h-24 mx-auto text-voltify-gold/30 mb-6"
             fill="none" 
             stroke="currentColor" 
             viewBox="0 0 24 24"
@@ -93,8 +93,8 @@ export default function CartPage() {
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
           </motion.svg>
-          <h2 className="text-4xl font-bold tracking-tight text-slate-900 mb-4">Cart is Empty</h2>
-          <p className="text-slate-600 text-lg mb-8">Discover amazing tech products and start your shopping experience.</p>
+          <h2 className="text-4xl font-bold tracking-tight text-voltify-light mb-4">Cart is Empty</h2>
+          <p className="text-voltify-light/70 text-lg mb-8">Discover amazing tech products and start your shopping experience.</p>
           <Button variant="primary" size="lg" onClick={() => navigate('/')}>
             Continue Shopping
           </Button>
@@ -107,13 +107,13 @@ export default function CartPage() {
   if (orderSuccess) {
     return (
       <motion.div 
-        className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+        className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
         <motion.div 
-          className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center space-y-6"
+          className="bg-voltify-dark rounded-2xl shadow-2xl max-w-md w-full p-8 text-center space-y-6 border border-voltify-border"
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 100 }}
@@ -126,8 +126,8 @@ export default function CartPage() {
             transition={{ delay: 0.2, type: 'spring' }}
           >
             <div className="relative">
-              <div className="absolute inset-0 bg-emerald-100 rounded-full animate-pulse"></div>
-              <svg className="w-16 h-16 text-emerald-600 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="absolute inset-0 bg-voltify-gold/20 rounded-full animate-pulse"></div>
+              <svg className="w-16 h-16 text-voltify-gold relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
@@ -135,18 +135,18 @@ export default function CartPage() {
 
           {/* Success Message */}
           <div className="space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight text-slate-900">Order Placed!</h2>
-            <p className="text-slate-600">Thank you for your purchase. Your order has been confirmed.</p>
+            <h2 className="text-3xl font-bold tracking-tight text-voltify-light">Order Placed!</h2>
+            <p className="text-voltify-light/70">Thank you for your purchase. Your order has been confirmed.</p>
           </div>
 
           {/* Order ID */}
-          <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-xl p-6 text-white">
-            <p className="text-sm text-slate-300 mb-2">Order ID</p>
-            <p className="text-2xl font-bold font-mono break-all">{orderId}</p>
+          <div className="bg-voltify-dark/80 rounded-xl p-6 border border-voltify-gold/20 text-voltify-light">
+            <p className="text-sm text-voltify-light/60 mb-2">Order ID</p>
+            <p className="text-2xl font-bold font-mono break-all text-voltify-gold">{orderId}</p>
           </div>
 
           {/* Info Text */}
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-voltify-light/70">
             We've sent a confirmation email with your order details. Track your order in your profile.
           </p>
 
@@ -175,18 +175,18 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 pt-24 pb-12 cart-container light-surface">
+    <div className="min-h-screen bg-voltify-dark pt-20 pb-12 overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-4xl font-bold tracking-tight text-slate-900 mb-8">Shopping Cart</h1>
+        <h1 className="text-4xl font-bold tracking-tight text-voltify-light mb-6">Shopping Cart</h1>
 
         {error && (
           <Alert type="error" message={error} />
         )}
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2">
-            <Card className="bg-white">
+            <Card className="bg-voltify-dark/80 border border-voltify-border">
               <Card.Body>
                 <div>
                   {cartItems.map((item) => {
@@ -194,12 +194,12 @@ export default function CartPage() {
                     const imageUrl = item.image && item.image.trim() ? item.image : 'https://via.placeholder.com/150?text=No+Image';
                     
                     return (
-                    <div key={item._id} className="flex gap-6 pb-6 border-b border-slate-200 last:border-b-0 last:pb-0 hover:bg-slate-50/50 transition">
-                      <div className="w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden bg-[#f5f5f5] flex items-center justify-center shadow-sm border border-slate-200 cart-item">
+                    <div key={item._id} className="flex flex-col sm:flex-row gap-4 pb-6 border-b border-voltify-border/30 last:border-b-0 last:pb-0 hover:bg-voltify-dark/40 transition">
+                      <div className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 rounded-lg overflow-hidden bg-voltify-dark flex items-center justify-center border border-voltify-border/20 cart-item">
                         <img
                           src={imageUrl}
                           alt={item.name}
-                          className="w-full h-full object-contain p-2"
+                          className="w-full h-full object-contain p-1"
                           style={{ maxWidth: '100%', maxHeight: '100%' }}
                           loading="lazy"
                           onError={(e) => {
@@ -212,44 +212,59 @@ export default function CartPage() {
                         />
                       </div>
 
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-slate-900 mb-1">{item.name}</h3>
-                        <p className="text-slate-600 text-sm mb-4 line-clamp-2">{item.description}</p>
+                      <div className="flex-1 flex flex-col">
+                        <div>
+                          <h3 className="font-semibold text-voltify-light line-clamp-2">{item.name}</h3>
+                          {item.variant && (
+                            <p className="text-voltify-light/60 text-sm mt-1">{item.variant}</p>
+                          )}
+                        </div>
 
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <button
-                              onClick={() => updateQuantity(item._id, item.quantity - 1)}
-                              className="w-8 h-8 flex items-center justify-center border border-slate-300 rounded-lg hover:bg-slate-100 transition font-semibold text-slate-600"
-                            >
-                              −
-                            </button>
-                            <span className="w-12 text-center font-semibold text-slate-900">{item.quantity}</span>
-                            <button
-                              onClick={() => updateQuantity(item._id, item.quantity + 1)}
-                              className="w-8 h-8 flex items-center justify-center border border-slate-300 rounded-lg hover:bg-slate-100 transition font-semibold text-slate-600"
-                            >
-                              +
-                            </button>
-                          </div>
+                        <div className="mt-auto flex flex-col-reverse sm:flex-col">
+                          <div className="flex items-center justify-between gap-3 mt-3 sm:mt-0">
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => updateQuantity(item._id, item.quantity - 1)}
+                                className="w-8 h-8 flex items-center justify-center border border-voltify-border rounded hover:bg-voltify-dark/60 transition font-semibold text-voltify-light/80"
+                              >
+                                −
+                              </button>
+                              <span className="w-10 text-center font-semibold text-voltify-light">{item.quantity}</span>
+                              <button
+                                onClick={() => updateQuantity(item._id, item.quantity + 1)}
+                                className="w-8 h-8 flex items-center justify-center border border-voltify-border rounded hover:bg-voltify-dark/60 transition font-semibold text-voltify-light/80"
+                              >
+                                +
+                              </button>
+                            </div>
 
-                          <div className="text-right">
-                            <p className="font-semibold text-slate-900">
-                              ₹{Number(item.price * item.quantity).toLocaleString('en-IN')}
-                            </p>
-                            <p className="text-sm text-slate-600">₹{Number(item.price).toLocaleString('en-IN')} each</p>
+                            <div className="text-right">
+                              <p className="font-semibold text-voltify-gold">
+                                ₹{Number(item.price * item.quantity).toLocaleString('en-IN')}
+                              </p>
+                              <p className="text-xs text-voltify-light/60">₹{Number(item.price).toLocaleString('en-IN')} each</p>
+                            </div>
                           </div>
 
                           <Button
                             onClick={() => removeFromCart(item._id)}
                             variant="danger"
                             size="sm"
-                            className="ml-4"
+                            className="sm:hidden mt-2 w-full"
                           >
                             Remove
                           </Button>
                         </div>
                       </div>
+
+                      <Button
+                        onClick={() => removeFromCart(item._id)}
+                        variant="danger"
+                        size="sm"
+                        className="hidden sm:flex flex-shrink-0"
+                      >
+                        Remove
+                      </Button>
                     </div>
                     );
                   })}
@@ -261,30 +276,30 @@ export default function CartPage() {
           {/* Order Summary & Shipping */}
           <div className="lg:col-span-1 space-y-6">
             {/* Order Summary */}
-            <Card className="bg-white">
+            <Card className="bg-voltify-dark/80 border border-voltify-border">
               <Card.Body>
-                <h2 className="font-semibold text-lg text-slate-900 mb-4">Order Summary</h2>
-                <div className="space-y-2 pb-4 border-b border-slate-200">
-                  <div className="flex justify-between text-slate-600">
+                <h2 className="font-semibold text-lg text-voltify-light mb-4">Order Summary</h2>
+                <div className="space-y-3 pb-4 border-b border-voltify-border/30">
+                  <div className="flex justify-between text-voltify-light/80">
                     <span>Subtotal</span>
-                    <span>₹{Number(totalPrice).toLocaleString('en-IN')}</span>
+                    <span className="font-medium">₹{Number(totalPrice).toLocaleString('en-IN')}</span>
                   </div>
-                  <div className="flex justify-between text-slate-600">
+                  <div className="flex justify-between text-voltify-light/80">
                     <span>Shipping</span>
-                    <span>Free</span>
+                    <span className="font-medium text-voltify-gold">Free</span>
                   </div>
                 </div>
-                <div className="flex justify-between font-bold text-lg text-slate-900 pt-4">
+                <div className="flex justify-between font-bold text-lg text-voltify-light pt-4">
                   <span>Total</span>
-                  <span>₹{Number(totalPrice).toLocaleString('en-IN')}</span>
+                  <span className="text-voltify-gold">₹{Number(totalPrice).toLocaleString('en-IN')}</span>
                 </div>
               </Card.Body>
             </Card>
 
             {/* Shipping Info */}
-            <Card className="bg-white">
+            <Card className="bg-voltify-dark/80 border border-voltify-border">
               <Card.Body>
-                <h2 className="font-semibold text-lg text-slate-900 mb-5">Shipping Info</h2>
+                <h2 className="font-semibold text-lg text-voltify-light mb-5">Shipping Info</h2>
                 <div className="space-y-4">
                   <input name="fullName" value={shippingInfo.fullName} onChange={handleShippingChange} required hidden />
                   <input name="email" value={shippingInfo.email} onChange={handleShippingChange} required hidden />
@@ -294,29 +309,29 @@ export default function CartPage() {
                     {/* These fields are pre-filled with user data but hidden from display */}
                   </div>
 
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label className="block text-sm font-semibold text-voltify-light mb-2">
                     Full Name
                   </label>
                   <input
                     type="text"
                     value={shippingInfo.fullName}
                     readOnly
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 text-sm"
+                    className="w-full px-4 py-2.5 bg-voltify-dark border border-voltify-border rounded-lg text-voltify-light/80 text-sm"
                   />
 
-                  <label className="block text-sm font-semibold text-slate-700 mb-2 mt-3">
+                  <label className="block text-sm font-semibold text-voltify-light mb-2 mt-3">
                     Email
                   </label>
                   <input
                     type="email"
                     value={shippingInfo.email}
                     readOnly
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 text-sm"
+                    className="w-full px-4 py-2.5 bg-voltify-dark border border-voltify-border rounded-lg text-voltify-light/80 text-sm"
                   />
 
                   {/* Address Input */}
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-sm font-semibold text-voltify-light mb-2">
                       Address
                     </label>
                     <textarea
@@ -324,7 +339,7 @@ export default function CartPage() {
                       value={shippingInfo.address}
                       onChange={handleShippingChange}
                       required
-                      className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent resize-none"
+                      className="w-full px-4 py-2.5 bg-voltify-dark border border-voltify-border rounded-lg text-voltify-light focus:ring-2 focus:ring-voltify-gold focus:border-transparent resize-none placeholder-voltify-light/40"
                       rows="2"
                       placeholder="Enter your full address"
                     />
@@ -333,7 +348,7 @@ export default function CartPage() {
                   {/* City & Zip Code */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      <label className="block text-sm font-semibold text-voltify-light mb-2">
                         City
                       </label>
                       <input
@@ -342,12 +357,12 @@ export default function CartPage() {
                         value={shippingInfo.city}
                         onChange={handleShippingChange}
                         required
-                        className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent"
+                        className="w-full px-4 py-2.5 bg-voltify-dark border border-voltify-border rounded-lg text-voltify-light focus:ring-2 focus:ring-voltify-gold focus:border-transparent placeholder-voltify-light/40"
                         placeholder="City"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      <label className="block text-sm font-semibold text-voltify-light mb-2">
                         Zip Code
                       </label>
                       <input
@@ -356,20 +371,22 @@ export default function CartPage() {
                         value={shippingInfo.zipCode}
                         onChange={handleShippingChange}
                         required
-                        className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-900 focus:border-transparent"
+                        className="w-full px-4 py-2.5 bg-voltify-dark border border-voltify-border rounded-lg text-voltify-light focus:ring-2 focus:ring-voltify-gold focus:border-transparent placeholder-voltify-light/40"
                         placeholder="Zip Code"
                       />
                     </div>
                   </div>
 
-                  <RazorpayCheckout
-                    cartItems={cartItems}
-                    totalPrice={totalPrice}
-                    shippingInfo={shippingInfo}
-                    user={user}
-                    onSuccess={handlePaymentSuccess}
-                    onError={handlePaymentError}
-                  />
+                  <div className="pt-2">
+                    <RazorpayCheckout
+                      cartItems={cartItems}
+                      totalPrice={totalPrice}
+                      shippingInfo={shippingInfo}
+                      user={user}
+                      onSuccess={handlePaymentSuccess}
+                      onError={handlePaymentError}
+                    />
+                  </div>
                 </div>
               </Card.Body>
             </Card>
