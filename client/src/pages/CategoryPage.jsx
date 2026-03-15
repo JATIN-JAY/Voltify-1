@@ -119,11 +119,11 @@ function ProductCard({ product }) {
   };
 
   return (
-    <div className="group bg-[#1e1e1e] rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col h-full border border-[#2a2a2a]">
+    <div className="group bg-[#1e1e1e] rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col h-96 border border-[#2a2a2a]">
       <Link to={product.slug && product.category 
         ? `/${product.category.toLowerCase().replace(/\s+/g, '-')}/${product.slug}`
         : `/product/${product._id}`
-      } className="relative overflow-hidden h-40 md:aspect-square block bg-[#0f0f0f]">
+      } className="relative overflow-hidden h-40 md:h-56 block bg-[#1a1a1a]">
         <img
           src={product.image}
           alt={`${product.brand || 'Product'} ${product.name} ${product.color || ''} - Buy on Voltify`}
@@ -131,72 +131,64 @@ function ProductCard({ product }) {
           height={400}
           loading="lazy"
           style={{ mixBlendMode: 'screen' }}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
+          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 ease-out"
           onError={(e) => {
             e.target.src = 'https://via.placeholder.com/400x400?text=Product';
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
       </Link>
 
-      <div className="p-3 md:p-5 flex flex-col flex-grow space-y-2 md:space-y-4">
+      <div className="p-3 md:p-4 flex flex-col flex-grow">
         <Link to={product.slug && product.category 
           ? `/${product.category.toLowerCase().replace(/\s+/g, '-')}/${product.slug}`
           : `/product/${product._id}`
-        } className="block">
-          <h3 className="font-bold text-sm md:text-lg text-white group-hover:text-gray-200 transition-colors line-clamp-2 hover:underline">
+        } className="block mb-1 flex-shrink-0">
+          <h3 className="font-bold text-sm md:text-base text-white group-hover:text-gray-200 transition-colors line-clamp-2 hover:underline">
             {product.name}
           </h3>
         </Link>
 
-        <p className="text-xs md:text-sm text-[#aaaaaa] line-clamp-2 flex-grow">
+        <p className="text-xs md:text-xs text-[#aaaaaa] line-clamp-1 flex-grow mb-2 flex-shrink-0">
           {product.description}
         </p>
 
-        <div className="flex flex-col gap-2">
-          <div className="flex justify-between items-center gap-2">
-            <span className="text-base md:text-2xl font-extrabold text-[#f5a623]">
-              ₹{Number(product.price).toLocaleString('en-IN')}
-            </span>
-            <div className="flex items-center gap-0.5 whitespace-nowrap">
-              <svg className="w-3 h-3 md:w-5 md:h-5 text-[#f5a623] fill-current" viewBox="0 0 20 20">
-                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-              </svg>
-              <span className="text-xs md:text-sm font-medium text-[#aaaaaa]">4.8</span>
-            </div>
-          </div>
-
-          {existingItem ? (
-            <div className="w-full flex items-center justify-between gap-1 bg-[#2a2a2a] p-1 rounded-lg shadow-md border border-[#3a3a3a]">
-              <button
-                onClick={handleDecrease}
-                className="flex-1 py-1.5 md:py-2.5 px-2 md:px-4 bg-[#f5a623]/20 hover:bg-[#f5a623]/30 text-white font-bold text-sm md:text-lg rounded-lg transition-all duration-200"
-              >
-                −
-              </button>
-              <div className="flex-1 py-1.5 md:py-2.5 px-2 md:px-4 bg-[#f5a623]/20 text-white text-center font-bold text-sm md:text-lg rounded-lg">
-                {existingItem.quantity}
-              </div>
-              <button
-                onClick={handleIncrease}
-                className="flex-1 py-1.5 md:py-2.5 px-2 md:px-4 bg-[#f5a623]/20 hover:bg-[#f5a623]/30 text-white font-bold text-sm md:text-lg rounded-lg transition-all duration-200"
-              >
-                +
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={handleAddToCart}
-              className={`w-full py-2 md:py-3.5 px-3 md:px-6 rounded-lg md:rounded-xl font-semibold text-xs md:text-base transition-all duration-300 shadow-md ${
-                isAdded
-                  ? 'bg-emerald-600 text-white shadow-emerald-500/30'
-                  : 'bg-[#f5a623] text-[#0f0f0f] hover:bg-[#f5b833] hover:shadow-xl hover:scale-[1.02] font-bold'
-              }`}
-            >
-              {isAdded ? '✓ Added' : 'Add to Cart'}
-            </button>
-          )}
+        <div className="flex items-center mb-3 flex-shrink-0">
+          <span className="text-base md:text-xl font-extrabold text-[#f5a623]">
+            ₹{Number(product.price).toLocaleString('en-IN')}
+          </span>
         </div>
+
+        {existingItem ? (
+          <div className="w-full flex items-center justify-between gap-1 bg-[#2a2a2a] p-1 rounded-lg shadow-md border border-[#3a3a3a] flex-shrink-0">
+            <button
+              onClick={handleDecrease}
+              className="flex-1 py-1.5 px-2 bg-[#f5a623]/20 hover:bg-[#f5a623]/30 text-white font-bold text-xs rounded-lg transition-all duration-200"
+            >
+              −
+            </button>
+            <div className="flex-1 py-1.5 px-2 bg-[#f5a623]/20 text-white text-center font-bold text-xs rounded-lg">
+              {existingItem.quantity}
+            </div>
+            <button
+              onClick={handleIncrease}
+              className="flex-1 py-1.5 px-2 bg-[#f5a623]/20 hover:bg-[#f5a623]/30 text-white font-bold text-xs rounded-lg transition-all duration-200"
+            >
+              +
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={handleAddToCart}
+            className={`w-full h-9 rounded-lg font-semibold text-sm transition-all duration-300 shadow-md flex-shrink-0 ${
+              isAdded
+                ? 'bg-emerald-600 text-white shadow-emerald-500/30'
+                : 'bg-[#f5a623] text-[#0f0f0f] hover:bg-[#f5b833] hover:shadow-lg font-bold'
+            }`}
+          >
+            {isAdded ? '✓ Added' : 'Add to Cart'}
+          </button>
+        )}
       </div>
     </div>
   );
