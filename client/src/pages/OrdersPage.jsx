@@ -54,7 +54,7 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-voltify-dark py-12 md:py-24">
+    <div className="min-h-screen bg-voltify-dark py-12 md:py-24 orders-page orders-container">
       <div className="container mx-auto px-4">
         {/* Header */}
         <motion.div 
@@ -158,6 +158,17 @@ export default function OrdersPage() {
                             const productData = product.productId || {};
                             const productName = productData.name || product.name || 'Product';
                             const productImage = productData.image || product.image;
+                            
+                            // Debug: log product data on first product of each order
+                            if (pidx === 0) {
+                              console.log(`📦 Order ${order._id} - Product #${pidx}:`, {
+                                productId: productData._id,
+                                name: productName,
+                                image: productImage,
+                                hasImage: !!productImage,
+                                imageType: typeof productImage,
+                              });
+                            }
 
                             return (
                             <motion.div 
@@ -181,19 +192,24 @@ export default function OrdersPage() {
                                   <img
                                     src={productImage || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="rgba(232,160,32,0.4)" stroke-width="1.5"%3E%3Cpath stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-4.22 4.125-9.25 4.125S2 8.653 2 6.375m18.25 0c0-2.278-4.22-4.125-9.25-4.125S2 4.097 2 6.375m18.25 0v11.25c0 2.278-4.22 4.125-9.25 4.125s-9.25-1.847-9.25-4.125V6.375M4.5 12.75h15"/%3E%3C/svg%3E'}
                                     alt={productName}
+                                    title={`Image: ${productImage ? 'Loading...' : 'No image available'}`}
                                     style={{
                                       width: '100%',
                                       height: '100%',
                                       objectFit: 'contain',
-                                      mixBlendMode: 'normal',
+                                      mixBlendMode: 'normal !important',
                                       filter: 'none',
                                       opacity: 1,
                                     }}
                                     onError={(e) => {
-                                      // Replace with fallback SVG icon
-                                      e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="rgba(232,160,32,0.4)" stroke-width="1.5"%3E%3Cpath stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-4.22 4.125-9.25 4.125S2 8.653 2 6.375m18.25 0c0-2.278-4.22-4.125-9.25-4.125S2 4.097 2 6.375m18.25 0v11.25c0 2.278-4.22 4.125-9.25 4.125s-9.25-1.847-9.25-4.125V6.375M4.5 12.75h15"/%3E%3C/svg%3E';
+                                      console.warn(`❌ Product image failed to load: ${productImage}`);
+                                      // Replace with fallback SVG icon with grey color
+                                      e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="rgba(168,168,168,0.5)" stroke-width="1.5"%3E%3Crect x="3" y="3" width="18" height="18" rx="2"/%3E%3Ccircle cx="8.5" cy="8.5" r="1.5"/%3E%3Cpath d="M21 15l-5-5L5 21"/%3E%3C/svg%3E';
+                                      e.target.style.opacity = '1';
                                     }}
-                                    onLoad={() => console.log(`✓ Image loaded: ${productName}`)}
+                                    onLoad={() => {
+                                      console.log(`✓ Order product image loaded: ${productName}`);
+                                    }}
                                   />
                                 </div>
 

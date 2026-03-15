@@ -2,7 +2,7 @@
 
 .promo-strip {
   position: fixed;
-  top: 64px;
+  top: 56px;
   left: 0;
   right: 0;
   width: 100%;
@@ -17,6 +17,7 @@
   text-transform: uppercase;
   line-height: 1.4;
   padding: 0;
+  margin: 0;
   transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
   opacity: 1;
   visibility: visible;
@@ -29,7 +30,7 @@
 
 @media (min-width: 768px) {
   .promo-strip {
-    top: 80px;
+    top: 56px;
   }
 }
 
@@ -48,10 +49,11 @@
   flex: 1;
   overflow: hidden;
   position: relative;
-  min-height: 44px;
+  min-height: 40px;
   display: flex;
   align-items: center;
-  padding: 12px 24px;
+  padding: 8px 24px;
+  margin: 0;
 }
 
 /* The scrolling element with duplicated content */

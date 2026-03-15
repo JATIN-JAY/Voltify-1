@@ -195,7 +195,7 @@ export default function CartPage() {
                     
                     return (
                     <div key={item._id} className="flex gap-6 pb-6 border-b border-slate-200 last:border-b-0 last:pb-0 hover:bg-slate-50/50 transition">
-                      <div className="w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center shadow-sm border-2 border-slate-300 cart-item">
+                      <div className="w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden bg-[#f5f5f5] flex items-center justify-center shadow-sm border border-slate-200 cart-item">
                         <img
                           src={imageUrl}
                           alt={item.name}

@@ -58,7 +58,7 @@ function App() {
             <PromoStrip variant="dark" />
             <LoginModal />
             <SignupModal />
-          <div className="pt-[20px] md:pt-[24px]">
+          <div className="bg-voltify-dark">
             <Suspense fallback={<RouteLoadingFallback />}>
             <Routes>
               {/* Public routes */}
