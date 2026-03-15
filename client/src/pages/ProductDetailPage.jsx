@@ -107,6 +107,7 @@ export default function ProductDetailPage() {
 
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
+  const [showToast, setShowToast] = useState(false);
   const [selectedColor, setSelectedColor] = useState('Space Black');
   const [selectedStorage, setSelectedStorage] = useState('512GB');
   const [mainImageIndex, setMainImageIndex] = useState(0);
@@ -168,7 +169,9 @@ export default function ProductDetailPage() {
   const handleAddToCart = useCallback(() => {
     syncCartWithQuantity(quantity);
     setIsAdded(true);
+    setShowToast(true);
     setTimeout(() => setIsAdded(false), 2000);
+    setTimeout(() => setShowToast(false), 3000);
   }, [quantity, syncCartWithQuantity]);
 
   const handleBuyNow = useCallback(() => {
@@ -645,6 +648,25 @@ export default function ProductDetailPage() {
             </div>
           </motion.div>
         </div>
+
+        {/* Toast Notification - Add to Cart Feedback */}
+        {showToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+            className="fixed bottom-6 right-6 bg-emerald-600 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 z-50"
+          >
+            <svg className="w-6 h-6 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <div>
+              <p className="font-bold text-sm">Added to Cart!</p>
+              <p className="text-xs text-emerald-100">Product added successfully</p>
+            </div>
+          </motion.div>
+        )}
 
         {/* Related Products Section */}
         <motion.div
