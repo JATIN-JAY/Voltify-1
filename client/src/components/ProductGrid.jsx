@@ -140,34 +140,38 @@ export default function ProductCard({ product, index }) {
       whileHover={{ y: -8 }}
       viewport={{ once: false, amount: 0.3 }}
       transition={{ duration: 0.5, delay: (index % 4) * 0.1 }}
-      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-voltify-border bg-voltify-dark/80 shadow-sm transition-all duration-300 hover:shadow-xl hover:border-voltify-gold/60 hover:shadow-voltify-gold/10 w-full"
+      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-voltify-light/10 bg-voltify-dark/80 shadow-sm transition-all duration-300 hover:shadow-2xl hover:border-voltify-gold/40 hover:shadow-voltify-gold/15 hover:bg-voltify-dark/90 w-full"
     >
-      <Link to={productUrl} className="relative overflow-hidden aspect-square block w-full">
+      {/* Product Image Container */}
+      <Link to={productUrl} className="relative overflow-hidden aspect-square block w-full bg-voltify-dark/50">
         <img
           src={product.image}
           alt={altText}
           width={400}
           height={400}
           loading={shouldLazyLoad ? 'lazy' : 'eager'}
-          className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105 max-w-full"
+          className="h-full w-full object-contain mix-blend-mode: screen transition-transform duration-500 ease-out group-hover:scale-105 max-w-full"
           onError={(e) => {
             e.target.src = 'https://via.placeholder.com/400x400?text=Product';
           }}
         />
+        
+        {/* Discount Badge */}
         {hasDiscount && (
-          <span className="absolute left-3 top-3 rounded-md bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white">
+          <div className="absolute left-3 top-3 rounded-lg bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white shadow-lg">
             {discountPercent}% OFF
-          </span>
+          </div>
         )}
-        {/* Wishlist Button - Subtle */}
+        
+        {/* Wishlist Button */}
         <button
           onClick={handleWishlistToggle}
           disabled={loading}
-          className="absolute right-3 top-3 rounded-full p-2 transition-all duration-200 disabled:opacity-50 hover:scale-110"
+          className="absolute right-3 top-3 rounded-full p-2.5 bg-voltify-dark/60 backdrop-blur-sm transition-all duration-200 disabled:opacity-50 hover:scale-110 hover:bg-voltify-dark/80"
           aria-label="Add to wishlist"
         >
           <svg
-            className={`h-5 w-5 transition-all duration-200 ${inWishlist ? 'fill-red-500 text-red-500' : 'text-voltify-light/40 hover:text-voltify-light/70'}`}
+            className={`h-5 w-5 transition-all duration-200 ${inWishlist ? 'fill-red-500 text-red-500' : 'text-voltify-light/60 hover:text-red-500'}`}
             viewBox="0 0 24 24"
             stroke="currentColor"
             strokeWidth="2"
@@ -181,76 +185,90 @@ export default function ProductCard({ product, index }) {
         </button>
       </Link>
 
-      <div className="flex flex-grow flex-col p-4 space-y-3">
-        {/* Title - Editorial */}
-        <Link to={`/product/${product._id}`} className="block">
-          <h3 className="text-sm font-semibold text-voltify-light leading-tight">
+      {/* Card Content */}
+      <div className="flex flex-grow flex-col p-4 sm:p-5 space-y-2.5 sm:space-y-3">
+        {/* Product Name */}
+        <Link to={productUrl} className="block group/title">
+          <h3 className="text-sm sm:text-base font-semibold text-voltify-light leading-snug group-hover/title:text-voltify-gold transition-colors line-clamp-2">
             {modelName}
           </h3>
         </Link>
 
-        {/* Color Variant Tag */}
-        <span className="text-xs text-voltify-light/50 font-medium">
+        {/* Color/Variant */}
+        <p className="text-xs sm:text-xs text-voltify-light/50 font-medium">
           {color}
-        </span>
+        </p>
 
-        {/* Rating Line */}
-        <div className="text-xs text-voltify-light/60">
-          ★ {rating} · {reviewCount.toLocaleString()} reviews
+        {/* Rating */}
+        <div className="flex items-center gap-2 text-xs text-voltify-light/60">
+          <span>★</span>
+          <span>{rating}</span>
+          <span>·</span>
+          <span>{reviewCount.toLocaleString()}</span>
         </div>
 
+        {/* Spacer */}
         <div className="flex-grow" />
 
-        {/* Price - Premium */}
+        {/* Price */}
         <div>
-          <p className="text-lg font-bold text-voltify-gold">
+          <p className="text-lg sm:text-xl font-bold text-voltify-gold">
             ₹{sellingPrice.toLocaleString('en-IN')}
           </p>
           {hasDiscount && (
-            <p className="text-xs font-medium text-emerald-500 mt-0.5">
-              Save {discountPercent}%
+            <p className="text-xs text-voltify-light/40 line-through mt-1">
+              ₹{originalPrice.toLocaleString('en-IN')}
             </p>
           )}
         </div>
+      </div>
 
-        {/* CTA - Small Icon Button */}
-        <div className="flex items-center justify-between pt-1">
-          <div />
-          {existingItem ? (
-            <div className="flex items-center gap-2 bg-voltify-border/50 rounded-full px-2 py-1">
-              <button
-                onClick={handleDecrease}
-                className="text-voltify-gold hover:text-voltify-gold/70 transition-colors p-1"
-              >
-                −
-              </button>
-              <span className="text-xs font-bold text-voltify-gold w-6 text-center">
-                {existingItem.quantity}
-              </span>
-              <button
-                onClick={handleIncrease}
-                className="text-voltify-gold hover:text-voltify-gold/70 transition-colors p-1"
-              >
-                +
-              </button>
-            </div>
-          ) : (
+      {/* Floating Add to Cart Button - Bottom Right */}
+      <div className="absolute bottom-4 right-4 sm:bottom-5 sm:right-5">
+        {existingItem ? (
+          <div className="flex items-center gap-2 bg-voltify-dark/80 backdrop-blur-sm border border-voltify-gold/40 rounded-full px-3 py-2">
             <button
-              onClick={handleAddToCart}
-              className={`rounded-full p-2.5 transition-all duration-300 active:scale-95 ${
-                isAdded
-                  ? 'bg-emerald-600/20 text-emerald-400'
-                  : 'bg-voltify-gold/10 text-voltify-gold hover:bg-voltify-gold/20 border border-voltify-gold/40 hover:border-voltify-gold/60'
-              }`}
-              title="Add to cart"
+              onClick={handleDecrease}
+              className="text-voltify-gold hover:text-voltify-gold/70 transition-colors text-sm font-bold"
+              title="Decrease quantity"
             >
-              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              −
+            </button>
+            <span className="text-xs font-bold text-voltify-gold w-5 text-center">
+              {existingItem.quantity}
+            </span>
+            <button
+              onClick={handleIncrease}
+              className="text-voltify-gold hover:text-voltify-gold/70 transition-colors text-sm font-bold"
+              title="Increase quantity"
+            >
+              +
+            </button>
+          </div>
+        ) : (
+          <motion.button
+            onClick={handleAddToCart}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center font-bold transition-all duration-300 shadow-lg ${
+              isAdded
+                ? 'bg-emerald-500 text-white'
+                : 'bg-voltify-gold text-voltify-dark hover:shadow-xl hover:bg-yellow-400'
+            }`}
+            title="Add to cart"
+          >
+            {isAdded ? (
+              <svg className="h-6 w-6 sm:h-7 sm:w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            ) : (
+              <svg className="h-6 w-6 sm:h-7 sm:w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
-            </button>
-          )}
-        </div>
+            )}
+          </motion.button>
+        )}
       </div>
     </motion.div>
   );
