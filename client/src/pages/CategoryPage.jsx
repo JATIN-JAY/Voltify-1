@@ -443,15 +443,15 @@ export default function CategoryPage() {
           
           return seoContent ? (
             <motion.div 
-              className="mb-16 bg-[#1a1a1a] rounded-2xl shadow-sm border border-[#2a2a2a] p-8 border-l-4 border-l-[#f5a623]"
+              className="mb-16 bg-[#1a1a1a] rounded-2xl shadow-sm border border-[#2a2a2a] p-4 md:p-8 border-l-4 border-l-[#f5a623]"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
             >
-              <h2 className="text-3xl font-bold text-white mb-4">
+              <h2 className="text-xl md:text-3xl font-bold text-white mb-3 md:mb-4">
                 {seoContent.heading}
               </h2>
-              <p className="text-base text-[#aaaaaa] leading-relaxed">
+              <p className="text-sm md:text-base text-[#aaaaaa] leading-relaxed">
                 {seoContent.description || seoContent.baseDescription}
               </p>
             </motion.div>
@@ -464,10 +464,10 @@ export default function CategoryPage() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h1 className="text-5xl font-display font-bold text-white mb-4">
+          <h1 className="text-3xl md:text-5xl font-display font-bold text-white mb-4">
             {brand ? `${brand} ${categoryTitles[normalizedCategory] || normalizedCategory}` : (categoryTitles[normalizedCategory] || normalizedCategory)}
           </h1>
-          <p className="text-lg text-[#888]">
+          <p className="text-sm md:text-lg text-[#888]">
             {brand 
               ? `Browse ${brand}'s premium collection of ${normalizedCategory?.toLowerCase() || ''}` 
               : `Browse our premium collection of ${normalizedCategory?.toLowerCase() || ''}`}
@@ -519,15 +519,15 @@ export default function CategoryPage() {
           
           return seoContent && seoContent.faqs ? (
             <motion.div 
-              className="mt-20 bg-[#1a1a1a] rounded-2xl shadow-sm border border-[#2a2a2a] p-8"
+              className="mt-20 bg-[#1a1a1a] rounded-2xl shadow-sm border border-[#2a2a2a] p-4 md:p-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              <h2 className="text-3xl font-bold text-white mb-8 text-center">
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 md:mb-8 text-center">
                 Frequently Asked Questions
               </h2>
-              <div className="space-y-6 max-w-4xl mx-auto">
+              <div className="space-y-4 md:space-y-6 max-w-4xl mx-auto">
                 {seoContent.faqs.map((faq, idx) => (
                   <motion.div 
                     key={idx}
@@ -537,18 +537,18 @@ export default function CategoryPage() {
                     transition={{ delay: 0.3 + idx * 0.1 }}
                   >
                     <details className="group cursor-pointer">
-                      <summary className="flex items-center justify-between p-6 bg-[#0f0f0f] hover:bg-[#1a1a1a] transition-colors">
-                        <h3 className="font-semibold text-white text-lg pr-4">
+                      <summary className="flex items-center justify-between p-4 md:p-6 bg-[#0f0f0f] hover:bg-[#1a1a1a] transition-colors">
+                        <h3 className="font-semibold text-white text-sm md:text-lg pr-4">
                           {faq.question}
                         </h3>
                         <span className="text-[#888] group-open:text-[#f5a623] transition-colors">
-                          <svg className="w-6 h-6 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-5 md:w-6 h-5 md:h-6 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                           </svg>
                         </span>
                       </summary>
-                      <div className="px-6 py-4 bg-[#0f0f0f] border-t border-[#2a2a2a]">
-                        <p className="text-[#aaaaaa] leading-relaxed">
+                      <div className="px-4 py-3 md:px-6 md:py-4 bg-[#0f0f0f] border-t border-[#2a2a2a]">
+                        <p className="text-xs md:text-sm text-[#aaaaaa] leading-relaxed">
                           {faq.answer}
                         </p>
                       </div>
