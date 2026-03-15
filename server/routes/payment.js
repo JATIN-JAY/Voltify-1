@@ -15,16 +15,19 @@ let razorpay;
 try {
   if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
     console.warn('WARNING: Razorpay credentials not found in environment variables!');
+    console.warn('RAZORPAY_KEY_ID:', process.env.RAZORPAY_KEY_ID ? '✓ Set' : '✗ Missing');
+    console.warn('RAZORPAY_KEY_SECRET:', process.env.RAZORPAY_KEY_SECRET ? '✓ Set' : '✗ Missing');
     console.warn('Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in .env file');
   } else {
     razorpay = new Razorpay({
       key_id: process.env.RAZORPAY_KEY_ID,
       key_secret: process.env.RAZORPAY_KEY_SECRET,
     });
-    console.log('Razorpay initialized successfully');
+    console.log('✓ Razorpay initialized successfully with key_id:', process.env.RAZORPAY_KEY_ID.substring(0, 15) + '...');
   }
 } catch (error) {
-  console.error('Failed to initialize Razorpay:', error.message);
+  console.error('❌ Failed to initialize Razorpay:', error.message);
+  console.error('Stack:', error.stack);
 }
 
 // Create order for payment
@@ -87,7 +90,9 @@ router.post('/create-order', verifyToken, async (req, res) => {
       code: error.code,
       statusCode: error.statusCode,
       description: error.description,
+      response: error.response,
       fullError: error.toString(),
+      stack: error.stack,
     });
     
     if (error.description) {
@@ -98,7 +103,11 @@ router.post('/create-order', verifyToken, async (req, res) => {
       return res.status(500).json({ message: 'Cannot connect to Razorpay. Check internet connection.' });
     }
     
-    res.status(500).json({ message: `Failed to create order: ${error.message || 'Unknown error'}` });
+    if (error.message?.includes('Invalid API key')) {
+      return res.status(500).json({ message: 'Invalid Razorpay API credentials. Check RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in .env' });
+    }
+    
+    res.status(500).json({ message: `Failed to create order: ${error.message || 'Unknown error'}`, error: process.env.NODE_ENV === 'development' ? error.message : undefined });
   }
 });
 
