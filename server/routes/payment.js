@@ -13,21 +13,30 @@ const router = express.Router();
 let razorpay;
 
 try {
-  if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-    console.warn('WARNING: Razorpay credentials not found in environment variables!');
-    console.warn('RAZORPAY_KEY_ID:', process.env.RAZORPAY_KEY_ID ? '✓ Set' : '✗ Missing');
-    console.warn('RAZORPAY_KEY_SECRET:', process.env.RAZORPAY_KEY_SECRET ? '✓ Set' : '✗ Missing');
-    console.warn('Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in .env file');
+  const keyId = process.env.RAZORPAY_KEY_ID;
+  const keySecret = process.env.RAZORPAY_KEY_SECRET;
+  
+  console.log('🔵 Razorpay Initialization Attempt:');
+  console.log('   RAZORPAY_KEY_ID present:', !!keyId);
+  console.log('   RAZORPAY_KEY_SECRET present:', !!keySecret);
+  
+  if (!keyId || !keySecret) {
+    console.warn('⚠️  WARNING: Razorpay credentials not found in environment variables!');
+    console.warn('   → Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in your environment');
+    console.warn('   → For Render: Add to Environment Variables in Render Dashboard');
+    console.warn('   → Current RAZORPAY_KEY_ID:', keyId ? '✓ Set' : '✗ Missing');
+    console.warn('   → Current RAZORPAY_KEY_SECRET:', keySecret ? '✓ Set' : '✗ Missing');
   } else {
     razorpay = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID,
-      key_secret: process.env.RAZORPAY_KEY_SECRET,
+      key_id: keyId,
+      key_secret: keySecret,
     });
-    console.log('✓ Razorpay initialized successfully with key_id:', process.env.RAZORPAY_KEY_ID.substring(0, 15) + '...');
+    console.log('✓ Razorpay SDK initialized with credentials');
+    console.log('   Key ID starts with:', keyId.substring(0, 8) + '...');
   }
 } catch (error) {
-  console.error('❌ Failed to initialize Razorpay:', error.message);
-  console.error('Stack:', error.stack);
+  console.error('❌ Failed to initialize Razorpay SDK:', error.message);
+  console.error('   Stack:', error.stack);
 }
 
 // Health check endpoint for payment service
@@ -123,6 +132,16 @@ router.post('/create-order', verifyToken, async (req, res) => {
       stack: error.stack,
     });
     
+    // Handle 401 Unauthorized - Invalid credentials
+    if (error.statusCode === 401) {
+      console.error('❌ Razorpay API Authentication Failed (401 Unauthorized)');
+      console.error('Verify that RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in Render environment variables match your Razorpay account');
+      return res.status(500).json({ 
+        message: 'Payment service authentication failed. Invalid Razorpay credentials.',
+        debug: 'Check that RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET are correctly set on Render'
+      });
+    }
+    
     if (error.description) {
       return res.status(400).json({ message: `Razorpay Error: ${error.description}` });
     }
@@ -135,7 +154,11 @@ router.post('/create-order', verifyToken, async (req, res) => {
       return res.status(500).json({ message: 'Invalid Razorpay API credentials. Check RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in .env' });
     }
     
-    res.status(500).json({ message: `Failed to create order: ${error.message || 'Unknown error'}`, error: process.env.NODE_ENV === 'development' ? error.message : undefined });
+    res.status(500).json({ 
+      message: `Failed to create order: ${error.message || 'Unknown error'}`, 
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+      statusCode: error.statusCode
+    });
   }
 });
 
