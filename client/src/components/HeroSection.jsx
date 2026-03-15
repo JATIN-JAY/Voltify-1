@@ -78,43 +78,60 @@ const HeroSection = memo(function HeroSection() {
     };
   }, []);
 
+  // Memoized fetch function for featured products
+  const fetchFeaturedProducts = useCallback(async () => {
+    try {
+      setLoadingFeatured(true);
+      const response = await api.get('/products/featured/list');
+      const rawProducts = Array.isArray(response.data) ? response.data : [];
+      
+      // Normalize product data (clean names, strip trailing pipes and special chars)
+      const normalizedProducts = normalizeProducts(rawProducts);
+      
+      // Ensure max 3 products
+      const limitedProducts = normalizedProducts.slice(0, 3);
+
+      console.log('✓ Flagship carousel loaded:', {
+        count: limitedProducts.length,
+        maxProducts: 3,
+        timestamp: new Date().toISOString(),
+        products: limitedProducts.map(p => ({
+          id: p._id,
+          name: p.name,
+          price: p.price,
+          hasImage: !!p.image,
+          featured: p.featured,
+        })),
+      });
+
+      setFeaturedProducts(limitedProducts);
+    } catch (error) {
+      console.error('Error fetching featured products:', error);
+      setFeaturedProducts([]);
+    } finally {
+      setLoadingFeatured(false);
+    }
+  }, []);
+
+  // Initial load of featured products
   useEffect(() => {
-    const fetchFeaturedProducts = async () => {
-      try {
-        const response = await api.get('/products/featured/list');
-        const rawProducts = Array.isArray(response.data) ? response.data : [];
-        
-        // Normalize product data (clean names, strip trailing pipes and special chars)
-        const normalizedProducts = normalizeProducts(rawProducts);
-        
-        // Ensure max 3 products
-        const limitedProducts = normalizedProducts.slice(0, 3);
+    fetchFeaturedProducts();
+  }, [fetchFeaturedProducts]);
 
-        console.log('✓ Flagship carousel loaded:', {
-          count: limitedProducts.length,
-          maxProducts: 3,
-          products: limitedProducts.map(p => ({
-            id: p._id,
-            name: p.name,
-            price: p.price,
-            hasImage: !!p.image,
-            imageUrl: p.image,
-            featured: p.featured,
-            category: p.category,
-          })),
-        });
-
-        setFeaturedProducts(limitedProducts);
-      } catch (error) {
-        console.error('Error fetching featured products:', error);
-        setFeaturedProducts([]);
-      } finally {
-        setLoadingFeatured(false);
-      }
+  // Listen for featured products changes from admin dashboard
+  useEffect(() => {
+    const handleFeaturedProductsChanged = (event) => {
+      console.log('📢 Featured products changed event received:', event.detail);
+      // Refetch featured products to reflect changes
+      fetchFeaturedProducts();
     };
 
-    fetchFeaturedProducts();
-  }, []);
+    window.addEventListener('featuredProductsChanged', handleFeaturedProductsChanged);
+
+    return () => {
+      window.removeEventListener('featuredProductsChanged', handleFeaturedProductsChanged);
+    };
+  }, [fetchFeaturedProducts]);
 
   return (
     <section className="relative overflow-hidden" style={{ backgroundColor: '#0f0f0f' }}>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useAdminDashboard } from '../hooks';
@@ -18,6 +18,18 @@ const AdminProductsPage = () => {
 
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [deleteMessage, setDeleteMessage] = useState('');
+  const [displayMessage, setDisplayMessage] = useState(message);
+
+  // Auto-clear success/warning messages after 4 seconds
+  useEffect(() => {
+    setDisplayMessage(message);
+    if (message.text && (message.type === 'success' || message.type === 'warning')) {
+      const timer = setTimeout(() => {
+        setDisplayMessage({ type: '', text: '' });
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   const handleDeleteClick = (productId, productName) => {
     setConfirmDelete(productId);
@@ -65,17 +77,20 @@ const AdminProductsPage = () => {
           </motion.div>
 
           {/* Alert Messages */}
-          {message.text && (
+          {displayMessage.text && (
             <motion.div
               className={`mb-8 p-4 rounded-lg border ${
-                message.type === 'error'
+                displayMessage.type === 'error'
                   ? 'bg-red-500/10 border-red-500/30 text-red-400'
+                  : displayMessage.type === 'warning'
+                  ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
                   : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
               }`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
             >
-              {message.text}
+              {displayMessage.text}
             </motion.div>
           )}
 

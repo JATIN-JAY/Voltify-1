@@ -181,6 +181,34 @@ router.put('/:id', verifyToken, checkAdmin, async (req, res) => {
   }
 });
 
+// Partial update product (admin only) - e.g. toggle featured status
+router.patch('/:id', verifyToken, checkAdmin, async (req, res) => {
+  if (!ensureDatabaseReady(res)) return;
+
+  try {
+    const { featured } = req.body;
+
+    // Build update object for provided fields only
+    const updateData = {};
+    if (featured !== undefined) updateData.featured = featured;
+
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    const normalizedProduct = normalizeProduct(product);
+    res.json({ message: 'Product updated successfully', product: normalizedProduct });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Upload image to Cloudinary (admin only)
 router.post('/upload/image', verifyToken, checkAdmin, async (req, res) => {
   const multer = (await import('multer')).default;

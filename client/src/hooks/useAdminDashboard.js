@@ -70,26 +70,57 @@ export const useAdminDashboard = () => {
     setMessage({ type: 'success', text: 'Product created successfully!' });
   }, []);
 
-  // Toggle featured status
+  // Toggle featured status with optimistic update and 5-product limit
   const toggleFeatured = useCallback(async (productId, currentFeaturedStatus) => {
+    const newFeaturedStatus = !currentFeaturedStatus;
+    
+    // Check 5-product limit only when trying to feature (not when unfeatureing)
+    if (newFeaturedStatus) {
+      const currentlyFeaturedCount = products.filter(p => p.featured).length;
+      if (currentlyFeaturedCount >= 5) {
+        setMessage({ 
+          type: 'warning', 
+          text: 'Maximum 5 featured products allowed. Unfeature another product first.' 
+        });
+        return;
+      }
+    }
+
+    // Optimistic update - update UI immediately
+    const previousProducts = [...products];
+    setProducts((prev) =>
+      prev.map((p) =>
+        p._id === productId ? { ...p, featured: newFeaturedStatus } : p
+      )
+    );
+
     try {
-      await api.put(
+      // Call API with PATCH request
+      await api.patch(
         `/products/${productId}`,
-        { featured: !currentFeaturedStatus },
+        { featured: newFeaturedStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setProducts((prev) =>
-        prev.map((p) =>
-          p._id === productId ? { ...p, featured: !currentFeaturedStatus } : p
-        )
-      );
-      setMessage({ type: 'success', text: 'Product updated' });
+      setMessage({ 
+        type: 'success', 
+        text: `Product ${newFeaturedStatus ? 'featured' : 'unfeatured'} successfully` 
+      });
+
+      // Dispatch event to refresh carousel on homepage
+      window.dispatchEvent(new CustomEvent('featuredProductsChanged', {
+        detail: { productId, featured: newFeaturedStatus }
+      }));
     } catch (err) {
       console.error('Toggle featured error:', err);
-      setMessage({ type: 'error', text: 'Failed to update product' });
+      // Revert on failure
+      setProducts(previousProducts);
+      setMessage({ 
+        type: 'error', 
+        text: 'Failed to update product. Please try again.' 
+      });
     }
-  }, [token]);
+  }, [products, token]);
 
   // Delete product
   const deleteProduct = useCallback(async (productId) => {
