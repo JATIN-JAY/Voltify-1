@@ -223,44 +223,33 @@ const NavUserActions = ({ user, cartCount, onSearchClick, onLogout, onOpenLogin,
 };
 
 /**
- * Mobile Navigation Menu - Slide-down drawer for mobile screens
+ * Mobile Navigation Menu - Full-width left sidebar drawer for mobile screens
  */
 const MobileNavMenu = ({ isOpen, onClose, user, cartCount, onSearchClick, onLogout, onOpenLogin, onOpenSignup, categories }) => {
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {/* Dark Backdrop Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/50 z-40"
-            style={{ top: '56px' }}
+            className="fixed inset-0 bg-black/60 z-40"
           />
           
-          {/* Drawer */}
+          {/* Left-Sliding Drawer */}
           <motion.div
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -20, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed top-14 left-0 right-0 w-full bg-[#1a1a1a] border-b border-voltify-border z-50 shadow-xl"
+            initial={{ x: -400, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -400, opacity: 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="fixed inset-y-0 left-0 w-[85vw] max-w-sm bg-voltify-dark z-50 border-r border-voltify-border shadow-2xl overflow-y-auto"
           >
-            <div className="px-4 py-4 space-y-3 max-h-[80vh] overflow-y-auto">
-              {/* Close Button */}
-              <div className="flex justify-end mb-2">
-                <button
-                  onClick={onClose}
-                  className="text-voltify-light/60 hover:text-voltify-light transition-colors text-2xl w-8 h-8 flex items-center justify-center"
-                  aria-label="Close menu"
-                >
-                  ×
-                </button>
-              </div>
-
-              {/* SECTION 1: Navigation Links */}
+            <div className="px-4 py-4 space-y-3 min-h-full">
+              {/* Navigation Links */}
               {/* Home Link */}
               <Link
                 to="/"
@@ -290,62 +279,34 @@ const MobileNavMenu = ({ isOpen, onClose, user, cartCount, onSearchClick, onLogo
               ))}
 
               {/* DIVIDER */}
-              <div className="border-t border-voltify-border my-2"></div>
+              <div className="border-t border-voltify-border my-3"></div>
 
-              {/* SECTION 2: Icons/Quick Actions */}
-              <div className="space-y-2">
-                {/* Search */}
-                <button
-                  onClick={() => {
-                    onSearchClick();
-                    onClose();
-                  }}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-voltify-light hover:text-voltify-gold hover:bg-voltify-dark/50 rounded-lg transition-all text-left text-sm"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                  <span>Search</span>
-                </button>
+              {/* Account Section */}
+              {/* Wishlist */}
+              <Link
+                to="/wishlist"
+                onClick={onClose}
+                className="flex items-center gap-3 px-4 py-3 text-voltify-light hover:text-voltify-gold hover:bg-voltify-dark/50 rounded-lg transition-all text-left text-sm w-full"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+                <span>Wishlist</span>
+              </Link>
 
-                {/* Wishlist */}
-                <Link
-                  to="/wishlist"
-                  onClick={onClose}
-                  className="flex items-center gap-3 px-4 py-3 text-voltify-light hover:text-voltify-gold hover:bg-voltify-dark/50 rounded-lg transition-all text-left text-sm w-full"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                  <span>Wishlist</span>
-                </Link>
-
-                {/* Cart */}
-                <Link
-                  to="/cart"
-                  onClick={onClose}
-                  className="flex items-center gap-3 px-4 py-3 text-voltify-light hover:text-voltify-gold hover:bg-voltify-dark/50 rounded-lg transition-all text-left text-sm w-full"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                  </svg>
-                  <span>Cart {cartCount > 0 && `(${cartCount})`}</span>
-                </Link>
-              </div>
-
-              {/* DIVIDER */}
-              <div className="border-t border-voltify-border my-2"></div>
-
-              {/* SECTION 3: Sell Button */}
+              {/* Sell Button */}
               <Link
                 to="/become-seller"
                 onClick={onClose}
-                className="block px-4 py-3 text-voltify-light border border-voltify-gold/30 rounded-lg hover:text-voltify-gold hover:border-voltify-gold/60 transition-all font-medium text-center text-sm uppercase tracking-wide"
+                className="flex items-center gap-3 px-4 py-3 text-voltify-light border border-voltify-gold/30 rounded-lg hover:text-voltify-gold hover:border-voltify-gold/60 transition-all text-sm w-full"
               >
-                Become a Seller
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m0 0h6m-6-6H6m0 0H0" />
+                </svg>
+                <span>Sell</span>
               </Link>
 
-              {/* SECTION 4: User Actions */}
+              {/* User Actions Section */}
               {user ? (
                 <div className="border-t border-voltify-border pt-4 mt-4">
                   {/* Profile Link */}
@@ -507,23 +468,50 @@ export default function Navbar() {
               onOpenSignup={() => openModal('signup')}
             />
 
-            {/* Hamburger Menu Button - Mobile Only (below lg/1024px) */}
-            <motion.button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 text-voltify-light/60 hover:text-voltify-gold transition-colors min-h-11 min-w-11 flex items-center justify-center ml-auto"
-              aria-label="Toggle navigation menu"
-              whileTap={{ scale: 0.95 }}
-            >
-              {mobileMenuOpen ? (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+            {/* Mobile Icons and Hamburger - Only visible on mobile */}
+            <div className="lg:hidden flex items-center gap-2 ml-auto">
+              {/* Mobile Search Icon */}
+              <motion.button
+                onClick={() => setSearchOpen(true)}
+                className="p-2 text-voltify-light/60 hover:text-voltify-gold transition-colors min-h-11 min-w-11 flex items-center justify-center"
+                aria-label="Search"
+                whileTap={{ scale: 0.95 }}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-              ) : (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h16" />
+              </motion.button>
+
+              {/* Mobile Cart Icon */}
+              <Link to="/cart" className="relative p-2 min-h-11 min-w-11 flex items-center justify-center text-voltify-light/60 hover:text-voltify-gold transition-colors">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
-              )}
-            </motion.button>
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+
+              {/* Mobile Hamburger Menu Button */}
+              <motion.button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2 text-voltify-light/60 hover:text-voltify-gold transition-colors min-h-11 min-w-11 flex items-center justify-center"
+                aria-label="Toggle navigation menu"
+                whileTap={{ scale: 0.95 }}
+              >
+                {mobileMenuOpen ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                )}
+              </motion.button>
+            </div>
           </div>
         </div>
       </nav>
