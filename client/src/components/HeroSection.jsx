@@ -62,13 +62,14 @@ const HeroSection = memo(function HeroSection() {
       performTyping();
     }, 500);
 
-    // Fallback: Force full text display after 2 seconds if animation hasn't completed
+    // Fallback: Force full text display after 2.5 seconds if animation hasn't completed
     fallbackTimeout = setTimeout(() => {
       setTypedText(edgeText);
       setShowCursor(false);
       if (typingInterval) clearInterval(typingInterval);
+      if (restartTimeout) clearTimeout(restartTimeout);
       console.warn('Typewriter animation fallback triggered - forced display of full text');
-    }, 2000);
+    }, 2500);
 
     return () => {
       clearTimeout(initialTimeout);
@@ -192,25 +193,47 @@ const HeroSection = memo(function HeroSection() {
 
             {/* CTA Buttons - Fade + slide at 1000ms */}
             <div 
-              className="flex flex-col items-stretch gap-3 mb-14 hero-cta-fade"
+              className="flex flex-col md:flex-row flex-wrap gap-4 mb-14 hero-cta-fade md:items-center"
             >
               <button
                 type="button"
                 onClick={handleBrowseProducts}
-                className="group relative w-full px-6 sm:px-10 py-4 sm:py-5 bg-voltify-gold text-voltify-dark font-black text-sm sm:text-base uppercase tracking-widest rounded-lg transition-all duration-300 hover:shadow-[0_20px_40px_rgba(232,160,32,0.3)] hover:-translate-y-1 active:translate-y-0 touch-target"
+                className="group relative px-6 py-3 bg-voltify-gold text-voltify-dark font-black text-sm uppercase tracking-widest rounded-lg transition-all duration-300 hover:shadow-[0_20px_40px_rgba(232,160,32,0.3)] hover:-translate-y-1 active:translate-y-0 touch-target"
+                style={{
+                  width: 'fit-content',
+                  minWidth: '220px',
+                  height: '48px',
+                  paddingLeft: '24px',
+                  paddingRight: '24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
               >
-                <span className="flex items-center justify-center gap-3">
-                  Explore Picks
-                  <svg className="w-4 sm:w-5 h-4 sm:h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
+                <span className="flex items-center justify-center gap-2">
+                  Explore Curated Picks
+                  <span>→</span>
                 </span>
               </button>
 
               {!user && (
                 <button
                   onClick={() => openModal('signup')}
-                  className="w-full px-4 sm:px-6 py-3 sm:py-4 border-2 border-voltify-light/30 text-voltify-light font-semibold text-xs uppercase tracking-wide rounded-lg hover:bg-voltify-light/5 hover:border-voltify-light/50 transition-all touch-target">
+                  className="px-6 font-semibold text-sm uppercase tracking-wide rounded-lg transition-all touch-target"
+                  style={{
+                    width: 'fit-content',
+                    minWidth: '220px',
+                    height: '48px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: 'transparent',
+                    border: '2px solid white',
+                    color: 'white'
+                  }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(255,255,255,0.05)'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                >
                   Create Account
                 </button>
               )}
