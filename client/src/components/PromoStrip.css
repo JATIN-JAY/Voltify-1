@@ -18,6 +18,9 @@
   line-height: 1.4;
   padding: 0;
   margin: 0;
+  border: none;
+  border-bottom: none;
+  border-top: none;
   transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
   opacity: 1;
   visibility: visible;
@@ -35,7 +38,7 @@
 }
 
 .promo-strip--dark {
-  background-color: #141210;
+  background-color: #0f0f0f;
   color: #f5f0e8;
 }
 

@@ -16,10 +16,14 @@ html {
 
 body {
   font-family: 'Inter', sans-serif;
-  background-color: #141210;
+  background-color: #0f0f0f;
   color: #f5f0e8;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+html, #root {
+  background-color: #0f0f0f;
 }
 
 h1, h2, h3, h4, h5, h6 {

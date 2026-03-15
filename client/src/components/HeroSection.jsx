@@ -79,7 +79,7 @@ const HeroSection = memo(function HeroSection() {
   }, []);
 
   return (
-    <section className="relative overflow-hidden bg-voltify-dark">
+    <section className="relative overflow-hidden" style={{ backgroundColor: '#0f0f0f' }}>
       {/* Minimalist Background - Just Color and Subtle Geometry */}
       <div
         aria-hidden="true"
@@ -91,7 +91,7 @@ const HeroSection = memo(function HeroSection() {
         <div className="absolute -bottom-1/4 -left-1/4 w-96 h-96 bg-voltify-gold/10 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-6 lg:px-8 pt-16 pb-20 lg:pt-24 lg:pb-24">
+      <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-6 lg:px-8 pt-0 pb-20 lg:pt-24 lg:pb-24 mt-0">
         
         <div className="grid items-stretch gap-14 lg:grid-cols-2 lg:gap-24">
           
