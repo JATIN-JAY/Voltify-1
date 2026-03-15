@@ -119,11 +119,11 @@ function ProductCard({ product }) {
   };
 
   return (
-    <div className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col h-full">
+    <div className="group bg-[#1e1e1e] rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col h-full border border-[#2a2a2a]">
       <Link to={product.slug && product.category 
         ? `/${product.category.toLowerCase().replace(/\s+/g, '-')}/${product.slug}`
         : `/product/${product._id}`
-      } className="relative overflow-hidden aspect-square block">
+      } className="relative overflow-hidden aspect-square block bg-[#0f0f0f]">
         <img
           src={product.image}
           alt={`${product.brand || 'Product'} ${product.name} ${product.color || ''} - Buy on Voltify`}
@@ -143,41 +143,41 @@ function ProductCard({ product }) {
           ? `/${product.category.toLowerCase().replace(/\s+/g, '-')}/${product.slug}`
           : `/product/${product._id}`
         } className="block">
-          <h3 className="font-bold text-lg text-slate-900 group-hover:text-slate-700 transition-colors line-clamp-2 hover:underline">
+          <h3 className="font-bold text-lg text-white group-hover:text-gray-200 transition-colors line-clamp-2 hover:underline">
             {product.name}
           </h3>
         </Link>
 
-        <p className="text-sm text-slate-600 line-clamp-2 flex-grow">
+        <p className="text-sm text-[#aaaaaa] line-clamp-2 flex-grow">
           {product.description}
         </p>
 
         <div className="flex justify-between items-center">
-          <span className="text-2xl font-extrabold text-slate-900">
+          <span className="text-2xl font-extrabold text-[#f5a623]">
             ₹{Number(product.price).toLocaleString('en-IN')}
           </span>
           <div className="flex items-center gap-1">
-            <svg className="w-5 h-5 text-amber-400 fill-current" viewBox="0 0 20 20">
+            <svg className="w-5 h-5 text-[#f5a623] fill-current" viewBox="0 0 20 20">
               <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
             </svg>
-            <span className="text-sm font-medium text-slate-700">4.8</span>
+            <span className="text-sm font-medium text-[#aaaaaa]">4.8</span>
           </div>
         </div>
 
         {existingItem ? (
-          <div className="w-full flex items-center justify-between gap-2 bg-gradient-to-r from-slate-900 to-slate-800 p-1 rounded-xl shadow-md">
+          <div className="w-full flex items-center justify-between gap-2 bg-[#2a2a2a] p-1 rounded-xl shadow-md border border-[#3a3a3a]">
             <button
               onClick={handleDecrease}
-              className="flex-1 py-2.5 px-4 bg-white/20 hover:bg-white/30 text-white font-bold text-lg rounded-lg transition-all duration-200"
+              className="flex-1 py-2.5 px-4 bg-[#f5a623]/20 hover:bg-[#f5a623]/30 text-white font-bold text-lg rounded-lg transition-all duration-200"
             >
               −
             </button>
-            <div className="flex-1 py-2.5 px-4 bg-white/20 text-white text-center font-bold text-lg rounded-lg">
+            <div className="flex-1 py-2.5 px-4 bg-[#f5a623]/20 text-white text-center font-bold text-lg rounded-lg">
               {existingItem.quantity}
             </div>
             <button
               onClick={handleIncrease}
-              className="flex-1 py-2.5 px-4 bg-white/20 hover:bg-white/30 text-white font-bold text-lg rounded-lg transition-all duration-200"
+              className="flex-1 py-2.5 px-4 bg-[#f5a623]/20 hover:bg-[#f5a623]/30 text-white font-bold text-lg rounded-lg transition-all duration-200"
             >
               +
             </button>
@@ -188,7 +188,7 @@ function ProductCard({ product }) {
             className={`w-full py-3.5 px-6 rounded-xl font-semibold text-base transition-all duration-300 shadow-md ${
               isAdded
                 ? 'bg-emerald-600 text-white shadow-emerald-500/30'
-                : 'bg-gradient-to-r from-slate-900 to-slate-800 text-white hover:from-slate-800 hover:to-slate-700 hover:shadow-xl hover:scale-[1.02]'
+                : 'bg-[#f5a623] text-[#0f0f0f] hover:bg-[#f5b833] hover:shadow-xl hover:scale-[1.02] font-bold'
             }`}
           >
             {isAdded ? '✓ Added' : 'Add to Cart'}
@@ -312,7 +312,7 @@ export default function CategoryPage() {
           })}
         </script>
       </Helmet>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 pt-20 pb-12">
+      <div className="min-h-screen bg-[#0f0f0f] pt-20 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb Navigation */}
         <Breadcrumb 
@@ -321,20 +321,20 @@ export default function CategoryPage() {
             categoryParam
           )}
           showMobileAbbreviated={true}
-          className="mb-8 bg-white/50 rounded-lg -mx-4 px-4"
+          className="mb-8 -mx-4 px-4 text-[#888]"
         />
         {/* SEO Content Block */}
         {SEO_CONTENT_CONFIG[normalizedCategory] && (
           <motion.div 
-            className="mb-16 bg-white rounded-2xl shadow-sm border border-slate-200 p-8"
+            className="mb-16 bg-[#1a1a1a] rounded-2xl shadow-sm border border-[#2a2a2a] p-8 border-l-4 border-l-[#f5a623]"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">
+            <h2 className="text-3xl font-bold text-white mb-4">
               {SEO_CONTENT_CONFIG[normalizedCategory].heading}
             </h2>
-            <p className="text-base text-slate-700 leading-relaxed">
+            <p className="text-base text-[#aaaaaa] leading-relaxed">
               {SEO_CONTENT_CONFIG[normalizedCategory].description}
             </p>
           </motion.div>
@@ -346,10 +346,10 @@ export default function CategoryPage() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h1 className="text-5xl font-display font-bold text-slate-900 mb-4">
+          <h1 className="text-5xl font-display font-bold text-white mb-4">
             {brand ? `${brand} ${categoryTitles[normalizedCategory] || normalizedCategory}` : (categoryTitles[normalizedCategory] || normalizedCategory)}
           </h1>
-          <p className="text-lg text-slate-600">
+          <p className="text-lg text-[#888]">
             {brand 
               ? `Browse ${brand}'s premium collection of ${normalizedCategory?.toLowerCase() || ''}` 
               : `Browse our premium collection of ${normalizedCategory?.toLowerCase() || ''}`}
@@ -359,12 +359,12 @@ export default function CategoryPage() {
         {/* Products Grid */}
         {products.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-lg text-slate-600 mb-6">
+            <p className="text-lg text-[#888] mb-6">
               No products available in this category yet.
             </p>
             <a
               href="/"
-              className="inline-block px-8 py-3 btn-primary font-semibold"
+              className="inline-block px-8 py-3 bg-[#f5a623] text-[#0f0f0f] font-semibold rounded-lg hover:bg-[#f5b833] transition-colors"
             >
               Back to Home
             </a>
@@ -393,36 +393,36 @@ export default function CategoryPage() {
         {/* FAQ Section */}
         {SEO_CONTENT_CONFIG[normalizedCategory] && SEO_CONTENT_CONFIG[normalizedCategory].faqs && (
           <motion.div 
-            className="mt-20 bg-white rounded-2xl shadow-sm border border-slate-200 p-8"
+            className="mt-20 bg-[#1a1a1a] rounded-2xl shadow-sm border border-[#2a2a2a] p-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <h2 className="text-3xl font-bold text-slate-900 mb-8 text-center">
+            <h2 className="text-3xl font-bold text-white mb-8 text-center">
               Frequently Asked Questions
             </h2>
             <div className="space-y-6 max-w-4xl mx-auto">
               {SEO_CONTENT_CONFIG[normalizedCategory].faqs.map((faq, idx) => (
                 <motion.div 
                   key={idx}
-                  className="border border-slate-200 rounded-xl overflow-hidden hover:border-slate-300 transition-colors"
+                  className="border border-[#2a2a2a] rounded-xl overflow-hidden hover:border-[#f5a623]/50 transition-colors"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 + idx * 0.1 }}
                 >
                   <details className="group cursor-pointer">
-                    <summary className="flex items-center justify-between p-6 bg-slate-50 hover:bg-slate-100 transition-colors">
-                      <h3 className="font-semibold text-slate-900 text-lg pr-4">
+                    <summary className="flex items-center justify-between p-6 bg-[#0f0f0f] hover:bg-[#1a1a1a] transition-colors">
+                      <h3 className="font-semibold text-white text-lg pr-4">
                         {faq.question}
                       </h3>
-                      <span className="text-slate-400 group-open:text-slate-600 transition-colors">
+                      <span className="text-[#888] group-open:text-[#f5a623] transition-colors">
                         <svg className="w-6 h-6 transform group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                         </svg>
                       </span>
                     </summary>
-                    <div className="px-6 py-4 bg-white border-t border-slate-200">
-                      <p className="text-slate-700 leading-relaxed">
+                    <div className="px-6 py-4 bg-[#0f0f0f] border-t border-[#2a2a2a]">
+                      <p className="text-[#aaaaaa] leading-relaxed">
                         {faq.answer}
                       </p>
                     </div>
