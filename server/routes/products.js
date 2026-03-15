@@ -169,7 +169,7 @@ router.post('/', verifyToken, checkAdmin, async (req, res) => {
   if (!ensureDatabaseReady(res)) return;
 
   try {
-    const { name, price, category, brand, color, description, imageUrl, featured } = req.body;
+    const { name, price, category, brand, color, description, imageUrl, images, featured } = req.body;
 
     // Validate required fields
     if (!name || !price || !category || !brand || !description || !imageUrl) {
@@ -185,6 +185,7 @@ router.post('/', verifyToken, checkAdmin, async (req, res) => {
       color: color || '',
       description,
       image: imageUrl,
+      images: images || [],
       featured: featured ?? false,
     });
 
@@ -222,7 +223,7 @@ router.put('/:id', verifyToken, checkAdmin, async (req, res) => {
   if (!ensureDatabaseReady(res)) return;
 
   try {
-    const { name, price, category, brand, color, description, imageUrl, featured } = req.body;
+    const { name, price, category, brand, color, description, imageUrl, images, featured } = req.body;
 
     // Build update object dynamically with provided fields
     const updateData = {};
@@ -233,6 +234,7 @@ router.put('/:id', verifyToken, checkAdmin, async (req, res) => {
     if (color !== undefined) updateData.color = color;
     if (description !== undefined) updateData.description = description;
     if (imageUrl !== undefined) updateData.image = imageUrl;
+    if (images !== undefined) updateData.images = images;
     if (featured !== undefined) updateData.featured = featured;
 
     const product = await Product.findByIdAndUpdate(

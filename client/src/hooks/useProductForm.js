@@ -27,8 +27,10 @@ const BRANDS_BY_CATEGORY = {
  */
 export const useProductForm = (onProductCreated, productToEdit = null) => {
   const [formData, setFormData] = useState(INITIAL_FORM_STATE);
+  const [additionalImages, setAdditionalImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [additionalUploading, setAdditionalUploading] = useState(false);
   const { imagePreview, uploading, error: uploadError, uploadImage, clearImage, setError: setUploadError } = useImageUpload();
   const [isEditing] = useState(!!productToEdit);
 
@@ -46,6 +48,8 @@ export const useProductForm = (onProductCreated, productToEdit = null) => {
         imageUrl: productToEdit.image || '',
         featured: productToEdit.featured || false,
       });
+      // Load additional images if available
+      setAdditionalImages(productToEdit.images || []);
     }
   }, [productToEdit]);
 
@@ -68,10 +72,28 @@ export const useProductForm = (onProductCreated, productToEdit = null) => {
     const imageUrl = await uploadImage(file);
     if (imageUrl) {
       setFormData((prev) => ({ ...prev, imageUrl }));
-      setMessage({ type: 'success', text: 'Image uploaded successfully!' });
+      setMessage({ type: 'success', text: 'Main image uploaded successfully!' });
       setTimeout(() => setMessage({ type: '', text: '' }), 3000);
     }
   }, [uploadImage]);
+
+  const handleAdditionalImageUpload = useCallback(async (file) => {
+    setAdditionalUploading(true);
+    try {
+      const imageUrl = await uploadImage(file);
+      if (imageUrl) {
+        setAdditionalImages((prev) => [...prev, imageUrl]);
+        setMessage({ type: 'success', text: 'Image added to gallery!' });
+        setTimeout(() => setMessage({ type: '', text: '' }), 2000);
+      }
+    } finally {
+      setAdditionalUploading(false);
+    }
+  }, [uploadImage]);
+
+  const handleRemoveAdditionalImage = useCallback((index) => {
+    setAdditionalImages((prev) => prev.filter((_, i) => i !== index));
+  }, []);
 
   const validateForm = useCallback(() => {
     // Check if image is still uploading
@@ -135,21 +157,28 @@ export const useProductForm = (onProductCreated, productToEdit = null) => {
       setLoading(true);
 
       try {
+        // Include additional images in form data
+        const submitData = {
+          ...formData,
+          images: additionalImages,
+        };
+
         let response;
         
         if (isEditing && productToEdit) {
           // Update existing product
-          response = await api.put(`/products/${productToEdit._id}`, formData, {
+          response = await api.put(`/products/${productToEdit._id}`, submitData, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setMessage({ type: 'success', text: 'Product updated successfully!' });
         } else {
           // Create new product
-          response = await api.post('/products', formData, {
+          response = await api.post('/products', submitData, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setMessage({ type: 'success', text: 'Product created successfully!' });
           setFormData(INITIAL_FORM_STATE);
+          setAdditionalImages([]);
           clearImage();
         }
 
@@ -165,7 +194,7 @@ export const useProductForm = (onProductCreated, productToEdit = null) => {
         setLoading(false);
       }
     },
-    [formData, validateForm, token, onProductCreated, clearImage, isEditing, productToEdit]
+    [formData, additionalImages, validateForm, token, onProductCreated, clearImage, isEditing, productToEdit]
   );
 
   const resetForm = useCallback(() => {
@@ -178,10 +207,14 @@ export const useProductForm = (onProductCreated, productToEdit = null) => {
     formData,
     handleInputChange,
     handleImageUpload,
+    handleAdditionalImageUpload,
+    handleRemoveAdditionalImage,
+    additionalImages,
     handleSubmit,
     resetForm,
     loading,
     uploading,
+    additionalUploading,
     message,
     imagePreview,
     uploadError,

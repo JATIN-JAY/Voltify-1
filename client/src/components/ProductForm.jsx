@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useProductForm } from '../hooks';
-import { Button, Input, Select, Alert, Card, ImageUpload } from './shared';
+import { Button, Input, Select, Alert, Card, ImageUpload, MultiImageUpload } from './shared';
 import { BRANDS_BY_CATEGORY } from '../constants/navigation';
 
 /**
@@ -13,9 +13,13 @@ const ProductForm = ({ onProductCreated, categories, productToEdit = null }) => 
     formData,
     handleInputChange,
     handleImageUpload,
+    handleAdditionalImageUpload,
+    handleRemoveAdditionalImage,
+    additionalImages,
     handleSubmit,
     loading,
     uploading,
+    additionalUploading,
     message,
     imagePreview,
     uploadError,
@@ -113,19 +117,18 @@ const ProductForm = ({ onProductCreated, categories, productToEdit = null }) => 
             />
           </div>
 
-          {/* Image Upload */}
-          <div className="space-y-2">
-            <label className="block text-sm font-semibold text-slate-900">
-              Product Image
-            </label>
-            <ImageUpload
-              onUpload={handleImageUpload}
-              preview={imagePreview}
-              uploading={uploading}
-              error={uploadError}
-              label="Choose Image"
-            />
-          </div>
+          {/* Multi-Image Upload */}
+          <MultiImageUpload
+            mainImage={imagePreview || formData.imageUrl}
+            additionalImages={additionalImages}
+            onMainImageUpload={handleImageUpload}
+            onAdditionalImageUpload={handleAdditionalImageUpload}
+            onRemoveAdditionalImage={handleRemoveAdditionalImage}
+            mainUploading={uploading}
+            additionalUploading={additionalUploading}
+            error={uploadError}
+            mainImageLabel="Choose Main Image"
+          />
 
           {/* Featured Checkbox */}
           <div className="flex items-center gap-3 p-3 bg-slate-100 rounded-lg">
@@ -149,7 +152,7 @@ const ProductForm = ({ onProductCreated, categories, productToEdit = null }) => 
           <Button
             type="submit"
             isLoading={loading}
-            disabled={loading || uploading}
+            disabled={loading || uploading || additionalUploading}
             size="lg"
             className="w-full"
           >
