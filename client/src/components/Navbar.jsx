@@ -309,13 +309,27 @@ const MobileNavMenu = ({ isOpen, onClose, user, cartCount, onSearchClick, onLogo
               {/* User Actions Section */}
               {user ? (
                 <div className="border-t border-voltify-border pt-4 mt-4">
-                  {/* Profile Link */}
+                  {/* User Profile Header */}
+                  <div className="flex items-center gap-3 px-4 py-3 mb-3 bg-voltify-dark/70 rounded-lg">
+                    <div className="w-8 h-8 bg-gradient-to-br from-voltify-gold to-voltify-gold/70 rounded-full flex items-center justify-center text-voltify-dark text-xs font-semibold flex-shrink-0">
+                      {user.name?.[0]?.toUpperCase() || 'U'}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-voltify-light truncate">{user.name}</p>
+                      <p className="text-xs text-voltify-light/60 truncate">{user.email}</p>
+                    </div>
+                  </div>
+
+                  {/* My Account */}
                   <Link
                     to="/profile"
                     onClick={onClose}
-                    className="block px-4 py-2.5 text-voltify-light hover:text-voltify-gold hover:bg-voltify-dark/50 rounded-lg transition-all text-sm mb-2"
+                    className="flex items-center gap-3 px-4 py-2.5 text-voltify-light hover:text-voltify-gold hover:bg-voltify-dark/50 rounded-lg transition-all text-sm mb-2"
                   >
-                    Profile
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>My Account</span>
                   </Link>
                   
                   {/* Admin Panel for Admins */}
@@ -323,9 +337,12 @@ const MobileNavMenu = ({ isOpen, onClose, user, cartCount, onSearchClick, onLogo
                     <Link
                       to="/admin"
                       onClick={onClose}
-                      className="block px-4 py-2.5 text-voltify-light hover:text-voltify-gold hover:bg-voltify-dark/50 rounded-lg transition-all text-sm mb-2"
+                      className="flex items-center gap-3 px-4 py-2.5 text-voltify-light hover:text-voltify-gold hover:bg-voltify-dark/50 rounded-lg transition-all text-sm mb-2"
                     >
-                      Admin Panel
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                      </svg>
+                      <span>Admin Panel</span>
                     </Link>
                   )}
 
@@ -335,9 +352,12 @@ const MobileNavMenu = ({ isOpen, onClose, user, cartCount, onSearchClick, onLogo
                       onLogout();
                       onClose();
                     }}
-                    className="w-full px-4 py-2.5 text-left text-sm text-[#c97878] hover:text-[#ff9999] hover:bg-voltify-dark/50 rounded-lg transition-all"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm text-[#c97878] hover:text-[#ff9999] hover:bg-voltify-dark/50 rounded-lg transition-all"
                   >
-                    Logout
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span>Logout</span>
                   </button>
                 </div>
               ) : (
@@ -493,6 +513,27 @@ export default function Navbar() {
                   </span>
                 )}
               </Link>
+
+              {/* Mobile User Auth Indicator */}
+              {user ? (
+                /* User Avatar Circle - When logged in */
+                <motion.button
+                  onClick={() => setMobileMenuOpen(true)}
+                  whileHover={{ scale: 1.08 }}
+                  className="w-7 h-7 bg-gradient-to-br from-voltify-gold to-voltify-gold/70 rounded-full flex items-center justify-center text-voltify-dark text-xs font-semibold hover:shadow-[0_0_12px_rgba(232,160,32,0.5)] transition-all cursor-pointer min-h-11 min-w-11 flex-shrink-0"
+                  title={user.name}
+                >
+                  {user.name?.[0]?.toUpperCase() || 'U'}
+                </motion.button>
+              ) : (
+                /* Login Text Link - When logged out */
+                <button
+                  onClick={() => openModal('login')}
+                  className="px-3 py-2 text-xs font-semibold text-voltify-light hover:text-voltify-gold transition-colors min-h-11 min-w-11 flex items-center justify-center"
+                >
+                  Login
+                </button>
+              )}
 
               {/* Mobile Hamburger Menu Button */}
               <motion.button
