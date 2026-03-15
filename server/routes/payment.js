@@ -41,13 +41,59 @@ try {
 
 // Health check endpoint for payment service
 router.get('/health', (req, res) => {
-  res.json({
-    status: 'Payment service healthy',
+  const status = {
+    status: 'Payment service active',
     razorpayInitialized: !!razorpay,
     razorpayKeyId: process.env.RAZORPAY_KEY_ID ? '✓ Configured' : '✗ Missing',
     razorpaySecret: process.env.RAZORPAY_KEY_SECRET ? '✓ Configured' : '✗ Missing',
     timestamp: new Date().toISOString(),
-  });
+  };
+  
+  console.log('🏥 [Health Check]', status);
+  res.json(status);
+});
+
+// Test Razorpay connection
+router.get('/test', async (req, res) => {
+  console.log('🧪 [Test] Razorpay connection test initiated');
+  
+  try {
+    if (!razorpay) {
+      return res.status(500).json({ 
+        message: 'Razorpay not initialized',
+        keyId: process.env.RAZORPAY_KEY_ID ? '✓ Set' : '✗ Missing',
+        secret: process.env.RAZORPAY_KEY_SECRET ? '✓ Set' : '✗ Missing'
+      });
+    }
+
+    // Try to fetch account details - this validates credentials
+    console.log('📡 [Test] Attempting to fetch account details from Razorpay...');
+    const account = await razorpay.customers.all({ count: 1 });
+    
+    console.log('✓ [Test] Razorpay connection successful');
+    res.json({ 
+      message: 'Razorpay connection successful',
+      razorpayInitialized: true,
+      accountAccess: true,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('❌ [Test Error]', {
+      message: error.message,
+      statusCode: error.statusCode,
+      description: error.description,
+    });
+    
+    res.status(500).json({ 
+      message: 'Razorpay connection test failed',
+      error: {
+        message: error.message,
+        statusCode: error.statusCode,
+        description: error.description,
+        suggestion: error.statusCode === 401 ? 'Invalid Razorpay credentials' : 'Check Razorpay account'
+      }
+    });
+  }
 });
 
 // Create order for payment
@@ -55,43 +101,41 @@ router.post('/create-order', verifyToken, async (req, res) => {
   try {
     const { amount, items, userEmail, userName, userPhone } = req.body;
 
-    // Log the request details
-    console.log('📥 Payment request received:', {
-      hasUser: !!verifyToken,
+    console.log('📥 [Payment Request] Received:', {
       amount,
+      itemsCount: items?.length,
       userEmail,
+      userName,
       razorpayInitialized: !!razorpay,
-      env: process.env.NODE_ENV,
+      timestamp: new Date().toISOString(),
     });
 
     // Check if Razorpay is initialized
     if (!razorpay) {
-      console.error('❌ Razorpay not initialized');
-      console.error('Razorpay state:', {
+      console.error('❌ [Error] Razorpay SDK not initialized');
+      console.error('   Credentials status:', {
         keyId: process.env.RAZORPAY_KEY_ID ? '✓ Set' : '✗ Missing',
         keySecret: process.env.RAZORPAY_KEY_SECRET ? '✓ Set' : '✗ Missing',
       });
       return res.status(500).json({ 
-        message: 'Payment service not configured. Razorpay initialization failed.',
-        debug: process.env.NODE_ENV === 'development' ? {
-          razorpayKeyId: process.env.RAZORPAY_KEY_ID ? '✓ Set' : '✗ Missing',
-          razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET ? '✓ Set' : '✗ Missing',
-        } : undefined
+        message: 'Razorpay service not initialized. Check server environment variables.',
       });
     }
 
     // Validate input
     if (!amount || !items || !userEmail) {
+      console.warn('⚠️  [Validation] Missing required fields');
       return res.status(400).json({ message: 'Missing required fields: amount, items, userEmail' });
     }
 
-    // Check maximum allowed amount (useful for test mode limits)
-    const maxAmountPaise = parseInt(process.env.RAZORPAY_MAX_AMOUNT_PAISE || '5000000', 10); // default ₹50,000
+    // Check maximum allowed amount
+    const maxAmountPaise = parseInt(process.env.RAZORPAY_MAX_AMOUNT_PAISE || '5000000', 10);
     const amountPaise = Math.round(Number(amount) * 100);
 
     if (amountPaise > maxAmountPaise) {
+      console.warn('⚠️  [Validation] Amount exceeds maximum');
       return res.status(400).json({ 
-        message: `Amount exceeds maximum allowed for payments (₹${(maxAmountPaise/100).toLocaleString()}). Try a smaller amount or update RAZORPAY_MAX_AMOUNT_PAISE in server .env for testing.` 
+        message: `Amount exceeds maximum allowed (₹${(maxAmountPaise/100).toLocaleString()})` 
       });
     }
 
@@ -107,11 +151,11 @@ router.post('/create-order', verifyToken, async (req, res) => {
       },
     };
 
-    console.log('Creating Razorpay order with options:', { amount: amountPaise, currency: 'INR', userEmail });
+    console.log('🔵 [Razorpay] Creating order with:', { amount: amountPaise, currency: 'INR', receipt: options.receipt });
 
     const razorpayOrder = await razorpay.orders.create(options);
 
-    console.log('✓ Razorpay order created successfully:', razorpayOrder.id);
+    console.log('✓ [Success] Razorpay order created:', razorpayOrder.id);
 
     res.json({
       orderId: razorpayOrder.id,
@@ -122,42 +166,38 @@ router.post('/create-order', verifyToken, async (req, res) => {
       phone: userPhone,
     });
   } catch (error) {
-    console.error('❌ Error creating Razorpay order:', {
-      message: error.message,
-      code: error.code,
-      statusCode: error.statusCode,
-      description: error.description,
-      response: error.response,
-      fullError: error.toString(),
-      stack: error.stack,
-    });
+    console.error('❌ [Error] Payment creation failed');
+    console.error('   Error Type:', error.constructor.name);
+    console.error('   Message:', error.message);
+    console.error('   Status Code:', error.statusCode);
+    console.error('   Code:', error.code);
+    console.error('   Description:', error.description);
+    console.error('   Full Error:', JSON.stringify(error, null, 2));
     
-    // Handle 401 Unauthorized - Invalid credentials
+    // Handle specific error cases
     if (error.statusCode === 401) {
-      console.error('❌ Razorpay API Authentication Failed (401 Unauthorized)');
-      console.error('Verify that RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in Render environment variables match your Razorpay account');
+      console.error('   → 401 Unauthorized: Invalid Razorpay credentials');
       return res.status(500).json({ 
-        message: 'Payment service authentication failed. Invalid Razorpay credentials.',
-        debug: 'Check that RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET are correctly set on Render'
+        message: 'Razorpay authentication failed. Check API credentials on Render.',
+        details: '401 Unauthorized - verify RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET'
       });
     }
     
-    if (error.description) {
-      return res.status(400).json({ message: `Razorpay Error: ${error.description}` });
+    if (error.statusCode === 400) {
+      return res.status(400).json({ 
+        message: `Razorpay validation error: ${error.description || error.message}` 
+      });
     }
     
     if (error.message?.includes('ECONNREFUSED')) {
-      return res.status(500).json({ message: 'Cannot connect to Razorpay. Check internet connection.' });
+      return res.status(500).json({ message: 'Cannot reach Razorpay service' });
     }
     
-    if (error.message?.includes('Invalid API key')) {
-      return res.status(500).json({ message: 'Invalid Razorpay API credentials. Check RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in .env' });
-    }
-    
+    // Fallback error response
     res.status(500).json({ 
-      message: `Failed to create order: ${error.message || 'Unknown error'}`, 
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
-      statusCode: error.statusCode
+      message: error.description || error.message || 'Failed to create payment order',
+      errorType: error.constructor.name,
+      timestamp: new Date().toISOString()
     });
   }
 });
