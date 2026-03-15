@@ -26,7 +26,9 @@ router.post('/', verifyToken, async (req, res) => {
 // Get user orders
 router.get('/', verifyToken, async (req, res) => {
   try {
-    const orders = await Order.find({ userId: req.userId }).populate('products.productId');
+    const orders = await Order.find({ userId: req.userId })
+      .sort({ createdAt: -1 })
+      .populate('products.productId');
     res.json(orders);
   } catch (error) {
     res.status(500).json({ message: error.message });
