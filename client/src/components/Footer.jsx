@@ -242,10 +242,10 @@ export default function Footer() {
               </li>
               <li>
                 <a 
-                  href="tel:+919889488918"
+                  href="mailto:jatinsingh200425@gmail.com"
                   className="hover:text-voltify-gold transition duration-300"
                 >
-                  📱 +91-9889488918
+                  📧 jatinsingh200425@gmail.com
                 </a>
               </li>
               <li className="text-voltify-light/40">
