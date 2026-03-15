@@ -62,13 +62,13 @@ const HeroSection = memo(function HeroSection() {
       performTyping();
     }, 500);
 
-    // Fallback: Force full text display after 3 seconds if animation hasn't completed
+    // Fallback: Force full text display after 2 seconds if animation hasn't completed
     fallbackTimeout = setTimeout(() => {
       setTypedText(edgeText);
       setShowCursor(false);
       if (typingInterval) clearInterval(typingInterval);
       console.warn('Typewriter animation fallback triggered - forced display of full text');
-    }, 3000);
+    }, 2000);
 
     return () => {
       clearTimeout(initialTimeout);
@@ -235,7 +235,7 @@ const HeroSection = memo(function HeroSection() {
                 </div>
 
                 {/* Product Details Section */}
-                <div className="px-4 sm:px-6 pb-3 sm:pb-4 border-t border-voltify-border">
+                <div className="px-4 sm:px-6 pb-5 sm:pb-6 border-t border-voltify-border">
                   <FeaturedProductDetails products={featuredProducts} activeIndex={activeProductIndex} />
                 </div>
               </div>

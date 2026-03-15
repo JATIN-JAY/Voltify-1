@@ -45,7 +45,7 @@ const NavMenuItem = ({ category, isOpen, onMouseEnter, onMouseLeave }) => {
 };
 
 /**
- * User Navigation Actions
+ * User Navigation Actions - Desktop only on mobile
  * Account, wishlist, orders links with profile dropdown
  */
 const NavUserActions = ({ user, cartCount, onSearchClick, onLogout, onOpenLogin, onOpenSignup }) => {
@@ -64,13 +64,13 @@ const NavUserActions = ({ user, cartCount, onSearchClick, onLogout, onOpenLogin,
   }, []);
 
   return (
-    <div className="flex items-center gap-2 sm:gap-4">
+    <div className="hidden lg:flex items-center gap-2 sm:gap-4">
       <button
         onClick={onSearchClick}
-        className="text-voltify-light/60 hover:text-voltify-gold transition-colors p-2.5 sm:p-2 rounded-lg hover:bg-voltify-light/5 min-h-11 min-w-11 sm:min-h-auto sm:min-w-auto flex items-center justify-center"
+        className="text-voltify-light/60 hover:text-voltify-gold transition-colors p-2.5 sm:p-2 rounded-lg hover:bg-voltify-light/5 min-h-11 min-w-11 flex items-center justify-center"
         aria-label="Search"
       >
-        <svg className="w-5 h-5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
       </button>
@@ -204,7 +204,7 @@ const NavUserActions = ({ user, cartCount, onSearchClick, onLogout, onOpenLogin,
         </div>
       )}
 
-      <Link to="/cart" className="relative p-1 min-h-11 min-w-11 flex items-center justify-center">
+      <Link to="/cart" className="hidden lg:flex relative p-1 min-h-11 min-w-11 items-center justify-center">
         <svg className="w-4 h-4 text-voltify-light/60 hover:text-voltify-gold transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
         </svg>
@@ -225,7 +225,7 @@ const NavUserActions = ({ user, cartCount, onSearchClick, onLogout, onOpenLogin,
 /**
  * Mobile Navigation Menu - Slide-down drawer for mobile screens
  */
-const MobileNavMenu = ({ isOpen, onClose, user, onOpenLogin, onOpenSignup, categories }) => {
+const MobileNavMenu = ({ isOpen, onClose, user, cartCount, onSearchClick, onLogout, onOpenLogin, onOpenSignup, categories }) => {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -260,6 +260,7 @@ const MobileNavMenu = ({ isOpen, onClose, user, onOpenLogin, onOpenSignup, categ
                 </button>
               </div>
 
+              {/* SECTION 1: Navigation Links */}
               {/* Home Link */}
               <Link
                 to="/"
@@ -288,17 +289,97 @@ const MobileNavMenu = ({ isOpen, onClose, user, onOpenLogin, onOpenSignup, categ
                 </div>
               ))}
 
-              {/* Sell Button */}
+              {/* DIVIDER */}
+              <div className="border-t border-voltify-border my-2"></div>
+
+              {/* SECTION 2: Icons/Quick Actions */}
+              <div className="space-y-2">
+                {/* Search */}
+                <button
+                  onClick={() => {
+                    onSearchClick();
+                    onClose();
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-voltify-light hover:text-voltify-gold hover:bg-voltify-dark/50 rounded-lg transition-all text-left text-sm"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <span>Search</span>
+                </button>
+
+                {/* Wishlist */}
+                <Link
+                  to="/wishlist"
+                  onClick={onClose}
+                  className="flex items-center gap-3 px-4 py-3 text-voltify-light hover:text-voltify-gold hover:bg-voltify-dark/50 rounded-lg transition-all text-left text-sm w-full"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                  <span>Wishlist</span>
+                </Link>
+
+                {/* Cart */}
+                <Link
+                  to="/cart"
+                  onClick={onClose}
+                  className="flex items-center gap-3 px-4 py-3 text-voltify-light hover:text-voltify-gold hover:bg-voltify-dark/50 rounded-lg transition-all text-left text-sm w-full"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                  </svg>
+                  <span>Cart {cartCount > 0 && `(${cartCount})`}</span>
+                </Link>
+              </div>
+
+              {/* DIVIDER */}
+              <div className="border-t border-voltify-border my-2"></div>
+
+              {/* SECTION 3: Sell Button */}
               <Link
                 to="/become-seller"
                 onClick={onClose}
-                className="block px-4 py-3 mt-4 text-voltify-light border border-voltify-gold/30 rounded-lg hover:text-voltify-gold hover:border-voltify-gold/60 transition-all font-medium text-center text-sm uppercase tracking-wide"
+                className="block px-4 py-3 text-voltify-light border border-voltify-gold/30 rounded-lg hover:text-voltify-gold hover:border-voltify-gold/60 transition-all font-medium text-center text-sm uppercase tracking-wide"
               >
                 Become a Seller
               </Link>
 
-              {/* Auth Actions - Mobile Only */}
-              {!user && (
+              {/* SECTION 4: User Actions */}
+              {user ? (
+                <div className="border-t border-voltify-border pt-4 mt-4">
+                  {/* Profile Link */}
+                  <Link
+                    to="/profile"
+                    onClick={onClose}
+                    className="block px-4 py-2.5 text-voltify-light hover:text-voltify-gold hover:bg-voltify-dark/50 rounded-lg transition-all text-sm mb-2"
+                  >
+                    Profile
+                  </Link>
+                  
+                  {/* Admin Panel for Admins */}
+                  {user.isAdmin && (
+                    <Link
+                      to="/admin"
+                      onClick={onClose}
+                      className="block px-4 py-2.5 text-voltify-light hover:text-voltify-gold hover:bg-voltify-dark/50 rounded-lg transition-all text-sm mb-2"
+                    >
+                      Admin Panel
+                    </Link>
+                  )}
+
+                  {/* Logout */}
+                  <button
+                    onClick={() => {
+                      onLogout();
+                      onClose();
+                    }}
+                    className="w-full px-4 py-2.5 text-left text-sm text-[#c97878] hover:text-[#ff9999] hover:bg-voltify-dark/50 rounded-lg transition-all"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
                 <div className="space-y-2 mt-4 border-t border-voltify-border pt-4">
                   <button
                     onClick={() => {
@@ -379,7 +460,7 @@ export default function Navbar() {
       >
         <div className="w-full px-4 sm:px-6 lg:px-12">
           <div className="flex justify-between items-center h-14 gap-4">
-            {/* Logo */}
+            {/* Logo - Left */}
             <Link to="/" className="flex items-center gap-2.5 group relative z-50 flex-shrink-0">
               <div className="relative">
                 <div className="w-9 h-9 bg-voltify-gold rounded-lg flex items-center justify-center text-voltify-dark font-black text-base group-hover:shadow-[0_0_20px_rgba(232,160,32,0.4)] transition-all duration-500 shadow-lg">
@@ -416,36 +497,33 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* Right Section - Icons and Hamburger */}
-            <div className="flex items-center gap-2 sm:gap-4 ml-auto">
-              {/* Right Navigation Actions */}
-              <NavUserActions
-                user={user}
-                cartCount={cartCount}
-                onSearchClick={() => setSearchOpen(true)}
-                onLogout={logoutUser}
-                onOpenLogin={() => openModal('login')}
-                onOpenSignup={() => openModal('signup')}
-              />
+            {/* Desktop Navigation Actions - Hidden on mobile */}
+            <NavUserActions
+              user={user}
+              cartCount={cartCount}
+              onSearchClick={() => setSearchOpen(true)}
+              onLogout={logoutUser}
+              onOpenLogin={() => openModal('login')}
+              onOpenSignup={() => openModal('signup')}
+            />
 
-              {/* Hamburger Menu Button - Mobile Only (below lg/1024px) */}
-              <motion.button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 text-voltify-light/60 hover:text-voltify-gold transition-colors min-h-11 min-w-11 flex items-center justify-center"
-                aria-label="Toggle navigation menu"
-                whileTap={{ scale: 0.95 }}
-              >
-                {mobileMenuOpen ? (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                ) : (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
-                )}
-              </motion.button>
-            </div>
+            {/* Hamburger Menu Button - Mobile Only (below lg/1024px) */}
+            <motion.button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-2 text-voltify-light/60 hover:text-voltify-gold transition-colors min-h-11 min-w-11 flex items-center justify-center ml-auto"
+              aria-label="Toggle navigation menu"
+              whileTap={{ scale: 0.95 }}
+            >
+              {mobileMenuOpen ? (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </motion.button>
           </div>
         </div>
       </nav>
