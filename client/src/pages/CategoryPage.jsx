@@ -218,20 +218,20 @@ function ProductCard({ product }) {
       </Link>
 
       {/* Content Section */}
-      <div className="p-4 sm:p-5 flex flex-col flex-grow space-y-2.5" style={{ paddingBottom: '48px', boxSizing: 'border-box' }}>
+      <div className="p-4 sm:p-5 flex flex-col flex-grow space-y-2.5" style={{ paddingBottom: '50px', boxSizing: 'border-box' }}>
         {/* Product Name */}
         <Link to={product.slug && product.category 
           ? `/${product.category.toLowerCase().replace(/\s+/g, '-')}/${product.slug}`
           : `/product/${product._id}`
         } className="block">
           <h3 className="font-semibold text-[13px] text-voltify-light group-hover:text-voltify-gold transition-colors leading-snug" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', maxWidth: '100%' }}>
-            {product.name}
+            {product.name.split(/[,()]/)[0].trim()}
           </h3>
         </Link>
 
-        {/* Color if available */}
-        <p className="text-xs text-voltify-light/50 font-medium" style={{ maxWidth: '100%' }}>
-          {product.color || product.category}
+        {/* Category */}
+        <p className="text-xs text-[#aaaaaa] font-medium" style={{ maxWidth: '100%' }}>
+          {product.category}
         </p>
 
         {/* Rating if available */}
@@ -249,7 +249,7 @@ function ProductCard({ product }) {
 
         {/* Price */}
         <div className="min-w-0" style={{ maxWidth: '100%' }}>
-          <span className="text-base sm:text-lg font-bold text-voltify-gold break-words">
+          <span className="text-sm md:text-base font-bold text-voltify-gold break-words">
             ₹{Number(product.price).toLocaleString('en-IN')}
           </span>
         </div>

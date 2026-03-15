@@ -75,7 +75,7 @@ export default function ProductCard({ product, index }) {
   const handleAddToCart = () => {
     addToCart(product);
     setIsAdded(true);
-    setTimeout(() => setIsAdded(false), 1000);
+    setTimeout(() => setIsAdded(false), 1500);
   };
 
   const handleDecrease = () => {
@@ -101,22 +101,12 @@ export default function ProductCard({ product, index }) {
   const hasDiscount = originalPrice > sellingPrice && sellingPrice > 0;
   const discountPercent = hasDiscount ? Math.round(((originalPrice - sellingPrice) / originalPrice) * 100) : 0;
 
-  // Extract model name and color variant from product name
+  // Extract model name from product name - strip everything after comma or parenthesis
   const getModelAndVariant = () => {
     const name = product.name || '';
-    // Remove brand name and get model (e.g., "Samsung Galaxy A55 5G" → "Galaxy A55 5G")
-    const brands = ['Samsung', 'Apple', 'OnePlus', 'Google', 'Xiaomi', 'Motorola', 'Realme', 'iQOO', 'OPPO', 'Vivo'];
-    let modelName = name;
-    for (const brand of brands) {
-      if (name.startsWith(brand)) {
-        modelName = name.substring(brand.length).trim();
-        break;
-      }
-    }
-    // Extract color if available (usually in parentheses)
-    const colorMatch = name.match(/\((.*?)\)/);
-    const color = colorMatch ? colorMatch[1].split(',')[0].trim() : 'Onyx';
-    return { modelName, color };
+    // Remove everything after first comma or parenthesis
+    let cleanName = name.split(',')[0].split('(')[0].trim();
+    return { modelName: cleanName, color: null };
   };
 
   const { modelName, color } = getModelAndVariant();
@@ -140,10 +130,23 @@ export default function ProductCard({ product, index }) {
       whileHover={{ y: -8 }}
       viewport={{ once: false, amount: 0.3 }}
       transition={{ duration: 0.5, delay: (index % 4) * 0.1 }}
-      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-voltify-light/10 bg-voltify-dark/80 shadow-sm transition-all duration-300 hover:shadow-2xl hover:border-voltify-gold/40 hover:shadow-voltify-gold/15 hover:bg-voltify-dark/90 w-full"
+      style={{
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        overflow: 'hidden',
+        borderRadius: '1rem',
+        border: '1px solid rgba(255,255,255,0.1)',
+        backgroundColor: '#1e1e1e',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+        transition: 'all 300ms ease',
+        width: '100%'
+      }}
+      className="group"
     >
       {/* Product Image Container */}
-      <Link to={productUrl} className="relative overflow-hidden aspect-square block w-full bg-voltify-dark/50">
+      <Link to={productUrl} className="relative overflow-hidden aspect-square block w-full" style={{ backgroundColor: '#1a1a1a', maxWidth: '100%' }}>
         <img
           src={product.image}
           alt={altText}
@@ -151,6 +154,7 @@ export default function ProductCard({ product, index }) {
           height={400}
           loading={shouldLazyLoad ? 'lazy' : 'eager'}
           className="h-full w-full object-contain transition-transform duration-500 ease-out group-hover:scale-105 max-w-full"
+          style={{ mixBlendMode: 'screen' }}
           onError={(e) => {
             e.target.src = 'https://via.placeholder.com/400x400?text=Product';
           }}
@@ -186,17 +190,17 @@ export default function ProductCard({ product, index }) {
       </Link>
 
       {/* Card Content */}
-      <div className="flex flex-grow flex-col p-4 sm:p-5 space-y-2.5 sm:space-y-3">
+      <div className="flex flex-grow flex-col p-4 sm:p-5 space-y-2.5 sm:space-y-3" style={{ paddingBottom: '50px', boxSizing: 'border-box' }}>
         {/* Product Name */}
         <Link to={productUrl} className="block group/title">
-          <h3 className="text-sm sm:text-base font-semibold text-voltify-light leading-snug group-hover/title:text-voltify-gold transition-colors line-clamp-2">
+          <h3 className="text-sm sm:text-base font-semibold text-voltify-light leading-snug group-hover/title:text-voltify-gold transition-colors" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', maxWidth: '100%' }}>
             {modelName}
           </h3>
         </Link>
 
-        {/* Color/Variant */}
-        <p className="text-xs text-voltify-light/50 font-medium">
-          {color}
+        {/* Category */}
+        <p className="text-xs text-voltify-light/50 font-medium" style={{ maxWidth: '100%' }}>
+          {product.category || 'Product'}
         </p>
 
         {/* Rating */}
@@ -211,8 +215,8 @@ export default function ProductCard({ product, index }) {
         <div className="flex-grow" />
 
         {/* Price */}
-        <div>
-          <p className="text-lg sm:text-xl font-bold text-voltify-gold">
+        <div style={{ minWidth: 0 }}>
+          <p className="font-bold text-voltify-gold break-words" style={{ fontSize: 'clamp(12px, 4vw, 18px)' }}>
             ₹{sellingPrice.toLocaleString('en-IN')}
           </p>
           {hasDiscount && (
@@ -224,7 +228,7 @@ export default function ProductCard({ product, index }) {
       </div>
 
       {/* Floating Add to Cart Button - Bottom Right */}
-      <div className="absolute bottom-4 right-4 sm:bottom-5 sm:right-5">
+      <div style={{ position: 'absolute', bottom: '12px', right: '12px' }}>
         {existingItem ? (
           <div className="flex items-center gap-2 bg-voltify-dark/80 backdrop-blur-sm border border-voltify-gold/40 rounded-full px-3 py-2">
             <button
@@ -250,11 +254,11 @@ export default function ProductCard({ product, index }) {
             onClick={handleAddToCart}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center font-bold transition-all duration-300 shadow-lg ${
-              isAdded
-                ? 'bg-emerald-500 text-white'
-                : 'bg-voltify-gold text-voltify-dark hover:shadow-xl hover:bg-yellow-400'
-            }`}
+            className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center font-bold transition-all duration-300 shadow-lg hover:shadow-xl"
+            style={{
+              backgroundColor: isAdded ? '#d68a0f' : '#f5a623',
+              color: '#1a1a1a',
+            }}
             title="Add to cart"
           >
             {isAdded ? (
