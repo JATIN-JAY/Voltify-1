@@ -1,48 +1,88 @@
-# Voltify - E-Commerce Web Application
+# Voltify - Premium E-Commerce Platform
 
-A beautiful, beginner-friendly e-commerce web application built with React, Node.js, and MongoDB. The UI is styled to look like the Apple App Store with premium modern design.
+A full-featured e-commerce platform with advanced merchant capabilities, modern UI/UX, and production-ready architecture. Built with React 18, Node.js, and MongoDB, featuring Google OAuth, Razorpay payments, and an admin dashboard for managing products and orders.
 
-## 🎯 Features
+## ✨ Core Features
 
-- **User Authentication** - Register and login with JWT
-- **Product Catalog** - Browse beautiful product grid with images
-- **Shopping Cart** - Add/remove items, update quantities
-- **Order Management** - Simple checkout with shipping info
-- **Responsive Design** - Mobile-first design that works on all devices
-- **Modern UI** - Apple App Store style with Tailwind CSS
+### For Customers
+- **Account Management** - JWT + Google OAuth authentication, profile management, address management
+- **Product Discovery** - Browse by categories, search with filters, view detailed product pages with SEO slugs
+- **Shopping Experience** - Dynamic cart with localStorage persistence, wishlist functionality, quantity management
+- **Payments** - Seamless Razorpay integration for secure transactions
+- **Order Tracking** - View order history with detailed status tracking
+- **Reviews & Feedback** - Customer feedback submission and ratings system
+
+### For Sellers
+- **Merchant Dashboard** - Register and manage seller accounts
+- **Product Management** - Add/edit/delete products with image upload via Cloudinary
+- **Order Management** - View and manage seller orders
+- **Earnings Tracking** - Monitor commission-based earnings
+- **Inventory Control** - Manage product stock and availability
+
+### For Admins
+- **Admin Dashboard** - Full platform oversight and management
+- **Product Administration** - CRUD operations, bulk management, stock control
+- **Order Management** - Process, track, and fulfill all platform orders
+- **Seller Management** - Approve/manage seller accounts and commissions
+- **User Management** - Manage customer and seller accounts
 
 ## 🛠️ Tech Stack
 
 ### Backend
-- Node.js + Express.js
-- MongoDB with Mongoose
-- JWT for authentication
-- bcryptjs for password hashing
+- **Runtime**: Node.js with Express.js 4.x
+- **Database**: MongoDB with Mongoose ODM
+- **Authentication**: JWT (JsonWebToken) + Google OAuth Library
+- **Security**: bcryptjs for password hashing, CORS enabled
+- **Payment**: Razorpay SDK integration
+- **Image Storage**: Cloudinary for media management
+- **Image Processing**: Sharp for optimization
+- **Email**: Nodemailer for transactional emails
+- **File Upload**: Multer middleware
+- **Environment**: dotenv for configuration
 
 ### Frontend
-- React 18 with Vite
-- Tailwind CSS for styling
-- React Router DOM for navigation
-- Axios for API calls
-- Context API for state management
+- **Framework**: React 18 with Vite bundler
+- **Styling**: Tailwind CSS 3.x + custom CSS
+- **Routing**: React Router DOM v6
+- **State Management**: React Context API
+- **HTTP Client**: Axios
+- **Authentication**: Google OAuth (@react-oauth/google)
+- **Animations**: Framer Motion for smooth transitions
+- **Icons**: Lucide React for scalable SVG icons
+- **SEO**: React Helmet Async for meta tags
+- **JWT Decoding**: jwt-decode for token parsing
 
 ## 📁 Project Structure
 
 ```
-zapvi clone/
+Voltify/
 ├── server/
 │   ├── models/
 │   │   ├── User.js
 │   │   ├── Product.js
-│   │   └── Order.js
+│   │   ├── SellerProduct.js
+│   │   ├── Seller.js
+│   │   ├── Order.js
+│   │   ├── SellerEarnings.js
+│   │   └── Feedback.js
 │   ├── routes/
 │   │   ├── auth.js
+│   │   ├── google-auth.js
 │   │   ├── products.js
-│   │   └── orders.js
+│   │   ├── sellers.js
+│   │   ├── orders.js
+│   │   ├── payment.js
+│   │   └── feedback.js
 │   ├── middleware/
 │   │   └── auth.js
+│   ├── utils/
+│   │   ├── imageOptimization.js
+│   │   ├── productDataUtils.js
+│   │   └── slugify.js
 │   ├── server.js
 │   ├── seed.js
+│   ├── create-admin.js
+│   ├── migrate-slugs.js
 │   ├── package.json
 │   └── .env
 └── client/
@@ -50,31 +90,63 @@ zapvi clone/
     │   ├── components/
     │   │   ├── Navbar.jsx
     │   │   ├── HeroSection.jsx
-    │   │   └── ProductGrid.jsx
+    │   │   ├── ProductGrid.jsx
+    │   │   ├── ProductForm.jsx
+    │   │   ├── RazorpayCheckout.jsx
+    │   │   ├── AdminSidebar.jsx
+    │   │   ├── ConfirmationModal.jsx
+    │   │   ├── SearchOverlay.jsx
+    │   │   └── shared/
     │   ├── pages/
-    │   │   ├── RegisterPage.jsx
+    │   │   ├── HomePage.jsx
+    │   │   ├── ProductDetailPage.jsx
+    │   │   ├── CartPage.jsx
     │   │   ├── LoginPage.jsx
-    │   │   └── CartPage.jsx
+    │   │   ├── RegisterPage.jsx
+    │   │   ├── AdminDashboard.jsx
+    │   │   ├── AdminProductsPage.jsx
+    │   │   ├── AdminProductAddPage.jsx
+    │   │   ├── AdminProductEditPage.jsx
+    │   │   ├── BecomeSellerPage.jsx
+    │   │   ├── SellerStatusPage.jsx
+    │   │   ├── WishlistPage.jsx
+    │   │   ├── OrdersPage.jsx
+    │   │   └── ProfilePage.jsx
     │   ├── context/
-    │   │   └── CartContext.jsx
+    │   │   ├── CartContext.jsx
+    │   │   ├── GoogleAuthContext.jsx
+    │   │   ├── ModalContext.jsx
+    │   │   └── Spotlight.jsx
+    │   ├── hooks/
+    │   │   ├── useLogin.js
+    │   │   ├── useRegister.js
+    │   │   ├── useAdminDashboard.js
+    │   │   ├── useProductForm.js
+    │   │   ├── useFeedback.js
+    │   │   └── [15+ custom hooks]
     │   ├── layouts/
     │   │   └── MainLayout.jsx
+    │   ├── styles/
+    │   ├── utils/
+    │   ├── constants/
     │   ├── App.jsx
     │   ├── main.jsx
     │   └── index.css
     ├── vite.config.js
     ├── tailwind.config.js
-    ├── postcss.config.js
     ├── package.json
     └── index.html
 ```
 
-## 🚀 Setup Instructions
+
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js (v16 or higher)
-- MongoDB (running locally or Atlas connection string)
-- npm or yarn
+- Node.js v16+ and npm
+- MongoDB (local or MongoDB Atlas cloud connection)
+- Cloudinary account (for image uploads)
+- Razorpay account (for payments)
+- Google OAuth credentials (optional, for social login)
 
 ### Backend Setup
 
@@ -90,29 +162,38 @@ zapvi clone/
 
 3. **Configure environment variables:**
    
-   Edit `.env` file:
-   ```
+   Create `.env` file in the server directory:
+   ```env
    PORT=5000
-   MONGODB_URI=mongodb://localhost:27017/ecommerce
-   JWT_SECRET=your_secret_key_here_change_in_production
+   MONGODB_URI=mongodb://localhost:27017/voltify
+   JWT_SECRET=your_jwt_secret_key_here
+   CLOUDINARY_NAME=your_cloudinary_name
+   CLOUDINARY_API_KEY=your_api_key
+   CLOUDINARY_API_SECRET=your_api_secret
+   RAZORPAY_KEY_ID=your_razorpay_key
+   RAZORPAY_KEY_SECRET=your_razorpay_secret
+   GOOGLE_CLIENT_ID=your_google_client_id
+   GOOGLE_CLIENT_SECRET=your_google_client_secret
    ```
 
-4. **Seed the database with sample products:**
+4. **Seed the database:**
    ```bash
    node seed.js
    ```
 
-5. **Start the backend server:**
+5. **Create admin account:**
+   ```bash
+   node create-admin.js
+   ```
+
+6. **Start the backend:**
    ```bash
    npm start
-   ```
-   
-   Or with auto-reload (requires nodemon):
-   ```bash
+   # or for development with auto-reload:
    npm run dev
    ```
 
-The backend will run on `http://localhost:5000`
+   Backend runs on `http://localhost:5000`
 
 ### Frontend Setup
 
@@ -126,167 +207,209 @@ The backend will run on `http://localhost:5000`
    npm install
    ```
 
-3. **Start the development server:**
+3. **Start development server:**
    ```bash
    npm run dev
    ```
 
-The frontend will run on `http://localhost:3000`
+   Frontend runs on `http://localhost:3000`
 
-## 📝 API Endpoints
+## 🔑 API Endpoints
 
-### Authentication
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - Login user
+### Authentication Routes
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login with JWT
+- `POST /api/auth/google` - Google OAuth authentication
+- `POST /api/auth/logout` - Logout user
 
-### Products
-- `GET /api/products` - Get all products
-- `GET /api/products/:id` - Get a single product
+### Products Routes
+- `GET /api/products` - Get all products with filters
+- `GET /api/products/:slug` - Get product by slug (SEO-friendly)
+- `GET /api/products/category/:category` - Get products by category
+- `POST /api/products` - Create product (admin/seller)
+- `PUT /api/products/:id` - Update product
+- `DELETE /api/products/:id` - Delete product
 
-### Orders
-- `POST /api/orders` - Create a new order (requires JWT)
-- `GET /api/orders` - Get user's orders (requires JWT)
+### Orders Routes
+- `POST /api/orders` - Create order (JWT required)
+- `GET /api/orders` - Get user/seller orders (JWT required)
+- `GET /api/orders/:id` - Get order details
+- `PUT /api/orders/:id` - Update order status
+
+### Payments Routes
+- `POST /api/payment/create-order` - Create Razorpay order
+- `POST /api/payment/verify` - Verify payment signature
+
+### Sellers Routes
+- `POST /api/sellers/register` - Register as seller
+- `GET /api/sellers/:id` - Get seller details
+- `PUT /api/sellers/:id` - Update seller profile
+- `GET /api/sellers/:id/earnings` - Get seller earnings
+
+### Feedback Routes
+- `POST /api/feedback` - Submit customer feedback
+- `GET /api/feedback` - Get all feedback
 
 ## 🎨 Design Features
 
-The UI is designed with Apple App Store aesthetics:
+- **Modern Premium UI** - Clean, professional design with smooth animations
+- **Responsive Layout** - Mobile-first design that scales to all devices
+- **Dark/Light Theme** - Support for theme preferences
+- **Smooth Animations** - Framer Motion for delightful interactions
+- **Accessibility** - WCAG compliant with proper color contrast and ARIA labels
+- **SEO Optimized** - URL slugs, meta tags, structured data
+- **Image Optimization** - Cloudinary integration with Sharp compression
 
-- **Clean white background** with soft gray accent sections
-- **Premium rounded corners** (rounded-2xl, rounded-xl)
-- **Smooth hover animations** with scale and shadow effects
-- **Gradient accents** using blue and purple
-- **Large, high-quality product images**
-- **Sticky navigation bar** with cart badge
-- **Generous spacing** for a premium feel
-- **Modern button styles** with hover states
-- **Smooth transitions** on all interactive elements
+## 🔐 Authentication & Security
 
-## 🔐 Authentication Flow
+**User Authentication Flow:**
+1. User registers/logs in with email and password
+2. Password is securely hashed using bcryptjs
+3. JWT token issued and stored in localStorage
+4. Token sent in Authorization header for protected routes
+5. Google OAuth for single-sign-on alternative
 
-1. User registers with name, email, and password
-2. Password is hashed with bcryptjs
-3. JWT token is generated and stored in localStorage
-4. Token is sent in Authorization header for protected routes
-5. User can logout to clear token and session
+**Security Best Practices:**
+- JWT tokens with expiration
+- Password hashing with bcryptjs
+- CORS enabled for frontend domain only
+- Input validation on server side
+- Secure Razorpay payment processing
+- Environment variables for sensitive data
+- Role-based access control (user, seller, admin)
 
-## 🛒 Cart System
+## 🛍️ Shopping Experience
 
-- **Context API** manages cart state globally
-- Cart data persists in localStorage
-- Add/remove/update quantity functionality
-- Real-time total price calculation
-- Cart badge shows item count
+**Cart Management:**
+- Global cart state using Context API
+- Persistent storage in localStorage
+- Real-time quantity and price updates
+- Add/remove/update cart items
+- Cart badge showing item count
 
-## 📦 Sample Products
+**Checkout Process:**
+1. Review cart items and totals
+2. Enter/select shipping address
+3. Process payment via Razorpay
+4. Order confirmation and tracking
+5. Email confirmation sent to customer
 
-The seed script includes 12 sample products:
-- Wireless Headphones
-- Smart Watch
-- USB-C Charger
-- Portable SSD
-- Mechanical Keyboard
-- Webcam
-- Phone Stand
-- Desk Lamp
-- Power Bank
-- Screen Protector
-- Laptop Cooling Pad
-- USB Hub
+## 💰 Payment Processing
 
-All with product images from Unsplash.
+- **Razorpay Integration** - Secure payment gateway for Indian merchants
+- **Order Verification** - Cryptographic signature validation
+- **Multiple Payment Methods** - Support for cards, UPI, wallets
+- **Instant Notifications** - Real-time order status updates
 
-## 🔧 Important Files Explained
+## 📊 Admin & Seller Dashboards
 
-### Backend
+**Admin Features:**
+- Product CRUD with bulk operations
+- Order management and fulfillment
+- Seller account approval and management
+- Commission tracking and payouts
+- User analytics and reports
+- System-wide inventory control
 
-**server.js** - Main server file that:
-- Sets up Express app
-- Connects to MongoDB
-- Mounts all route handlers
-- Starts the server on port 5000
+**Seller Features:**
+- Product listing and management
+- Order tracking with customer details
+- Earnings dashboard with commission breakdown
+- Inventory monitoring
+- Sales analytics
+- Payout management
 
-**models/User.js** - User schema with name, email, hashed password
+## 📱 Responsive Breakpoints
 
-**models/Product.js** - Product schema with name, price, description, image
-
-**models/Order.js** - Order schema linking users to products with shipping info
-
-**routes/auth.js** - Register and login endpoints with password hashing
-
-**routes/products.js** - GET endpoints to fetch all/single products
-
-**routes/orders.js** - POST/GET orders (protected with JWT)
-
-**middleware/auth.js** - JWT verification middleware for protected routes
-
-### Frontend
-
-**App.jsx** - Main component with Router and routes setup
-
-**CartContext.jsx** - Global state for user, cart items, and cart functions
-
-**Navbar.jsx** - Sticky navigation with logo, links, cart badge, user menu
-
-**HeroSection.jsx** - Premium hero banner with CTA buttons
-
-**ProductGrid.jsx** - Fetches products from API and displays in grid
-
-**CartPage.jsx** - Shopping cart with items list, quantity controls, checkout form
-
-**RegisterPage.jsx** & **LoginPage.jsx** - Auth forms with error handling
-
-## 🚀 Development Tips
-
-1. **Test authentication:**
-   - Register a test user
-   - Login and verify token is saved
-   - Try logout and login again
-
-2. **Test products:**
-   - Add items to cart
-   - Verify cart persists after page refresh
-   - Check total price calculation
-
-3. **Test checkout:**
-   - Make sure you're logged in
-   - Fill shipping info
-   - Verify order is saved in database
-
-4. **Style tweaks:**
-   - Tailwind CSS config in `tailwind.config.js`
-   - Custom CSS in `client/src/index.css`
-   - Component styles are inline with Tailwind classes
-
-## 📱 Responsive Design
-
-The app is mobile-first:
 - **Mobile** (default) - Full width, stacked layout
-- **Tablet** (md:) - 2-column layouts
-- **Desktop** (lg:) - 3-4 column layouts for products
+- **Tablet** (md: 768px) - 2-column layouts
+- **Desktop** (lg: 1024px) - 3-4 column layouts
+- **Large Desktop** (xl: 1280px) - Full multi-column layouts
 
-## 🎓 Learning Notes
+## 🔧 Development Guide
 
-This is built to be **beginner-friendly**:
-- No complex design patterns (no Redux, MobX, etc.)
-- Simple folder structure
-- Clear, readable code with comments
-- Context API for simple state management
-- Straightforward API calls with Axios
+**Key Technologies:**
+- **State Management**: React Context API for global state
+- **Component Library**: 20+ reusable components
+- **Custom Hooks**: 15+ hooks for common functionality
+- **API Integration**: Axios with interceptors for JWT
+- **Form Handling**: Custom validation with error messages
+- **Image Upload**: Cloudinary with drag-and-drop support
 
-## 🔐 Security Notes
+**Testing the Features:**
 
-For production:
-1. Change JWT_SECRET in .env
-2. Enable HTTPS
-3. Add input validation on backend
-4. Implement rate limiting
-5. Use environment variables for sensitive data
-6. Add CORS restrictions
+1. **Customer Flow:**
+   - Register/Login
+   - Browse products and categories
+   - Add items to cart and wishlist
+   - Complete checkout with Razorpay
+   - View order history
+
+2. **Seller Flow:**
+   - Register as seller
+   - Add products with images
+   - Manage inventory
+   - View orders and earnings
+   - Track sales
+
+3. **Admin Flow:**
+   - Access admin dashboard
+   - Manage all products and orders
+   - Approve seller registrations
+   - View analytics
+
+## 📦 Database Models
+
+- **User** - Customer accounts with authentication
+- **Product** - Product catalog with metadata and images
+- **SellerProduct** - Products added by sellers
+- **Seller** - Merchant accounts and commissions
+- **Order** - Customer orders with items and status
+- **SellerEarnings** - Commission tracking for sellers
+- **Feedback** - Customer reviews and ratings
+
+## 🎯 Key Features Implemented
+
+✅ JWT + Google OAuth authentication  
+✅ Role-based access control (Customer, Seller, Admin)  
+✅ Product catalog with SEO-friendly slugs  
+✅ Advanced cart and wishlist system  
+✅ Razorpay payment integration  
+✅ Order tracking and management  
+✅ Admin dashboard  
+✅ Seller dashboard  
+✅ Image uploads to Cloudinary  
+✅ Customer feedback system  
+✅ Responsive mobile design  
+✅ Email notifications  
+✅ Search and filtering  
+✅ Category browsing  
+✅ Inventory management  
+
+## 📚 Documentation
+
+- [Quick Start Guide](./QUICKSTART.md)
+- [Admin Setup](./ADMIN_SETUP.md)
+- [Google OAuth Setup](./GOOGLE_OAUTH_SETUP.md)
+- [React Optimizations](./REACT_OPTIMIZATIONS.md)
+
+## 🚀 Deployment Ready
+
+This project is built with production in mind:
+- Environment-based configuration
+- Image optimization with Sharp
+- Cloudinary CDN for fast delivery
+- Secure payment processing
+- JWT with token expiration
+- Database indexing for performance
+- Error handling and logging
+- CORS and security headers
+- Ready for Docker containerization
 
 ## 📄 License
 
-This project is open source and available for educational purposes.
+Open source project for educational and commercial use.
 
 ---
 
-**Built with ❤️ for beginners**
+**Built with modern best practices for enterprise e-commerce** ✨
