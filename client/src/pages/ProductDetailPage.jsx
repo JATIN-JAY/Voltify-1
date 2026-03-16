@@ -324,6 +324,26 @@ export default function ProductDetailPage() {
               width: 100%;
               overflow: hidden;
             }
+            .mobile-top-section {
+              display: flex;
+              gap: 12px;
+              align-items: flex-start;
+              width: 100%;
+            }
+            .mobile-category-text {
+              flex: 1;
+              min-width: 0;
+            }
+            .mobile-thumbnails {
+              flex-shrink: 0;
+              display: flex;
+              flex-direction: column;
+              gap: 4px;
+              width: 50px;
+              overflow-y: auto;
+              max-height: 200px;
+              padding-right: 4px;
+            }
           }
         `}</style>
 
@@ -370,8 +390,8 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            {/* Thumbnail Images - Gallery below main image */}
-            <div className="flex gap-1 md:gap-3 w-full overflow-x-auto pb-2 mb-6 md:mb-0 -mx-1 px-1">
+            {/* Thumbnail Images - Gallery below main image (Desktop only) */}
+            <div className="hidden md:flex gap-1 md:gap-3 w-full overflow-x-auto pb-2 mb-6 md:mb-0 -mx-1 px-1">
               {thumbnailImages.map((img, idx) => (
                 <button
                   key={idx}
@@ -406,8 +426,46 @@ export default function ProductDetailPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.15 }}
           >
-            <div>
+            {/* Mobile Top Section: Category text + thumbnails on right */}
+            <div className="md:hidden mobile-top-section">
+              <div className="mobile-category-text">
+                <p className="text-xs font-semibold text-voltify-light/50 mb-2 md:mb-3 uppercase tracking-wider">{product.category}</p>
+              </div>
+              {/* Thumbnail Images - Mobile: on right side */}
+              <div className="mobile-thumbnails">
+                {thumbnailImages.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setMainImageIndex(idx)}
+                    className={`flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                      mainImageIndex === idx
+                        ? 'border-voltify-gold shadow-lg scale-105'
+                        : 'border-voltify-light/20 hover:border-voltify-light/40'
+                    }`}
+                    title={`View ${idx + 1}`}
+                  >
+                    <img
+                      src={img || 'https://via.placeholder.com/100x100'}
+                      alt={`${product.brand} ${product.name} view ${idx + 1} - Buy on Voltify`}
+                      width={100}
+                      height={100}
+                      loading="eager"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.src = 'https://via.placeholder.com/100x100';
+                      }}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Desktop: Category text stays here */}
+            <div className="hidden md:block">
               <p className="text-xs font-semibold text-voltify-light/50 mb-2 md:mb-3 uppercase tracking-wider">{product.category}</p>
+            </div>
+
+            <div>
               <h1 className="text-xl md:text-2xl font-display font-semibold text-voltify-light mb-1 md:mb-2 leading-tight">
                 {product.name}
               </h1>

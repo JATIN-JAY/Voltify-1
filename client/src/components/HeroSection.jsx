@@ -149,7 +149,7 @@ const HeroSection = memo(function HeroSection() {
 
       <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-6 lg:px-8 pt-0 pb-20 lg:pt-24 lg:pb-24 mt-0">
         
-        <div className="grid items-stretch gap-6 lg:grid-cols-2 lg:gap-24">
+        <div className="grid items-stretch gap-4 md:gap-6 lg:grid-cols-2 lg:gap-24">
           
           {/* LEFT COLUMN - Content */}
           <div className="flex flex-col justify-between">
@@ -193,14 +193,13 @@ const HeroSection = memo(function HeroSection() {
 
             {/* CTA Buttons - Fade + slide at 1000ms */}
             <div 
-              className="flex flex-col md:flex-row flex-wrap gap-4 mb-14 hero-cta-fade md:items-center"
+              className="flex flex-col md:flex-row flex-wrap gap-3 mb-5 hero-cta-fade md:items-center md:gap-4 md:mb-6"
             >
               <button
                 type="button"
                 onClick={handleBrowseProducts}
-                className="group relative px-6 py-3 bg-voltify-gold text-voltify-dark font-black text-sm uppercase tracking-widest rounded-lg transition-all duration-300 hover:shadow-[0_20px_40px_rgba(232,160,32,0.3)] hover:-translate-y-1 active:translate-y-0 touch-target"
+                className="group relative px-6 py-3 bg-voltify-gold text-voltify-dark font-black text-sm uppercase tracking-widest rounded-lg transition-all duration-300 hover:shadow-[0_20px_40px_rgba(232,160,32,0.3)] hover:-translate-y-1 active:translate-y-0 touch-target w-full md:w-fit"
                 style={{
-                  width: 'fit-content',
                   minWidth: '220px',
                   height: '48px',
                   paddingLeft: '24px',
@@ -219,9 +218,8 @@ const HeroSection = memo(function HeroSection() {
               {!user && (
                 <button
                   onClick={() => openModal('signup')}
-                  className="px-6 font-semibold text-sm uppercase tracking-wide rounded-lg transition-all touch-target"
+                  className="px-6 font-semibold text-sm uppercase tracking-wide rounded-lg transition-all touch-target w-full md:w-fit"
                   style={{
-                    width: 'fit-content',
                     minWidth: '220px',
                     height: '48px',
                     display: 'flex',
@@ -241,7 +239,7 @@ const HeroSection = memo(function HeroSection() {
           </div>
 
           {/* RIGHT COLUMN - Featured Product - Fade from right at 300ms */}
-          <div className="relative mt-8 sm:mt-0 lg:-mr-8 lg:mt-0 hero-featured-fade-right w-full">
+          <div className="relative mt-4 sm:mt-0 lg:-mr-8 lg:mt-0 hero-featured-fade-right w-full">
             <div className="relative">
               {/* Clean Product Card Container - Mobile Optimized */}
               <div className="bg-voltify-dark/80 rounded-xl border border-voltify-border shadow-[0_15px_45px_rgba(0,0,0,0.3)] overflow-hidden max-h-96 sm:max-h-none lg:max-h-none">

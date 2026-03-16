@@ -285,9 +285,17 @@ export default function Footer() {
       </div>
 
       {/* Floating Feedback Button */}
+      <style>{`
+        .feedback-button-fixed {
+          position: fixed !important;
+          bottom: 20px !important;
+          right: 16px !important;
+          z-index: 999 !important;
+        }
+      `}</style>
       <motion.button
         onClick={() => setIsFeedbackOpen(true)}
-        className="fixed bottom-8 right-8 bg-amber-400 hover:bg-amber-500 text-black rounded-full p-4 shadow-lg z-40 flex items-center gap-2 font-semibold text-sm md:px-6 md:py-3 md:rounded-full"
+        className="feedback-button-fixed bg-amber-400 hover:bg-amber-500 text-black rounded-full p-4 shadow-lg flex items-center gap-2 font-semibold text-sm md:px-6 md:py-3 md:rounded-full"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         aria-label="Send feedback"
