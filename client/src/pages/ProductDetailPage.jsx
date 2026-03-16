@@ -320,7 +320,7 @@ export default function ProductDetailPage() {
             .product-detail-sticky-grid {
               display: grid;
               grid-template-columns: 1fr;
-              gap: 24px;
+              gap: 72px;
               width: 100%;
               overflow: hidden;
             }
@@ -371,12 +371,12 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Thumbnail Images - Gallery below main image */}
-            <div className="flex gap-1.5 md:gap-3 w-full overflow-x-auto pb-1 -mx-1 px-1">
+            <div className="flex gap-1 md:gap-3 w-full overflow-x-auto pb-2 mb-6 md:mb-0 -mx-1 px-1">
               {thumbnailImages.map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => setMainImageIndex(idx)}
-                  className={`flex-shrink-0 w-13 md:w-20 h-13 md:h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                  className={`flex-shrink-0 w-10 md:w-20 h-10 md:h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
                     mainImageIndex === idx
                       ? 'border-voltify-gold shadow-lg scale-105'
                       : 'border-voltify-light/20 hover:border-voltify-light/40'
