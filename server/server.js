@@ -21,8 +21,20 @@ if (!process.env.MONGODB_URI) {
   process.exit(1);
 }
 
+// CORS Configuration
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'https://voltify-1.vercel.app',
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // MongoDB Connection

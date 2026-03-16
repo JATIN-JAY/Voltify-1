@@ -60,8 +60,25 @@ router.post('/signin', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Google auth error:', error);
-    res.status(401).json({ error: 'Invalid Google token' });
+    console.error('Google auth error:', error.message);
+    
+    // Better error handling for debugging
+    if (error.message.includes('Invalid value for audience')) {
+      res.status(401).json({ 
+        error: 'Invalid Google Client ID. Check GOOGLE_CLIENT_ID in .env',
+        details: 'GOOGLE_CLIENT_ID might not match Google Console credentials'
+      });
+    } else if (error.message.includes('Audience mismatch')) {
+      res.status(401).json({ 
+        error: 'Google token audience mismatch',
+        details: 'Token was issued for different client'
+      });
+    } else {
+      res.status(401).json({ 
+        error: 'Google authentication failed',
+        details: error.message 
+      });
+    }
   }
 });
 
