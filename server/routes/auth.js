@@ -23,7 +23,7 @@ router.post('/register', async (req, res) => {
     const { name, email, password } = req.body;
 
     // Check if user exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists' });
     }
@@ -34,7 +34,7 @@ router.post('/register', async (req, res) => {
     // Create user
     const user = new User({
       name,
-      email,
+      email: email.toLowerCase(),
       password: hashedPassword,
     });
 
@@ -60,7 +60,7 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     // Find user
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
